@@ -1,29 +1,34 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Menu } from "semantic-ui-react";
+import { Menu, MenuMenu, Button, MenuItem } from "semantic-ui-react";
 
-export default function MenuSistema (props) {
+export default function MenuSistema(props) {
+  return (
+    <>
+      <Menu>
+        <Menu.Item
+          content={<span style={{ fontFamily: 'Roboto, sans-serif', fontSize: '20px', fontWeight: 'bold' }}>EVENTS</span>}
+          active={props.tela === "home"}
+          as={Link}
+          to="/"
+        />
 
-   return(
-       <>
-           <Menu inverted>
-              
-               <Menu.Item
-                   content='Home'
-                   active={props.tela === 'home'}
-                   as={Link}
-                   to='/'
-               />
+        <MenuMenu position="right">
+          <Menu>
+            <MenuItem 
+              content="Login"
+              active={props.tela === "Login"}
+              as={Link}
+              to="/form-cliente">
+              <Button primary>Sign up</Button>
+            </MenuItem>
 
-               <Menu.Item
-                   content='Cliente'
-                   active={props.tela === 'cliente'}
-                   as={Link}
-                   to='/form-cliente'
-               />
-           
-
-           </Menu>
-       </>
-   )
+            <MenuItem>
+              <Button>Log-in</Button>
+            </MenuItem>
+          </Menu>
+        </MenuMenu>
+      </Menu>
+    </>
+  );
 }

@@ -1,32 +1,51 @@
 import React from "react";
-import { Container, Grid, Image } from 'semantic-ui-react';
-import MenuSistema from '../../MenuSistema';
-export default function Home () {
+import { Container, Grid, Header, Button, Segment } from 'semantic-ui-react';
+import MenuSistema from "../../MenuSistema";
 
-   return(
-       <div>
-        
-<MenuSistema tela={'home'} />
+export default function Home() {
+    return (
+        <div>
+            {/* MenuSistema atualizado */}
+            <MenuSistema tela={'Home'} />
 
-           <div style={{marginTop: '5%'}}>
-               <Container>
-                   <Grid columns={2} divided>
-                       <Grid.Row>
-                           <Grid.Column>
-                               <Image src='/logo-IFPE.png' size='large' />
-                           </Grid.Column>
-                           <Grid.Column>
-                              
-                               Bem vindo ao sistema <strong>Eventos</strong> ! <br/>
-                               Este sistema foi desenvolvido na disciplina de Projeto e Prática. <br/> <br/>
-                               Para acessar o código da <strong>API</strong> do sistema, acesse: <a href='https://github.com/StephanieCaroll/eventos-backend' target='_blank'> https://github.com/StephanieCaroll/eventos-backend </a> <br/> <br/>
-                               Para acessar o código do <strong>Módulo WEB</strong>, acesse: <a href='https://github.com/StephanieCaroll/eventos-frontend' target='_blank'> https://github.com/StephanieCaroll/eventos-frontend </a>
+            {/* Conteúdo principal */}
+            <Container style={{ marginTop: '5%', textAlign: 'center' }}>
+                <Header as='h1' style={{ color: '#000', fontSize: '3em', fontWeight: 'bold', marginTop: '100px' }}>
+                    Bem-Vindo ao Events Stands
+                </Header>
 
-                           </Grid.Column>
-                       </Grid.Row>
-                   </Grid>
-               </Container>
-           </div>
-       </div>
-   )
+                <Grid columns={1} centered>
+                    <Grid.Row>
+                        <Grid.Column verticalAlign='middle' style={{ marginTop: '10px' }}>
+                            <p>junte-se a nós para uma experiência inesquecível</p>
+                            <Button color='blue' size='large' style={{ marginTop: '20px' }}>
+                                Veja os Stands
+                            </Button>
+                        </Grid.Column>
+                    </Grid.Row>
+                </Grid>
+            </Container>
+
+            <Segment vertical style={{ padding: '5%', textAlign: 'center' }}>
+                <Container>
+                    <Grid columns={3} stackable textAlign="center">
+                        <Grid.Row>
+                            <Grid.Column>
+                                <Header as='h3'>Localização</Header>
+                                   <p>Em desenvolvimento...</p>
+                            </Grid.Column>
+                            <Grid.Column>
+                                <Header as='h3'>Data e Horário</Header>
+                                   <p>Em desenvolvimento...</p>
+                            </Grid.Column>
+                            <Grid.Column>
+                                <Header as='h3'>Stands em Destaque</Header>
+                                <p>Em desenvolvimento...</p>
+                            </Grid.Column>
+                        </Grid.Row>
+                    </Grid>
+                </Container>
+            </Segment>
+        </div>
+    );
 }
