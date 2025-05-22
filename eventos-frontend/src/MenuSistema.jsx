@@ -20,11 +20,11 @@ export default function MenuSistema(props) {
               active={props.tela === "Login"}
               as={Link}
               to="/form-cliente">
-              <Button primary>Sign up</Button>
+              <Button primary>Criar</Button>
             </MenuItem>
 
             <MenuItem>
-              <Button>Log-in</Button>
+              <Button>Entrar</Button>
             </MenuItem>
           </Menu>
         </MenuMenu>
