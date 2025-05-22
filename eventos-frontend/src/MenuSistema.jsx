@@ -26,6 +26,14 @@ export default function MenuSistema(props) {
             <MenuItem>
               <Button>Entrar</Button>
             </MenuItem>
+
+  <MenuItem content="Login"
+              active={props.tela === "Dono"}
+              as={Link}
+              to="/form-dono">
+              <Button>Dono</Button>
+            </MenuItem>
+
           </Menu>
         </MenuMenu>
       </Menu>

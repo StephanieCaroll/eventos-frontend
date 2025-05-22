@@ -1,6 +1,7 @@
 import React from "react";
 import { Container, Grid, Header, Button, Segment } from 'semantic-ui-react';
 import MenuSistema from "../../MenuSistema";
+import { Link } from "react-router-dom";
 
 export default function Home() {
     return (
