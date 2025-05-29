@@ -20,15 +20,15 @@ export default function MenuSistema(props) {
           <Button>Dono</Button>
         </MenuItem>
 
-          <MenuItem
-            content="Login"
-            active={props.tela === "cliente"}
-            as={Link}
-            to="/cliente-login">
-            <Button primary>Login</Button>
-          </MenuItem>
+        <MenuItem
+          content="Login"
+          active={props.tela === "cliente"}
+          as={Link}
+          to="/cliente-login">
+          <Button primary>Login</Button>
+        </MenuItem>
 
-        </Menu>
+      </Menu>
     </>
   );
 }
