@@ -39,7 +39,7 @@ export default function LoginCliente() {
                     transition={{ duration: 0.5 }}
                     style={{ width: 370, background: '#fff', borderRadius: 16, boxShadow: '0 4px 24px #e0e7ef', padding: 40, textAlign: 'center' }}
                 >
-                    <h2 style={{ color: '#1677ff', fontWeight: 700, fontSize: 28, marginBottom: 24 }}>Login do Cliente</h2>
+                    <h2 style={{ color: '#1677ff', fontWeight: 700, fontSize: 28, marginBottom: 24 }}>Expositor</h2>
                     <form onSubmit={handleLogin}>
                         <div style={{ marginBottom: 18, textAlign: 'left' }}>
                             <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, color: '#444', fontSize: 15 }}>E-mail</label>

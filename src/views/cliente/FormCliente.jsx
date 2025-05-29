@@ -57,7 +57,7 @@ export default function FormCliente() {
         >
           <h2 style={{ color: "#222", marginBottom: 16, fontWeight: 700, fontSize: 28, letterSpacing: 0.5 }}>
             <span style={{ color: "#8c8c8c", fontWeight: 400 }}>
-              Cliente &nbsp;
+              Expositor &nbsp;
               <span style={{ fontSize: 18, verticalAlign: "middle" }}>&raquo;</span>
             </span>
             &nbsp;Cadastro
