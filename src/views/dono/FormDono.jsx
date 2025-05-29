@@ -283,7 +283,7 @@ export default function FormDono() {
               </motion.div>
             )}
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 36, gap: 16 }}>
-              <Link to={"/"} style={{ textDecoration: 'none' }}>
+              <Link to={"/dono-login"} style={{ textDecoration: 'none' }}>
                 <motion.button
                   type="button"
                   whileHover={{ scale: 1.05, backgroundColor: '#ffd591' }}

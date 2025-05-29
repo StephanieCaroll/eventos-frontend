@@ -16,7 +16,7 @@ export default function MenuSistema(props) {
           content="Dono"
           active={props.tela === "Dono"}
           as={Link}
-          to="/form-dono">
+          to="/dono-login">
           <Button>Dono</Button>
         </MenuItem>
 

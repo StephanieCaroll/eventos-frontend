@@ -20,7 +20,7 @@ export default function LoginCliente() {
                 body: JSON.stringify({ email, senha })
             });
             if (response.ok) {
-                navigate("/cliente/dashboard");
+                navigate("/");
             } else {
                 setErro("E-mail ou senha inválidos.");
             }
