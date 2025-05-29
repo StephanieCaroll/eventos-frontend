@@ -89,7 +89,6 @@ export default function FormDono() {
             style={{ marginTop: 12 }}
             onSubmit={e => { e.preventDefault(); salvar(); }}
           >
-            <h3 style={{ marginBottom: 18, color: '#1677ff', fontWeight: 600 }}> Dados Pessoais</h3>
             {/* Nome e Razão Social */}
             <div style={{ display: "flex", gap: 20, marginBottom: 20, flexWrap: 'wrap' }}>
               <div style={{ flex: 1, minWidth: 220 }}>
@@ -168,99 +167,6 @@ export default function FormDono() {
                   value={dataNascimento}
                   onChange={e => setDataNascimento(e.target.value)}
                   style={{ width: "100%", padding: '12px 14px', borderRadius: 8, border: "1.5px solid #e0e7ef", fontSize: 15, background: '#fafbfc', outline: 'none', transition: 'border 0.2s' }}
-                />
-              </div>
-            </div>
-            <hr style={{ margin: "28px 0 24px 0", border: 0, borderTop: "1.5px solid #f0f0f0" }} />
-            <h3 style={{ marginBottom: 18, color: '#1677ff', fontWeight: 600 }}>Dados de Endereço</h3>
-            {/* Rua e Número */}
-            <div style={{ display: "flex", gap: 20, marginBottom: 20, flexWrap: 'wrap' }}>
-              <div style={{ flex: 2, minWidth: 220 }}>
-                <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, color: '#444', fontSize: 15, textAlign: 'left' }}>Rua <span style={{ color: 'red' }}>*</span></label>
-                <input
-                  required
-                  type="text"
-                  placeholder="Informe sua Rua"
-                  maxLength={150}
-                  value={enderecoRua}
-                  onChange={e => setEnderecoRua(e.target.value)}
-                  style={{ width: "100%", padding: '12px 14px', borderRadius: 8, border: "1.5px solid #e0e7ef", fontSize: 15, background: '#fafbfc', outline: 'none', transition: 'border 0.2s' }}
-                />
-              </div>
-              <div style={{ flex: 1, minWidth: 120 }}>
-                <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, color: '#444', fontSize: 15, textAlign: 'left' }}>Número <span style={{ color: 'red' }}>*</span></label>
-                <input
-                  required
-                  type="text"
-                  placeholder="Número da Rua"
-                  maxLength={10}
-                  value={enderecoNumero}
-                  onChange={e => setEnderecoNumero(e.target.value)}
-                  style={{ width: "100%", padding: '12px 14px', borderRadius: 8, border: "1.5px solid #e0e7ef", fontSize: 15, background: '#fafbfc', outline: 'none', transition: 'border 0.2s' }}
-                />
-              </div>
-            </div>
-            {/* Complemento e Bairro */}
-            <div style={{ display: "flex", gap: 20, marginBottom: 20, flexWrap: 'wrap' }}>
-              <div style={{ flex: 1, minWidth: 220 }}>
-                <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, color: '#444', fontSize: 15, textAlign: 'left' }}>Complemento</label>
-                <input
-                  type="text"
-                  placeholder="Ex: Apt 101, Bloco A"
-                  maxLength={100}
-                  value={enderecoComplemento}
-                  onChange={e => setEnderecoComplemento(e.target.value)}
-                  style={{ width: "100%", padding: '12px 14px', borderRadius: 8, border: "1.5px solid #e0e7ef", fontSize: 15, background: '#fafbfc', outline: 'none', transition: 'border 0.2s' }}
-                />
-              </div>
-              <div style={{ flex: 1, minWidth: 220 }}>
-                <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, color: '#444', fontSize: 15, textAlign: 'left' }}>Bairro <span style={{ color: 'red' }}>*</span></label>
-                <input
-                  required
-                  type="text"
-                  placeholder="Informe seu bairro"
-                  maxLength={100}
-                  value={enderecoBairro}
-                  onChange={e => setEnderecoBairro(e.target.value)}
-                  style={{ width: "100%", padding: '12px 14px', borderRadius: 8, border: "1.5px solid #e0e7ef", fontSize: 15, background: '#fafbfc', outline: 'none', transition: 'border 0.2s' }}
-                />
-              </div>
-            </div>
-            {/* Cidade, CEP, UF */}
-            <div style={{ display: "flex", gap: 20, marginBottom: 20, flexWrap: 'wrap' }}>
-              <div style={{ flex: 2, minWidth: 220 }}>
-                <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, color: '#444', fontSize: 15, textAlign: 'left' }}>Cidade <span style={{ color: 'red' }}>*</span></label>
-                <input
-                  required
-                  type="text"
-                  placeholder="Informe sua cidade"
-                  maxLength={100}
-                  value={enderecoCidade}
-                  onChange={e => setEnderecoCidade(e.target.value)}
-                  style={{ width: "100%", padding: '12px 14px', borderRadius: 8, border: "1.5px solid #e0e7ef", fontSize: 15, background: '#fafbfc', outline: 'none', transition: 'border 0.2s' }}
-                />
-              </div>
-              <div style={{ flex: 1, minWidth: 120 }}>
-                <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, color: '#444', fontSize: 15, textAlign: 'left' }}>CEP <span style={{ color: 'red' }}>*</span></label>
-                <InputMask
-                  mask="99999-999"
-                  placeholder="Ex: 12345-678"
-                  required
-                  value={enderecoCep}
-                  onChange={e => setEnderecoCep(e.target.value)}
-                  style={{ width: "100%", padding: '12px 14px', borderRadius: 8, border: "1.5px solid #e0e7ef", fontSize: 15, background: '#fafbfc', outline: 'none', transition: 'border 0.2s' }}
-                />
-              </div>
-              <div style={{ flex: 1, minWidth: 80 }}>
-                <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, color: '#444', fontSize: 15, textAlign: 'left' }}>UF <span style={{ color: 'red' }}>*</span></label>
-                <input
-                  required
-                  type="text"
-                  placeholder="UF (Ex: PE)"
-                  maxLength={2}
-                  value={enderecoUf}
-                  onChange={e => setEnderecoUf(e.target.value)}
-                  style={{ width: "100%", padding: '12px 14px', borderRadius: 8, border: "1.5px solid #e0e7ef", fontSize: 15, background: '#fafbfc', outline: 'none', transition: 'border 0.2s', textTransform: 'uppercase' }}
                 />
               </div>
             </div>
