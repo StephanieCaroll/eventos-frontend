@@ -25,7 +25,7 @@ export default function MenuSistema(props) {
           active={props.tela === "cliente"}
           as={Link}
           to="/cliente-login">
-          <Button primary>Login</Button>
+          <Button primary>Expositor</Button>
         </MenuItem>
 
       </Menu>

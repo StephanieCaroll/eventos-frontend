@@ -12,13 +12,19 @@ export default function FormCliente() {
   const [dataNascimento, setDataNascimento] = useState(""); // Inicializado com string vazia
   const [foneCelular, setFoneCelular] = useState(""); // Inicializado com string vazia
   const [senha, setSenha] = useState(""); // Inicializado com string vazia
+  const [confirmaSenha, setConfirmaSenha] = useState("");
+  const [erroSenha, setErroSenha] = useState("");
   const [mensagemSucesso, setMensagemSucesso] = useState(false); // Novo estado para mensagem de sucesso
   const [mensagemErro, setMensagemErro] = useState(false); // Novo estado para mensagem de erro
 
   function salvar() {
-    // Limpa mensagens anteriores
     setMensagemSucesso(false);
     setMensagemErro(false);
+    setErroSenha("");
+    if (senha !== confirmaSenha) {
+      setErroSenha("As senhas não são iguais.");
+      return;
+    }
 
     let clienteRequest = {
       nome: nome,
@@ -31,16 +37,17 @@ export default function FormCliente() {
     axios
       .post("http://localhost:8080/api/cliente", clienteRequest)
       .then((response) => {
-        console.log("Cliente cadastrado com sucesso.");
+        console.log("Expositor cadastrado com sucesso.");
         setMensagemSucesso(true); // Exibe mensagem de sucesso
         setNome("");
         setEmail("");
         setDataNascimento("");
         setFoneCelular("");
         setSenha("");
+        setConfirmaSenha("");
       })
       .catch((error) => {
-        console.log("Erro ao incluir o cliente.", error);
+        console.log("Erro ao incluir Expositor.", error);
         setMensagemErro(true); // Exibe mensagem de erro
       });
   }
@@ -70,7 +77,7 @@ export default function FormCliente() {
             style={{ marginTop: 12 }}
             onSubmit={e => { e.preventDefault(); salvar(); }}
           >
-            {/* Nome em um grupo só */}
+            {/* Nome e Email */}
             <div style={{ display: "flex", gap: 20, marginBottom: 20 }}>
               <div style={{ flex: 1, minWidth: 220 }}>
                 <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, color: '#444', fontSize: 15, textAlign: 'left' }}>Nome <span style={{ color: 'red' }}>*</span></label>
@@ -84,32 +91,46 @@ export default function FormCliente() {
                   style={{ width: "100%", padding: '12px 14px', borderRadius: 8, border: "1.5px solid #e0e7ef", fontSize: 15, background: '#fafbfc', outline: 'none', transition: 'border 0.2s' }}
                 />
               </div>
-            </div>
-            {/* Email e Senha juntos */}
-            <div style={{ display: "flex", gap: 20, marginBottom: 20, flexWrap: 'wrap' }}>
               <div style={{ flex: 1, minWidth: 220 }}>
                 <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, color: '#444', fontSize: 15, textAlign: 'left' }}>E-mail <span style={{ color: 'red' }}>*</span></label>
-                <input
-                  required
-                  type="email"
-                  placeholder="Informe seu email"
-                  maxLength={100}
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  style={{ width: "100%", padding: '12px 14px', borderRadius: 8, border: "1.5px solid #e0e7ef", fontSize: 15, background: '#fafbfc', outline: 'none', transition: 'border 0.2s' }}
-                />
+                  <input
+                    required
+                    type="email"
+                    placeholder="Informe seu email"
+                    maxLength={100}
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    style={{ width: "100%", padding: '12px 14px', borderRadius: 8, border: "1.5px solid #e0e7ef", fontSize: 15, background: '#fafbfc', outline: 'none', transition: 'border 0.2s' }}
+                  />
               </div>
+            </div>
+            {/* Senha e validação de Senha juntos */}
+            <div style={{ display: "flex", gap: 20, marginBottom: 20, flexWrap: 'wrap' }}>
               <div style={{ flex: 1, minWidth: 220 }}>
                 <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, color: '#444', fontSize: 15, textAlign: 'left' }}>Senha <span style={{ color: 'red' }}>*</span></label>
-                <input
-                  required
-                  type="password"
-                  placeholder="Crie uma senha"
-                  maxLength={100}
-                  value={senha}
-                  onChange={e => setSenha(e.target.value)}
-                  style={{ width: "100%", padding: '12px 14px', borderRadius: 8, border: "1.5px solid #e0e7ef", fontSize: 15, background: '#fafbfc', outline: 'none', transition: 'border 0.2s' }}
-                />
+                <div style={{ display: 'flex', gap: 12 }}>
+                  <input
+                    required
+                    type="password"
+                    placeholder="Crie uma senha"
+                    maxLength={100}
+                    value={senha}
+                    onChange={e => setSenha(e.target.value)}
+                    style={{ width: '100%', padding: '12px 14px', borderRadius: 8, border: '1.5px solid #e0e7ef', fontSize: 15, background: '#fafbfc', outline: 'none' }}
+                  />
+                  <input
+                    required
+                    type="password"
+                    placeholder="Confirme a senha"
+                    maxLength={100}
+                    value={confirmaSenha}
+                    onChange={e => setConfirmaSenha(e.target.value)}
+                    style={{ width: '100%', padding: '12px 14px', borderRadius: 8, border: '1.5px solid #e0e7ef', fontSize: 15, background: '#fafbfc', outline: 'none' }}
+                  />
+                </div>
+                {erroSenha && (
+                  <span style={{ color: 'red', fontSize: 13, marginTop: 4, display: 'block' }}>{erroSenha}</span>
+                )}
               </div>
             </div>
             {/* Data de nascimento e telefone */}
@@ -156,7 +177,7 @@ export default function FormCliente() {
               </motion.div>
             )}
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 36, gap: 16 }}>
-              
+
               <Link to={"/cliente-login"} style={{ textDecoration: 'none' }}>
                 <motion.button
                   type="button"
@@ -181,7 +202,7 @@ export default function FormCliente() {
           </motion.form>
         </motion.div>
       </div>
-      
+
       <br /> <br />
       <Footer />
     </div>
