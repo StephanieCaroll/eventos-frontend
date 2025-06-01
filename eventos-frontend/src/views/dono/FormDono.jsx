@@ -1,305 +1,517 @@
 import axios from "axios";
 import InputMask from "comigo-tech-react-input-mask";
-import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  Button,
-  Container,
-  Divider,
-  Form,
-  Grid, 
-  Icon,
-  Message,
-  Segment,
-} from "semantic-ui-react";
 import MenuSistema from "../../MenuSistema";
+import { Footer } from "../home/Home";
 
 export default function FormDono() {
   const [razaoSocial, setRazaoSocial] = useState("");
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [cpf, setCpf] = useState("");
-  const [rg, setRg] = useState("");
-  const [dataNascimento, setDataNascimento] = useState(""); 
-
-  const [enderecoRua, setEnderecoRua] = useState("");
-  const [enderecoComplemento, setEnderecoComplemento] = useState("");
-  const [enderecoNumero, setEnderecoNumero] = useState("");
-  const [enderecoBairro, setEnderecoBairro] = useState("");
-  const [enderecoCidade, setEnderecoCidade] = useState("");
-  const [enderecoCep, setEnderecoCep] = useState("");
-  const [enderecoUf, setEnderecoUf] = useState("");
-
+  const [dataNascimento, setDataNascimento] = useState("");
+  const [senha, setSenha] = useState("");
+  const [confirmaSenha, setConfirmaSenha] = useState("");
+  const [fonecelular, setFonecelular] = useState("");
   const [mensagemSucesso, setMensagemSucesso] = useState(false);
   const [mensagemErro, setMensagemErro] = useState(false);
+  const [erroSenha, setErroSenha] = useState("");
 
   function salvar() {
     setMensagemSucesso(false);
     setMensagemErro(false);
+    setErroSenha("");
+    if (senha !== confirmaSenha) {
+      setErroSenha("As senhas não coincidem.");
+      return;
+    }
 
     let donoRequest = {
-      razaoSocial: razaoSocial,
-      nome: nome,
-      email: email,
-      cpf: cpf,
-      rg: rg,
-      dataNascimento: dataNascimento,
-      enderecoRua: enderecoRua,
-      enderecoComplemento: enderecoComplemento,
-      enderecoNumero: enderecoNumero,
-      enderecoBairro: enderecoBairro,
-      enderecoCidade: enderecoCidade,
-      enderecoCep: enderecoCep,
-      enderecoUf: enderecoUf,
+      razaoSocial,
+      nome,
+      email,
+      cpf,
+      dataNascimento,
+      senha,
+      fonecelular,
     };
 
     axios
       .post("http://localhost:8080/api/dono", donoRequest)
-      .then((response) => {
-        console.log("Dono cadastrado com sucesso.");
+      .then(() => {
         setRazaoSocial("");
         setNome("");
         setEmail("");
         setCpf("");
-        setRg("");
         setDataNascimento("");
-        setEnderecoRua("");
-        setEnderecoComplemento("");
-        setEnderecoNumero("");
-        setEnderecoBairro("");
-        setEnderecoCidade("");
-        setEnderecoCep("");
-        setEnderecoUf("");
+        setSenha("");
+        setFonecelular("");
         setMensagemSucesso(true);
       })
-      .catch((error) => {
-        console.log("Erro ao incluir o Dono.", error);
-        setMensagemErro(true);
-      });
+      .catch(() => setMensagemErro(true));
   }
 
   return (
-    <div>
+    <div style={{ background: "#f5f7fa", minHeight: "100vh" }}>
       <MenuSistema tela={"dono"} />
-
-      <div style={{ marginTop: "3%" }}>
-        <Container textAlign="justified">
-          <Segment raised>
-            <h2>
-              <span style={{ color: "darkgray" }}>
-                Dono &nbsp;
-                <Icon name="angle double right" size="small" />{" "}
-              </span>{" "}
-              Cadastro{" "}
-            </h2>
-
-            <Divider />
-
-            <div style={{ marginTop: "4%" }}>
-              <Form>
-
-                <h3>Dados Pessoais</h3>
-                <Grid columns={2} stackable>
-                  <Grid.Column>
-                    <Form.Input
-                      required
-                      fluid
-                      label="Nome"
-                      placeholder="Informe seu nome"
-                      maxLength="100"
-                      value={nome}
-                      onChange={(e) => setNome(e.target.value)}
-                    />
-                  </Grid.Column>
-                  <Grid.Column>
-                    <Form.Input
-                      required
-                      fluid
-                      label="Razão Social"
-                      placeholder="Informe a razão social"
-                      maxLength="100"
-                      value={razaoSocial}
-                      onChange={(e) => setRazaoSocial(e.target.value)}
-                    />
-                  </Grid.Column>
-                  <Grid.Column>
-                    <Form.Input
-                      required
-                      fluid
-                      label="Email"
-                      placeholder="Informe o email"
-                      type="email"
-                      maxLength="100"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
-                  </Grid.Column>
-                  <Grid.Column>
-                    <Form.Field required>
-                      <label>CPF</label>
-                      <InputMask
-                        mask="999.999.999-99"
-                        value={cpf}
-                        onChange={(e) => setCpf(e.target.value)}
-                      />
-                    </Form.Field>
-                  </Grid.Column>
-                  <Grid.Column>
-                    <Form.Input
-                      required
-                      fluid
-                      label="RG"
-                      placeholder="Informe o RG"
-                      maxLength="20" 
-                      value={rg}
-                      onChange={(e) => setRg(e.target.value)}
-                    />
-                  </Grid.Column>
-                  <Grid.Column>
-                    <Form.Field required>
-                      <label>Data de Nascimento</label>
-                      <InputMask
-                        mask="99/99/9999"
-                        maskChar={null}
-                        placeholder="Ex: 20/03/1985"
-                        value={dataNascimento}
-                        onChange={(e) => setDataNascimento(e.target.value)}
-                      />
-                    </Form.Field>
-                  </Grid.Column>
-                </Grid>
-
-                <Divider section /> 
-
-                <h3>Dados de Endereço</h3>
-                <Grid columns={2} stackable>
-                  <Grid.Column width={10}> 
-                    <Form.Input
-                      required
-                      fluid
-                      label="Rua"
-                      placeholder="Informe sua Rua"
-                      maxLength="150"
-                      value={enderecoRua}
-                      onChange={(e) => setEnderecoRua(e.target.value)}
-                    />
-                  </Grid.Column>
-                  <Grid.Column width={6}>
-                    <Form.Input
-                      required
-                      fluid
-                      label="Número"
-                      placeholder="Número"
-                      maxLength="10"
-                      value={enderecoNumero}
-                      onChange={(e) => setEnderecoNumero(e.target.value)}
-                    />
-                  </Grid.Column>
-                  <Grid.Column>
-                    <Form.Input
-                      fluid
-                      label="Complemento"
-                      placeholder="Ex: Apt 101, Bloco A"
-                      maxLength="100"
-                      value={enderecoComplemento}
-                      onChange={(e) => setEnderecoComplemento(e.target.value)}
-                    />
-                  </Grid.Column>
-                  <Grid.Column>
-                    <Form.Input
-                      required
-                      fluid
-                      label="Bairro"
-                      placeholder="Informe seu bairro"
-                      maxLength="100"
-                      value={enderecoBairro}
-                      onChange={(e) => setEnderecoBairro(e.target.value)}
-                    />
-                  </Grid.Column>
-                  <Grid.Column width={10}>
-                    <Form.Input
-                      required
-                      fluid
-                      label="Cidade"
-                      placeholder="Informe sua cidade"
-                      maxLength="100"
-                      value={enderecoCidade}
-                      onChange={(e) => setEnderecoCidade(e.target.value)}
-                    />
-                  </Grid.Column>
-                  <Grid.Column width={6}>
-                    <Form.Field required>
-                      <label>CEP</label>
-                      <InputMask
-                        mask="99999-999"
-                        value={enderecoCep}
-                        onChange={(e) => setEnderecoCep(e.target.value)}
-                      />
-                    </Form.Field>
-                  </Grid.Column>
-                  <Grid.Column>
-                    <Form.Input
-                      required
-                      fluid
-                      label="UF"
-                      placeholder="UF (Ex: PE)"
-                      maxLength="2"
-                      value={enderecoUf}
-                      onChange={(e) => setEnderecoUf(e.target.value)}
-                    />
-                  </Grid.Column>
-                </Grid>
-              </Form>
-
-              {mensagemSucesso && (
-                <Message
-                  success
-                  header="Cadastro Realizado!"
-                  content="Dono cadastrado com sucesso."
-                  style={{ marginTop: "20px" }}
-                />
-              )}
-
-              {mensagemErro && (
-                <Message
-                  error
-                  header="Erro no Cadastro"
-                  content="Ocorreu um erro ao tentar cadastrar o Dono. Tente novamente."
-                  style={{ marginTop: "20px" }}
-                />
-              )}
-
-              <div style={{ marginTop: "4%" }}>
-                <Link to={"/"}>
-                  <Button
-                    type="button"
-                    inverted
-                    circular
-                    icon
-                    labelPosition="left"
-                    color="orange"
-                  >
-                    <Icon name="reply" />
-                    Voltar
-                  </Button>
-                </Link>
-                <Button
-                  inverted
-                  circular
-                  icon
-                  labelPosition="left"
-                  color="blue"
-                  floated="right"
-                  onClick={() => salvar()}
+      <div style={{ marginTop: "3%", marginBottom: 24 }}>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          style={{
+            maxWidth: 800,
+            margin: "0 auto",
+            background: "#fff",
+            borderRadius: 16,
+            boxShadow: "0 4px 24px #e0e7ef",
+            padding: 48,
+          }}
+        >
+          <h2
+            style={{
+              color: "#222",
+              marginBottom: 16,
+              fontWeight: 700,
+              fontSize: 28,
+              letterSpacing: 0.5,
+            }}
+          >
+            <span style={{ color: "#8c8c8c", fontWeight: 400 }}>
+              Dono &nbsp;
+              <span style={{ fontSize: 18, verticalAlign: "middle" }}>
+                &raquo;
+              </span>
+            </span>
+            &nbsp; Cadastro
+          </h2>
+          <hr
+            style={{
+              margin: "20px 0 28px 0",
+              border: 0,
+              borderTop: "1.5px solid #f0f0f0",
+            }}
+          />
+          <motion.form
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            style={{ marginTop: 12 }}
+            onSubmit={(e) => {
+              e.preventDefault();
+              salvar();
+            }}
+          >
+            {/* Nome e Razão Social */}
+            <div
+              style={{
+                display: "flex",
+                gap: 20,
+                marginBottom: 20,
+                flexWrap: "wrap",
+              }}
+            >
+              <div style={{ flex: 1, minWidth: 220 }}>
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: 6,
+                    fontWeight: 500,
+                    color: "#444",
+                    fontSize: 15,
+                    textAlign: "left",
+                  }}
                 >
-                  <Icon name="save" />
-                  Salvar
-                </Button>
+                  Nome <span style={{ color: "red" }}>*</span>
+                </label>
+                <input
+                  required
+                  type="text"
+                  placeholder="Informe seu nome"
+                  maxLength={100}
+                  value={nome}
+                  onChange={(e) => setNome(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "12px 14px",
+                    borderRadius: 8,
+                    border: "1.5px solid #e0e7ef",
+                    fontSize: 15,
+                    background: "#fafbfc",
+                    outline: "none",
+                    transition: "border 0.2s",
+                  }}
+                />
+              </div>
+              <div style={{ flex: 1, minWidth: 220 }}>
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: 6,
+                    fontWeight: 500,
+                    color: "#444",
+                    fontSize: 15,
+                    textAlign: "left",
+                  }}
+                >
+                  Razão Social <span style={{ color: "red" }}>*</span>
+                </label>
+                <input
+                  required
+                  type="text"
+                  placeholder="Informe a razão social"
+                  maxLength={100}
+                  value={razaoSocial}
+                  onChange={(e) => setRazaoSocial(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "12px 14px",
+                    borderRadius: 8,
+                    border: "1.5px solid #e0e7ef",
+                    fontSize: 15,
+                    background: "#fafbfc",
+                    outline: "none",
+                    transition: "border 0.2s",
+                  }}
+                />
               </div>
             </div>
-          </Segment>
-        </Container>
+
+            {/* Email */}
+            <div
+              style={{
+                display: "flex",
+                gap: 20,
+                marginBottom: 20,
+                flexWrap: "wrap",
+              }}
+            >
+              <div style={{ flex: 1, minWidth: 220 }}>
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: 6,
+                    fontWeight: 500,
+                    color: "#444",
+                    fontSize: 15,
+                    textAlign: "left",
+                  }}
+                >
+                  Email <span style={{ color: "red" }}>*</span>
+                </label>
+                <input
+                  required
+                  type="email"
+                  placeholder="Informe o email"
+                  maxLength={100}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "12px 14px",
+                    borderRadius: 8,
+                    border: "1.5px solid #e0e7ef",
+                    fontSize: 15,
+                    background: "#fafbfc",
+                    outline: "none",
+                    transition: "border 0.2s",
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Senha e Confirmação de Senha */}
+            <div
+              style={{
+                display: "flex",
+                gap: 20,
+                marginBottom: 2,
+                flexWrap: "wrap",
+              }}
+            >
+              <div style={{ flex: 1, minWidth: 220 }}>
+                <div style={{ marginBottom: 18, textAlign: "left" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: 6,
+                      fontWeight: 500,
+                      color: "#444",
+                      fontSize: 15,
+                    }}
+                  >
+                    Senha <span style={{ color: "red" }}>*</span>
+                  </label>
+                  <div style={{ display: "flex", gap: 12 }}>
+                    <input
+                      type="password"
+                      required
+                      placeholder="Digite sua senha"
+                      value={senha}
+                      onChange={(e) => setSenha(e.target.value)}
+                      style={{
+                        width: "100%",
+                        padding: "12px 14px",
+                        borderRadius: 8,
+                        border: "1.5px solid #e0e7ef",
+                        fontSize: 15,
+                        background: "#fafbfc",
+                        outline: "none",
+                      }}
+                    />
+                    <input
+                      type="password"
+                      required
+                      placeholder="Confirme sua senha"
+                      value={confirmaSenha}
+                      onChange={(e) => setConfirmaSenha(e.target.value)}
+                      style={{
+                        width: "100%",
+                        padding: "12px 14px",
+                        borderRadius: 8,
+                        border: "1.5px solid #e0e7ef",
+                        fontSize: 15,
+                        background: "#fafbfc",
+                        outline: "none",
+                      }}
+                    />
+                  </div>
+                  {erroSenha && (
+                    <span
+                      style={{
+                        color: "red",
+                        fontSize: 13,
+                        marginTop: 4,
+                        display: "block",
+                      }}
+                    >
+                      {erroSenha}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+            {/* CPF */}
+            <div
+              style={{
+                display: "flex",
+                gap: 20,
+                marginBottom: 20,
+                flexWrap: "wrap",
+              }}
+            >
+              <div style={{ flex: 1, minWidth: 220 }}>
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: 6,
+                    fontWeight: 500,
+                    color: "#444",
+                    fontSize: 15,
+                    textAlign: "left",
+                  }}
+                >
+                  CPF <span style={{ color: "red" }}>*</span>
+                </label>
+                <InputMask
+                  mask="999.999.999-99"
+                  placeholder="Ex: 123.456.789-00"
+                  maskChar={null}
+                  required
+                  value={cpf}
+                  onChange={(e) => setCpf(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "12px 14px",
+                    borderRadius: 8,
+                    border: "1.5px solid #e0e7ef",
+                    fontSize: 15,
+                    background: "#fafbfc",
+                    outline: "none",
+                    transition: "border 0.2s",
+                  }}
+                />
+              </div>
+            </div>
+            {/* Data de Nascimento e Telefone Celular */}
+            <div
+              style={{
+                display: "flex",
+                gap: 20,
+                marginBottom: 20,
+                flexWrap: "wrap",
+              }}
+            >
+              <div style={{ flex: 1, minWidth: 220 }}>
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: 6,
+                    fontWeight: 500,
+                    color: "#444",
+                    fontSize: 15,
+                    textAlign: "left",
+                  }}
+                >
+                  Data de Nascimento <span style={{ color: "red" }}>*</span>
+                </label>
+                <InputMask
+                  mask="99/99/9999"
+                  maskChar={null}
+                  required
+                  placeholder="Ex: 20/03/1985"
+                  value={dataNascimento}
+                  onChange={(e) => setDataNascimento(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "12px 14px",
+                    borderRadius: 8,
+                    border: "1.5px solid #e0e7ef",
+                    fontSize: 15,
+                    background: "#fafbfc",
+                    outline: "none",
+                    transition: "border 0.2s",
+                  }}
+                />
+              </div>
+              <div
+                style={{
+                  width: 180,
+                  minWidth: 0,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                }}
+              >
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: 6,
+                    fontWeight: 500,
+                    color: "#444",
+                    fontSize: 15,
+                    textAlign: "left",
+                  }}
+                >
+                  Telefone Celular
+                </label>
+                <input
+                  type="text"
+                  placeholder="(99) 99999-9999"
+                  maxLength={15}
+                  value={fonecelular}
+                  onChange={(e) => setFonecelular(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "12px 14px",
+                    borderRadius: 8,
+                    border: "1.5px solid #e0e7ef",
+                    fontSize: 15,
+                    background: "#fafbfc",
+                    outline: "none",
+                    transition: "border 0.2s",
+                  }}
+                />
+              </div>
+            </div>
+            {/* Mensagens de Sucesso e Erro */}
+            <div style={{ marginBottom: 20 }}>
+              {mensagemSucesso && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  style={{
+                    background: "#e6ffed",
+                    color: "#256029",
+                    border: "1.5px solid #b7eb8f",
+                    borderRadius: 6,
+                    padding: 14,
+                    marginBottom: 18,
+                    fontWeight: 500,
+                    fontSize: 15,
+                  }}
+                >
+                  <strong>Cadastro Realizado!</strong> Dono cadastrado com
+                  sucesso.
+                </motion.div>
+              )}
+              {mensagemErro && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  style={{
+                    background: "#fff1f0",
+                    color: "#a8071a",
+                    border: "1.5px solid #ffa39e",
+                    borderRadius: 6,
+                    padding: 14,
+                    marginBottom: 18,
+                    fontWeight: 500,
+                    fontSize: 15,
+                  }}
+                >
+                  <strong>Erro no Cadastro:</strong> Ocorreu um erro ao tentar
+                  cadastrar o Dono. Tente novamente.
+                </motion.div>
+              )}
+            </div>
+            {/* Botões de Ação */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginTop: 36,
+                gap: 16,
+              }}
+            >
+              <Link to={"/dono-login"} style={{ textDecoration: "none" }}>
+                <motion.button
+                  type="button"
+                  whileHover={{ scale: 1.05, backgroundColor: "#ffd591" }}
+                  whileTap={{ scale: 0.95 }}
+                  style={{
+                    background: "#fff7e6",
+                    color: "#d46b08",
+                    border: "1.5px solid #ffd591",
+                    borderRadius: 24,
+                    padding: "10px 32px",
+                    cursor: "pointer",
+                    fontWeight: 600,
+                    fontSize: 16,
+                    boxShadow: "0 1px 4px #f5e6d6",
+                    transition: "background 0.2s",
+                  }}
+                >
+                  Voltar
+                </motion.button>
+              </Link>
+              <motion.button
+                type="submit"
+                whileHover={{ scale: 1.05, backgroundColor: "#91caff" }}
+                whileTap={{ scale: 0.95 }}
+                style={{
+                  background: "#e6f4ff",
+                  color: "#1677ff",
+                  border: "1.5px solid #91caff",
+                  borderRadius: 24,
+                  padding: "10px 32px",
+                  cursor: "pointer",
+                  fontWeight: 600,
+                  fontSize: 16,
+                  boxShadow: "0 1px 4px #d6eaff",
+                  transition: "background 0.2s",
+                }}
+              >
+                Salvar
+              </motion.button>
+            </div>
+          </motion.form>
+        </motion.div>
       </div>
+      <br />
+      <Footer />
     </div>
   );
 }
