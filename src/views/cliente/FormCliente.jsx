@@ -5,8 +5,6 @@ import { Link } from "react-router-dom";
 import MenuSistema from "../../MenuSistema";
 import { Footer } from "../home/Home";
 
-//Coloquei esse comentário aqui pois ta bugado o github, alguns arquivos não estão sendo atualizados
-
 export default function FormCliente() {
   const [nome, setNome] = useState(""); // Inicializado com string vazia
   const [email, setEmail] = useState(""); // Inicializado com string vazia

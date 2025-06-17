@@ -8,7 +8,6 @@ export default function Home() {
         transition: { type: 'spring', stiffness: 300 },
     };
 
-//Coloquei esse comentário aqui pois ta bugado o github, alguns arquivos não estão sendo atualizados
     return (
         <div style={{ backgroundColor: '#0a192f', color: '#ffffff' }}>
             <MenuSistema tela={'Home'} />

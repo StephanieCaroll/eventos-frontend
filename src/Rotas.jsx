@@ -4,6 +4,7 @@ import LoginCliente from "./views/cliente/LoginCliente";
 import FormDono from './views/dono/FormDono';
 import LoginDono from "./views/dono/LoginDono";
 import Home from './views/home/Home';
+import FormEvento from "./views/evento/FormEvento";
 
 function Rotas() {
     return (
@@ -14,6 +15,7 @@ function Rotas() {
                 <Route path="cliente/*" element={ <FormCliente/> } />
                 <Route path="form-dono" element={ <FormDono/> } />
                 <Route path="dono-login" element={ <LoginDono/> } />
+                <Route path="form-evento" element={ <FormEvento/> } />
             </Routes>
         </>
     )
