@@ -1,8 +1,9 @@
 # 🏟️ Plataforma de Gerenciamento de Stands
 
 Este repositório contém o código-fonte da aplicação front-end para uma Plataforma de Gerenciamento de Stands, desenvolvida com **Next.js** e **React**. Esta interface permite o cadastro e a visualização de stands para eventos, exposições e feiras. O back-end, responsável pela lógica de negócios e persistência de dados, está em um repositório separado e foi construído com Spring Boot e Java. <br>
-https://github.com/StephanieCaroll/eventos-frontend
-
+https://github.com/StephanieCaroll/eventos-backend
+<br>
+Para Acessar o site -> https://eventos-frontend-rho.vercel.app/
 ## 🌟 Sobre o Projeto
 
 O objetivo principal desta plataforma é simplificar o processo de cadastro e organização de stands para eventos presenciais. Ela oferece uma interface intuitiva para que organizadores ou administradores possam adicionar novos stands, preencher suas informações essenciais e gerenciar o espaço de forma eficiente.
