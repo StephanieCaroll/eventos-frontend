@@ -1,70 +1,57 @@
-# Getting Started with Create React App
+# 🏟️ Plataforma de Gerenciamento de Stands
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Este repositório contém o código-fonte da aplicação front-end para uma Plataforma de Gerenciamento de Stands, desenvolvida com **Next.js** e **React**. Esta interface permite o cadastro e a visualização de stands para eventos, exposições e feiras. O back-end, responsável pela lógica de negócios e persistência de dados, está em um repositório separado e foi construído com Spring Boot e Java. <br>
+https://github.com/StephanieCaroll/eventos-backend
+<br>
+Para Acessar o site -> https://eventos-frontend-rho.vercel.app/
+## 🌟 Sobre o Projeto
 
-## Available Scripts
+O objetivo principal desta plataforma é simplificar o processo de cadastro e organização de stands para eventos presenciais. Ela oferece uma interface intuitiva para que organizadores ou administradores possam adicionar novos stands, preencher suas informações essenciais e gerenciar o espaço de forma eficiente.
 
-In the project directory, you can run:
+### Funcionalidades Principais:
+- **Cadastro de Stands**: Interface para inserir todos os detalhes de um novo stand, incluindo nome, descrição, dimensões, informações do responsável e requisitos especiais.
+- **Visualização de Stands**:(A ser implementado) Exibição de uma lista dos stands cadastrados, com opções para visualização detalhada.
+- **Cadastro de Eventos** : Interface para inserir detalhes sobre um novo evento, incluindo data, nomes e quantidade de ingresso.
 
-### `npm start`
+## 📚 Componentes
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **FormCliente**: Componente principal para o formulário de cadastro de um Cliente, onde os usuários interagem para inserir os dados.
+- **LoginCliente**: Componente principal para o Login de um cliente, onde os usuários interagem para inserir os dados.
+- **FormDono**: Componente principal para o formulário de cadastro do Dono de um evento, onde os usuários interagem para inserir os dados.
+- **LoginDono**: Componente principal para o Login do Dono de um evento, onde os usuários interagem para inserir os dados.
+- **FormEvento**: Componente principal para o formulário de cadastro de um Evento, onde os usuários interagem para inserir os dados.
+- **MenuSistema**: Componente de navegação superior, adaptado para as funcionalidades da plataforma de stands.
+- **Home**:  A página inicial do sistema, que pode ser o ponto de entrada para a lista de stands ou para o formulário de cadastro.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 🚀 Tecnologias Utilizadas
 
-### `npm test`
+- **Next.js**: Framework para React que possibilita renderização do lado do servidor e criação de páginas de forma otimizada.
+- **React**: Biblioteca para construção de interfaces de usuário.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 🛠️ Como Rodar o Projeto Localmente
 
-### `npm run build`
+1. Clone este repositório para sua máquina local:
+   ```bash
+   git clone https://github.com/StephanieCaroll/eventos-frontend.git
+2. Navegue até o diretório do projeto:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+   ```bash
+   cd eventos-frontend
+3. Instale as dependências do projeto:
+   ```bash
+   npm install
+4. Execute o projeto:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+   ```bash
+   npm run dev
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+5. Abra o navegador e vá para http://localhost:3000 para ver o e-commerce em funcionamento.
 
-### `npm run eject`
+## 🤝 Contribuições
+Sinta-se à vontade para contribuir com este repositório! <br>
+💡 Sugira novas funcionalidades.<br>
+🐛 Relate bugs ou problemas.<br>
+📚 Compartilhe recursos ou melhorias no design.<br>
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## 📬 Contato
+Autor: Stephanie Caroline, Evellyn Orico, Ewerthon Weslley, Guilherme Aurelio  <br>
