@@ -12,24 +12,21 @@ function Rotas() {
   return (
     <>
       <Routes>
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          }
-        />
+
+        <Route path="/" element={ <Home />}/>
 
         <Route path="login" element={<FormLogin />} />
 
         <Route path="homeLogin" element={<HomeLogin />} />
 
-        <Route path="/form-cliente" element={<FormCliente />} />
+        <Route path="form-cliente" element={<FormCliente />} />
+
         <Route path="form-dono" element={<FormDono />} />
 
         <Route path="form-evento" element={<FormEvento />} />
-        <Route path="form-adm" element={<FormAdm />} />
+
+        {/* <Route path="form-adm" element={<FormAdm />} /> */}
+        
       </Routes>
     </>
   );

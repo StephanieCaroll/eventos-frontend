@@ -76,29 +76,7 @@ export default function HomeLogin() {
                     <p style={{ fontSize: '1.5em', color: '#e0e0e0', maxWidth: '700px', margin: '0 auto', marginTop: '1em' }}>
                         Descubra espaços tecnológicos para exposições inesquecíveis. Conecte ideias e oportunidades em ambientes de alto padrão.
                     </p>
-                    <motion.button
-                        whileHover={{ scale: 1.05, backgroundColor: '#dc3545' }} 
-                        whileTap={{ scale: 0.97 }}
-                        style={{
-                            marginTop: '2.5em',
-                            backgroundColor: '#ff4d4f',
-                            color: '#fff',
-                            padding: '1em 2.5em',
-                            fontSize: '1.2em',
-                            fontWeight: '600',
-                            border: 'none',
-                            borderRadius: 32,
-                            cursor: 'pointer',
-                            boxShadow: '0 2px 12px #1e293b33',
-                            transition: 'background 0.2s',
-                            outline: 'none',
-                            textDecoration: 'none',
-                            display: 'inline-block'
-                        }}
-                        onClick={handleLogout}
-                    >
-                        Sair <span style={{ marginLeft: 12, fontSize: 22 }}>←</span>
-                    </motion.button>
+                   
                 </div>
             </section>
 

@@ -80,9 +80,9 @@ export default function PopupCadastro({ aberto, fechar }) {
             <Button secondary fluid onClick={() => handleNavigate("/form-cliente")}>
               Expositor
             </Button>
-            <Button tertiary fluid onClick={() => handleNavigate("/form-adm")}>
+            {/* <Button tertiary fluid onClick={() => handleNavigate("/form-adm")}>
               Administrador
-            </Button>
+            </Button> */}
           </div>
         </Modal.Content>
         <Modal.Actions style={{ textAlign: "center", marginTop: '1rem' }}>
