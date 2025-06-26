@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button, Menu, MenuItem } from "semantic-ui-react";
+import { logout } from './views/util/AuthenticationService';
 
 export default function MenuSistema(props) {
   return (
@@ -13,33 +14,12 @@ export default function MenuSistema(props) {
         />
 
         <MenuItem display="flex" position="right"
-          content="Dono"
-          active={props.tela === "Dono"}
+          content="Login"
+          active={props.tela === "Login"}
           as={Link}
-          to="/dono-login">
+          to="/login">
           <Button primary >Login</Button>
         </MenuItem>
-
-
-        {/* 
-
-         <MenuItem
-          content="Evento"
-          active={props.tela === "Evento"}
-          as={Link}
-          to="/form-evento">
-          <Button primary >Evento</Button>
-        </MenuItem>
-
-        <MenuItem
-          content="Login"
-          active={props.tela === "cliente"}
-          as={Link}
-          to="/cliente-login">
-          <Button primary >Expositor</Button>
-        </MenuItem>
-
-        */}
 
       </Menu>
     </>

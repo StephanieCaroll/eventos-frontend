@@ -1,4 +1,5 @@
 import axios from "axios";
+import InputMask from "comigo-tech-react-input-mask"; 
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -136,10 +137,11 @@ export default function FormCliente() {
             <div style={{ display: "flex", gap: 20, marginBottom: 20, flexWrap: 'wrap' }}>
               <div style={{ flex: 1, minWidth: 140 }}>
                 <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, color: '#444', fontSize: 15, textAlign: 'left' }}>Data de Nascimento</label>
-                <input
-                  type="text"
+               <InputMask
+                  mask="99/99/9999"
+                  maskChar={null}
+                  required
                   placeholder="Ex: 20/03/1985"
-                  maxLength={10}
                   value={dataNascimento}
                   onChange={e => setDataNascimento(e.target.value)}
                   style={{ width: "100%", padding: '12px 14px', borderRadius: 8, border: "1.5px solid #e0e7ef", fontSize: 15, background: '#fafbfc', outline: 'none', transition: 'border 0.2s' }}
@@ -177,7 +179,7 @@ export default function FormCliente() {
             )}
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 36, gap: 16 }}>
 
-              <Link to={"/cliente-login"} style={{ textDecoration: 'none' }}>
+              <Link to={"/dono-login"} style={{ textDecoration: 'none' }}>
                 <motion.button
                   type="button"
                   whileHover={{ scale: 1, backgroundColor: '#ffd591' }}

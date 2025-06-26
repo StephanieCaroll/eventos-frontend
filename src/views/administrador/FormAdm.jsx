@@ -3,18 +3,18 @@ import InputMask from "comigo-tech-react-input-mask";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import MenuSistema from "../../MenuSistema";
-import { Footer } from "../home/Home";
+import MenuSistema from "../../MenuSistema"; 
+import { Footer } from "../home/Home"; 
 
-export default function FormDono() {
-  const [razaoSocial, setRazaoSocial] = useState("");
+export default function FormAdm() {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
-  const [cpf, setCpf] = useState("");
-  const [dataNascimento, setDataNascimento] = useState("");
   const [senha, setSenha] = useState("");
   const [confirmaSenha, setConfirmaSenha] = useState("");
-  const [fonecelular, setFonecelular] = useState("");
+  const [cargo, setCargo] = useState("");
+  const [ativo, setAtivo] = useState(true);
+  const [dataNascimento, setDataNascimento] = useState(""); 
+  const [foneCelular, setFoneCelular] = useState("");
   const [mensagemSucesso, setMensagemSucesso] = useState(false);
   const [mensagemErro, setMensagemErro] = useState(false);
   const [erroSenha, setErroSenha] = useState("");
@@ -23,40 +23,51 @@ export default function FormDono() {
     setMensagemSucesso(false);
     setMensagemErro(false);
     setErroSenha("");
+
     if (senha !== confirmaSenha) {
       setErroSenha("As senhas não coincidem.");
       return;
     }
 
-    let donoRequest = {
-      razaoSocial,
+    let dataNascimentoFormatada = "";
+    if (dataNascimento) {
+      const [ano, mes, dia] = dataNascimento.split('-');
+      dataNascimentoFormatada = `${dia}/${mes}/${ano}`;
+    }
+
+    let admRequest = {
       nome,
       email,
-      cpf,
-      dataNascimento,
       senha,
-      fonecelular
+      cargo,
+      ativo,
+      dataNascimento: dataNascimentoFormatada, 
+      foneCelular
     };
 
     axios
-      .post("http://localhost:8080/api/dono", donoRequest)
+      .post("http://localhost:8080/api/administrador", admRequest)
       .then(() => {
-        setRazaoSocial("");
         setNome("");
         setEmail("");
-        setCpf("");
-        setDataNascimento("");
         setSenha("");
-        setFonecelular("");
+        setConfirmaSenha("");
+        setCargo("");
+        setAtivo(true);
+        setDataNascimento("");
+        setFoneCelular("");
         setMensagemSucesso(true);
       })
-      .catch(() => setMensagemErro(true));
+      .catch((error) => {
+        console.error("Erro ao cadastrar administrador:", error.response?.data || error.message);
+        setMensagemErro(true);
+      });
   }
 
   return (
-    <div style={{ background: '#f5f7fa', minHeight: '100vh' }}>
-      <MenuSistema tela={"dono"} />
-      <div style={{ marginTop: "3%", marginBottom: 24 }}>
+    <div style={{ background: '#f5f7fa', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <MenuSistema tela={"administrador"} />
+      <div style={{ marginTop: "3%", marginBottom: 24, flexGrow: 1 }}>
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -65,10 +76,10 @@ export default function FormDono() {
         >
           <h2 style={{ color: "#222", marginBottom: 16, fontWeight: 700, fontSize: 28, letterSpacing: 0.5 }}>
             <span style={{ color: "#8c8c8c", fontWeight: 400 }}>
-              Gerenciador &nbsp;
+              Administrador &nbsp;
               <span style={{ fontSize: 18, verticalAlign: "middle" }}>&raquo;</span>
             </span>
-            &nbsp;  Cadastro
+            &nbsp; Cadastro
           </h2>
           <hr style={{ margin: "20px 0 28px 0", border: 0, borderTop: "1.5px solid #f0f0f0" }} />
           <motion.form
@@ -78,36 +89,19 @@ export default function FormDono() {
             style={{ marginTop: 12 }}
             onSubmit={e => { e.preventDefault(); salvar(); }}
           >
-            {/* Nome e Razão Social */}
             <div style={{ display: "flex", gap: 20, marginBottom: 20, flexWrap: 'wrap' }}>
               <div style={{ flex: 1, minWidth: 220 }}>
                 <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, color: '#444', fontSize: 15, textAlign: 'left' }}>Nome <span style={{ color: 'red' }}>*</span></label>
                 <input
                   required
                   type="text"
-                  placeholder="Informe seu nome"
+                  placeholder="Informe o nome do administrador"
                   maxLength={100}
                   value={nome}
                   onChange={e => setNome(e.target.value)}
                   style={{ width: "100%", padding: '12px 14px', borderRadius: 8, border: "1.5px solid #e0e7ef", fontSize: 15, background: '#fafbfc', outline: 'none', transition: 'border 0.2s' }}
                 />
               </div>
-              <div style={{ flex: 1, minWidth: 220 }}>
-                <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, color: '#444', fontSize: 15, textAlign: 'left' }}>Razão Social <span style={{ color: 'red' }}>*</span></label>
-                <input
-                  required
-                  type="text"
-                  placeholder="Informe a razão social"
-                  maxLength={100}
-                  value={razaoSocial}
-                  onChange={e => setRazaoSocial(e.target.value)}
-                  style={{ width: "100%", padding: '12px 14px', borderRadius: 8, border: "1.5px solid #e0e7ef", fontSize: 15, background: '#fafbfc', outline: 'none', transition: 'border 0.2s' }}
-                />
-              </div>
-            </div>
-
-            {/* Email */}
-            <div style={{ display: "flex", gap: 20, marginBottom: 20, flexWrap: 'wrap' }}>
               <div style={{ flex: 1, minWidth: 220 }}>
                 <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, color: '#444', fontSize: 15, textAlign: 'left' }}>Email <span style={{ color: 'red' }}>*</span></label>
                 <input
@@ -122,16 +116,15 @@ export default function FormDono() {
               </div>
             </div>
 
-            {/* Senha e Confirmação de Senha */}
             <div style={{ display: "flex", gap: 20, marginBottom: 2, flexWrap: 'wrap' }}>
               <div style={{ flex: 1, minWidth: 220 }}>
                 <div style={{ marginBottom: 18, textAlign: 'left' }}>
-                  <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, color: '#444', fontSize: 15 }}>Senha  <span style={{ color: 'red' }}>*</span></label>
+                  <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, color: '#444', fontSize: 15 }}>Senha <span style={{ color: 'red' }}>*</span></label>
                   <div style={{ display: 'flex', gap: 12 }}>
                     <input
                       type="password"
                       required
-                      placeholder="Digite sua senha"
+                      placeholder="Digite a senha"
                       value={senha}
                       onChange={e => setSenha(e.target.value)}
                       style={{ width: '100%', padding: '12px 14px', borderRadius: 8, border: '1.5px solid #e0e7ef', fontSize: 15, background: '#fafbfc', outline: 'none' }}
@@ -139,7 +132,7 @@ export default function FormDono() {
                     <input
                       type="password"
                       required
-                      placeholder="Confirme sua senha"
+                      placeholder="Confirme a senha"
                       value={confirmaSenha}
                       onChange={e => setConfirmaSenha(e.target.value)}
                       style={{ width: '100%', padding: '12px 14px', borderRadius: 8, border: '1.5px solid #e0e7ef', fontSize: 15, background: '#fafbfc', outline: 'none' }}
@@ -149,25 +142,33 @@ export default function FormDono() {
                     <span style={{ color: 'red', fontSize: 13, marginTop: 4, display: 'block' }}>{erroSenha}</span>
                   )}
                 </div>
-
               </div>
             </div>
-            {/* CPF */}
+
             <div style={{ display: "flex", gap: 20, marginBottom: 20, flexWrap: 'wrap' }}>
               <div style={{ flex: 1, minWidth: 220 }}>
-                <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, color: '#444', fontSize: 15, textAlign: 'left' }}>CPF <span style={{ color: 'red' }}>*</span></label>
-                <InputMask
-                  mask="999.999.999-99"
-                  placeholder="Ex: 123.456.789-00"
-                  maskChar={null}
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, color: '#444', fontSize: 15, textAlign: 'left' }}>Cargo <span style={{ color: 'red' }}>*</span></label>
+                <input
                   required
-                  value={cpf}
-                  onChange={e => setCpf(e.target.value)}
+                  type="text"
+                  placeholder="Informe o cargo do administrador"
+                  maxLength={100}
+                  value={cargo}
+                  onChange={e => setCargo(e.target.value)}
                   style={{ width: "100%", padding: '12px 14px', borderRadius: 8, border: "1.5px solid #e0e7ef", fontSize: 15, background: '#fafbfc', outline: 'none', transition: 'border 0.2s' }}
                 />
               </div>
+              <div style={{ width: 180, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, color: '#444', fontSize: 15, textAlign: 'left' }}>Ativo</label>
+                <input
+                  type="checkbox"
+                  checked={ativo}
+                  onChange={e => setAtivo(e.target.checked)}
+                  style={{ width: '20px', height: '20px', transform: 'scale(1.2)', margin: 'auto 0' }}
+                />
+              </div>
             </div>
-            {/* Data de Nascimento e Telefone Celular */}
+
             <div style={{ display: "flex", gap: 20, marginBottom: 20, flexWrap: 'wrap' }}>
               <div style={{ flex: 1, minWidth: 220 }}>
                 <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, color: '#444', fontSize: 15, textAlign: 'left' }}>Data de Nascimento <span style={{ color: 'red' }}>*</span></label>
@@ -181,19 +182,19 @@ export default function FormDono() {
                   style={{ width: "100%", padding: '12px 14px', borderRadius: 8, border: "1.5px solid #e0e7ef", fontSize: 15, background: '#fafbfc', outline: 'none', transition: 'border 0.2s' }}
                 />
               </div>
-              <div style={{ width: 180, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+              <div style={{ flex: 1, minWidth: 220 }}>
                 <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, color: '#444', fontSize: 15, textAlign: 'left' }}>Telefone Celular</label>
                 <input
-                  type="text"
+                  type="tel"
                   placeholder="(99) 99999-9999"
                   maxLength={15}
-                  value={fonecelular}
-                  onChange={e => setFonecelular(e.target.value)}
+                  value={foneCelular}
+                  onChange={e => setFoneCelular(e.target.value)}
                   style={{ width: "100%", padding: '12px 14px', borderRadius: 8, border: "1.5px solid #e0e7ef", fontSize: 15, background: '#fafbfc', outline: 'none', transition: 'border 0.2s' }}
                 />
               </div>
             </div>
-            {/* Mensagens de Sucesso e Erro */}
+
             <div style={{ marginBottom: 20 }}>
               {mensagemSucesso && (
                 <motion.div
@@ -201,7 +202,7 @@ export default function FormDono() {
                   animate={{ opacity: 1 }}
                   style={{ background: "#e6ffed", color: "#256029", border: "1.5px solid #b7eb8f", borderRadius: 6, padding: 14, marginBottom: 18, fontWeight: 500, fontSize: 15 }}
                 >
-                  <strong>Cadastro Realizado!</strong> Gerenciador cadastrado com sucesso.
+                  <strong>Cadastro Realizado!</strong> Administrador cadastrado com sucesso.
                 </motion.div>
               )}
               {mensagemErro && (
@@ -210,11 +211,11 @@ export default function FormDono() {
                   animate={{ opacity: 1 }}
                   style={{ background: "#fff1f0", color: "#a8071a", border: "1.5px solid #ffa39e", borderRadius: 6, padding: 14, marginBottom: 18, fontWeight: 500, fontSize: 15 }}
                 >
-                  <strong>Erro no Cadastro:</strong> Ocorreu um erro ao tentar cadastrar o Gerenciador. Tente novamente.
+                  <strong>Erro no Cadastro:</strong> Ocorreu um erro ao tentar cadastrar o Administrador. Tente novamente.
                 </motion.div>
               )}
             </div>
-            {/* Botões de Ação */}
+
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 36, gap: 16 }}>
               <Link to={"/login"} style={{ textDecoration: 'none' }}>
                 <motion.button

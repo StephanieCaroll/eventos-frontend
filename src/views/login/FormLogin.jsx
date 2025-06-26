@@ -1,37 +1,51 @@
-import { motion } from "framer-motion";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import MenuSistema from "../../MenuSistema";
-import { Footer } from "../home/Home";
+import axios from 'axios';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import MenuSistema from '../../MenuSistema';
+import { Footer } from '../home/Home';
+import PopupCadastro from '../../componentes/PopupCadastro';
 
-export default function LoginCliente() {
-    const [email, setEmail] = useState("");
-    const [senha, setSenha] = useState("");
-    const [erro, setErro] = useState("");
+export default function FormLogin() {
     const navigate = useNavigate();
 
-    async function handleLogin(e) {
-        e.preventDefault();
+    const [username, setUsername] = useState('');
+    const [senha, setSenha] = useState('');
+    const [erro, setErro] = useState("");
+    const [mostrarPopup, setMostrarPopup] = useState(false);
+
+    const registerSuccessfulLoginForJwt = (token, expiration) => {
+        console.log('Login bem-sucedido. Token:', token, 'Expiração:', expiration);
+        localStorage.setItem('token', token);
+        localStorage.setItem('expiration', expiration);
+    };
+
+    function entrar() {
         setErro("");
-        try {
-            const response = await fetch("http://localhost:8080/api/cliente/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, senha })
-            });
-            if (response.ok) {
-                navigate("/");
-            } else {
-                setErro("E-mail ou senha inválidos.");
-            }
-        } catch (err) {
-            setErro("Erro ao conectar com o servidor.");
+
+        if (username !== '' && senha !== '') {
+            let authenticationRequest = {
+                username: username,
+                password: senha,
+            };
+
+            axios.post("http://localhost:8080/api/auth", authenticationRequest)
+                .then((response) => {
+                    registerSuccessfulLoginForJwt(response.data.token, response.data.expiration);
+                    navigate("/home");
+                })
+                .catch((error) => {
+                    console.error("Erro ao fazer login:", error.response?.data || error.message);
+                    setErro('Usuário ou senha inválidos.');
+                });
+        } else {
+            setErro("Por favor, preencha todos os campos.");
         }
     }
 
     return (
         <div style={{ background: '#f5f7fa', minHeight: '100vh' }}>
-            <MenuSistema tela={"cliente-login"} />
+           <MenuSistema tela={"form-login"} />
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '80vh' }}>
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
@@ -39,16 +53,24 @@ export default function LoginCliente() {
                     transition={{ duration: 0.5 }}
                     style={{ width: 370, background: '#fff', borderRadius: 16, boxShadow: '0 4px 24px #e0e7ef', padding: 40, textAlign: 'center' }}
                 >
-                    <h2 style={{ color: '#1677ff', fontWeight: 700, fontSize: 28, marginBottom: 24 }}>Expositor</h2>
-                    <form onSubmit={handleLogin}>
+                    <center>
+                        
+                        <h2 style={{ color: '#1677ff', fontWeight: 700, fontSize: 28, marginBottom: 24 }}>Login</h2>
+                    </center>
+
+                    <h3 style={{ color: '#8c8c8c', fontWeight: 500, fontSize: 18, marginBottom: 30 }}>
+                        Informe suas credenciais de acesso
+                    </h3>
+
+                    <form onSubmit={(e) => { e.preventDefault(); entrar(); }}>
                         <div style={{ marginBottom: 18, textAlign: 'left' }}>
                             <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, color: '#444', fontSize: 15 }}>E-mail</label>
                             <input
                                 type="email"
                                 required
-                                placeholder="Digite seu e-mail"
-                                value={email}
-                                onChange={e => setEmail(e.target.value)}
+                                placeholder="Informe seu e-mail"
+                                value={username}
+                                onChange={e => setUsername(e.target.value)}
                                 style={{ width: '100%', padding: '12px 14px', borderRadius: 8, border: '1.5px solid #e0e7ef', fontSize: 15, background: '#fafbfc', outline: 'none' }}
                             />
                         </div>
@@ -57,17 +79,19 @@ export default function LoginCliente() {
                             <input
                                 type="password"
                                 required
-                                placeholder="Digite sua senha"
+                                placeholder="Senha"
                                 value={senha}
                                 onChange={e => setSenha(e.target.value)}
                                 style={{ width: '100%', padding: '12px 14px', borderRadius: 8, border: '1.5px solid #e0e7ef', fontSize: 15, background: '#fafbfc', outline: 'none' }}
                             />
                         </div>
+
                         {erro && (
                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ color: '#a8071a', marginBottom: 14, fontWeight: 500, fontSize: 15 }}>
                                 {erro}
                             </motion.div>
                         )}
+
                         <div style={{ display: 'flex', gap: 12, marginBottom: 8 }}>
                             <Link to="/" style={{ textDecoration: 'none', flex: 1 }}>
                                 <motion.button
@@ -89,15 +113,28 @@ export default function LoginCliente() {
                             </motion.button>
                         </div>
                     </form>
+
                     <div style={{ marginTop: 18, fontSize: 15, color: '#444' }}>
-                        Não tem conta?
-                        <Link to="/cliente/form" style={{ color: '#1677ff', fontWeight: 600, marginLeft: 6, textDecoration: 'none' }}>
-                            Cadastre-se
+                        Esqueceu a sua senha:
+                        <Link to="#" style={{ color: '#1677ff', fontWeight: 600, marginLeft: 6, textDecoration: 'underline' }}>
+                            clique aqui
                         </Link>
                     </div>
+
+                    <div style={{ marginTop: 18, fontSize: 15, color: '#444' }}>
+                        Não tem conta?
+                        <button
+                            onClick={() => setMostrarPopup(true)}
+                            style={{ background: 'none', border: 'none', color: '#1677ff', fontWeight: 600, marginLeft: 6, cursor: 'pointer', textDecoration: 'underline' }}
+                        >
+                            Cadastre-se
+                        </button>
+                    </div>
+
+                    <PopupCadastro aberto={mostrarPopup} fechar={() => setMostrarPopup(false)} />
                 </motion.div>
             </div>
-            <Footer />
-        </div >
+           <Footer />
+        </div>
     );
 }

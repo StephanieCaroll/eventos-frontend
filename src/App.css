@@ -36,3 +36,80 @@
     transform: rotate(360deg);
   }
 }
+
+/* Dimmer customizado para controle total */
+.custom-dimmer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.85); 
+  z-index: 1000; 
+  opacity: 0; 
+  animation: fadeInDimmer 0.3s forwards;
+}
+
+/* Animação de fade-in para o dimmer */
+@keyframes fadeInDimmer {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Animação de fade-out para o dimmer */
+.custom-dimmer.fade-out-dimmer {
+  animation: fadeOutDimmer 0.3s forwards;
+}
+
+@keyframes fadeOutDimmer {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Estilos base do modal */
+.modal-gerenciador-expositor-base.ui.mini.modal {
+  position: relative !important; 
+  margin: 0 !important;
+  width: auto !important;
+  max-width: 60% !important;
+  max-height: 62% !important;
+  overflow-y: auto !important;
+  box-sizing: border-box !important;
+  opacity: 0;
+  animation: fadeInModal 0.3s forwards;
+}
+
+/* Animação de fade-in para o modal */
+@keyframes fadeInModal {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Animação de fade-out para o modal */
+.modal-gerenciador-expositor-base.ui.mini.modal.fade-out-modal {
+  animation: fadeOutModal 0.3s forwards;
+}
+
+@keyframes fadeOutModal {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
