@@ -179,7 +179,7 @@ export default function FormCliente() {
             )}
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 36, gap: 16 }}>
 
-              <Link to={"/dono-login"} style={{ textDecoration: 'none' }}>
+              <Link to={"/login"} style={{ textDecoration: 'none' }}>
                 <motion.button
                   type="button"
                   whileHover={{ scale: 1, backgroundColor: '#ffd591' }}
