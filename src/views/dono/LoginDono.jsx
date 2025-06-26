@@ -3,12 +3,14 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import MenuSistema from "../../MenuSistema";
 import { Footer } from "../home/Home";
+import PopupCadastro from "../../componentes/PopupCadastro"; // <- import do novo componente
 
 export default function LoginDono() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState("");
-  const navigate = useNavigate();
+  const [mostrarPopup, setMostrarPopup] = useState(false); // <- controla o modal
+  const navigate = useNavigate(); //novo
 
   async function handleLogin(e) {
     e.preventDefault();
@@ -39,7 +41,7 @@ export default function LoginDono() {
           transition={{ duration: 0.5 }}
           style={{ width: 370, background: '#fff', borderRadius: 16, boxShadow: '0 4px 24px #e0e7ef', padding: 40, textAlign: 'center' }}
         >
-          <h2 style={{ color: '#1677ff', fontWeight: 700, fontSize: 28, marginBottom: 24 }}>Login do Dono</h2>
+          <h2 style={{ color: '#1677ff', fontWeight: 700, fontSize: 28, marginBottom: 24 }}>Login</h2>
           <form onSubmit={handleLogin}>
             <div style={{ marginBottom: 18, textAlign: 'left' }}>
               <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, color: '#444', fontSize: 15 }}>E-mail</label>
@@ -89,12 +91,19 @@ export default function LoginDono() {
               </motion.button>
             </div>
           </form>
+
           <div style={{ marginTop: 18, fontSize: 15, color: '#444' }}>
             Não tem conta?
-            <Link to="/form-dono" style={{ color: '#1677ff', fontWeight: 600, marginLeft: 6, textDecoration: 'none' }}>
+            <button
+              onClick={() => setMostrarPopup(true)}
+              style={{ background: 'none', border: 'none', color: '#1677ff', fontWeight: 600, marginLeft: 6, cursor: 'pointer', textDecoration: 'underline' }}
+            >
               Cadastre-se
-            </Link>
+            </button>
           </div>
+
+          {/* Aqui está o modal sendo exibido */}
+          <PopupCadastro aberto={mostrarPopup} fechar={() => setMostrarPopup(false)} />
         </motion.div>
       </div>
       <Footer />

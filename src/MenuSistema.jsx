@@ -17,8 +17,11 @@ export default function MenuSistema(props) {
           active={props.tela === "Dono"}
           as={Link}
           to="/dono-login">
-          <Button primary >Dono</Button>
+          <Button primary >Login</Button>
         </MenuItem>
+
+
+        {/* 
 
          <MenuItem
           content="Evento"
@@ -35,6 +38,8 @@ export default function MenuSistema(props) {
           to="/cliente-login">
           <Button primary >Expositor</Button>
         </MenuItem>
+
+        */}
 
       </Menu>
     </>

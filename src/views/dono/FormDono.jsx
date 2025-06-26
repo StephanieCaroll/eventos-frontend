@@ -65,7 +65,7 @@ export default function FormDono() {
         >
           <h2 style={{ color: "#222", marginBottom: 16, fontWeight: 700, fontSize: 28, letterSpacing: 0.5 }}>
             <span style={{ color: "#8c8c8c", fontWeight: 400 }}>
-              Dono &nbsp;
+              Gerenciador &nbsp;
               <span style={{ fontSize: 18, verticalAlign: "middle" }}>&raquo;</span>
             </span>
             &nbsp;  Cadastro
@@ -201,7 +201,7 @@ export default function FormDono() {
                   animate={{ opacity: 1 }}
                   style={{ background: "#e6ffed", color: "#256029", border: "1.5px solid #b7eb8f", borderRadius: 6, padding: 14, marginBottom: 18, fontWeight: 500, fontSize: 15 }}
                 >
-                  <strong>Cadastro Realizado!</strong> Dono cadastrado com sucesso.
+                  <strong>Cadastro Realizado!</strong> Gerenciador cadastrado com sucesso.
                 </motion.div>
               )}
               {mensagemErro && (
@@ -210,7 +210,7 @@ export default function FormDono() {
                   animate={{ opacity: 1 }}
                   style={{ background: "#fff1f0", color: "#a8071a", border: "1.5px solid #ffa39e", borderRadius: 6, padding: 14, marginBottom: 18, fontWeight: 500, fontSize: 15 }}
                 >
-                  <strong>Erro no Cadastro:</strong> Ocorreu um erro ao tentar cadastrar o Dono. Tente novamente.
+                  <strong>Erro no Cadastro:</strong> Ocorreu um erro ao tentar cadastrar o Gerenciador. Tente novamente.
                 </motion.div>
               )}
             </div>
