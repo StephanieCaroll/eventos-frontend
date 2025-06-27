@@ -1,16 +1,19 @@
+// src/Rotas.js
 // Define as rotas da aplicação, utilizando ProtectedRoute para proteger rotas.
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import { ProtectedRoute } from './views/util/ProtectedRoute'; 
-import FormCliente from './views/cliente/FormCliente'; //  (expositor)
+import FormCliente from './views/cliente/FormCliente';
 import FormLogin from './views/login/FormLogin'; 
-import FormDono from './views/dono/FormDono'; // (gerenciador)
+import FormDono from './views/dono/FormDono'; 
 import Home from './views/home/Home'; 
 import FormEvento from './views/evento/FormEvento'; 
 import FormAdm from './views/administrador/FormAdm'; 
 import HomeExpositor from './views/home/HomeExpositor'; 
+import UserProfilePage from './componentes/UserProfilePage';
+import React, { useContext } from 'react';
+import { AuthContext } from './AuthContext';
 
-// Componente placeholder para o Dashboard do Administrador (fazer)
-
+// Componente placeholder para o Dashboard do Administrador
 const DashboardAdmin = () => (
   <div style={{ padding: '2em', textAlign: 'center', background: '#f5f7fa', minHeight: '100vh' }}>
     <h1 style={{ color: '#3b82f6' }}>Dashboard do Administrador</h1>
@@ -18,13 +21,33 @@ const DashboardAdmin = () => (
   </div>
 );
 
+// Componente placeholder para a Página de Eventos
+const EventosPage = () => (
+    <div style={{ backgroundColor: '#0f172a', color: '#ffffff', minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', fontSize: '1.5em' }}>
+        <h2>Página de Eventos</h2>
+        <p>Aqui você verá a lista de todos os eventos!</p>
+        <button onClick={() => window.history.back()} style={{
+            backgroundColor: '#2563eb',
+            color: '#fff',
+            padding: '0.8em 2em',
+            fontSize: '1em',
+            fontWeight: '600',
+            border: 'none',
+            borderRadius: 30,
+            cursor: 'pointer',
+            marginTop: '20px'
+        }}>Voltar</button>
+    </div>
+);
+
 function Rotas() {
   return (
     <>
       <Routes>
-       
         <Route path="/" element={<Home />} /> 
+        <Route path="/profile" element={<UserProfilePage />} />
         <Route path="login" element={<FormLogin />} /> 
+        
         <Route path="form-dono" element={<FormDono />} />
         <Route path="form-cliente" element={<FormCliente />} />
         <Route path="form-adm" element={<FormAdm />} />
@@ -37,11 +60,11 @@ function Rotas() {
           }
         />
 
-        {/* Dashboard do Administrador (AINDA VOU IMPLEMENTAR)*/}
+        {/* Dashboard do Administrador */}
         <Route
           path="dashboard-admin"
           element={
-            <ProtectedRoute allowedRoles={['ROLE_ADMINISTRADOR']}> {/* Apenas Administradores */}
+            <ProtectedRoute allowedRoles={['ROLE_ADMINISTRADOR']}>
               <DashboardAdmin />
             </ProtectedRoute>
           }
@@ -51,14 +74,15 @@ function Rotas() {
         <Route
           path="form-evento"
           element={
-            <ProtectedRoute allowedRoles={['ROLE_GERENCIADOR', 'ROLE_ADMINISTRADOR']}> {/* Gerenciadores e Administradores */}
+            <ProtectedRoute allowedRoles={['ROLE_GERENCIADOR', 'ROLE_ADMINISTRADOR']}>
               <FormEvento />
             </ProtectedRoute>
           }
         />
+        <Route path="/eventos" element={<EventosPage />} />
       </Routes>
     </>
   );
 }
 
-export default Rotas; 
+export default Rotas;

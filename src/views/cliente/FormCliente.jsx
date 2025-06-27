@@ -5,17 +5,20 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import MenuSistema from "../../MenuSistema";
 import { Footer } from "../home/Home";
+// Se você tem notifyError e notifySuccess, certifique-se de que estão no local certo ou comente-os se não os usa.
+// import { notifyError, notifySuccess } from "../../views/util/Util";
+
 
 export default function FormCliente() {
-  const [nome, setNome] = useState(""); // Inicializado com string vazia
-  const [email, setEmail] = useState(""); // Inicializado com string vazia
-  const [dataNascimento, setDataNascimento] = useState(""); // Inicializado com string vazia
-  const [foneCelular, setFoneCelular] = useState(""); // Inicializado com string vazia
-  const [password, setPassword] = useState(""); // Inicializado com string vazia
+  const [nome, setNome] = useState("");
+  const [email, setEmail] = useState("");
+  const [dataNascimento, setDataNascimento] = useState(""); // InputMask já está para DD/MM/YYYY
+  const [foneCelular, setFoneCelular] = useState("");
+  const [password, setPassword] = useState("");
   const [confirmaPassword, setConfirmaPassword] = useState("");
   const [erroPassword, setErroPassword] = useState("");
-  const [mensagemSucesso, setMensagemSucesso] = useState(false); // Novo estado para mensagem de sucesso
-  const [mensagemErro, setMensagemErro] = useState(false); // Novo estado para mensagem de erro
+  const [mensagemSucesso, setMensagemSucesso] = useState(false);
+  const [mensagemErro, setMensagemErro] = useState(false);
 
   function salvar() {
     setMensagemSucesso(false);
@@ -24,32 +27,65 @@ export default function FormCliente() {
 
     if (password !== confirmaPassword) {
       setErroPassword("As senhas não são iguais.");
+      console.error("[FormCliente] Erro de validação: As senhas não são iguais.");
       return;
     }
 
+    // A data é enviada no formato DD/MM/AAAA conforme InputMask
+    const dataParaBackend = dataNascimento; 
+
     let clienteRequest = {
       nome: nome,
-      email: email,
-      dataNascimento: dataNascimento,
+      usuario: { // Objeto 'usuario' aninhado
+          username: email,
+          password: password // <<-- AQUI A SENHA ESTÁ A SER ENVIADA
+      },
+      dataNascimento: dataParaBackend,
       foneCelular: foneCelular,
-      password: password, // Atualizado aqui
     };
 
+    // Log do objeto que está realmente a ser enviado
+    console.log("[FormCliente] Enviando requisição POST para /api/clientes com dados:", JSON.stringify(clienteRequest, null, 2));
+
     axios
-      .post("http://localhost:8080/api/cliente", clienteRequest)
+      .post("http://localhost:8080/api/clientes", clienteRequest)
       .then((response) => {
-        console.log("Expositor cadastrado com sucesso.");
+        console.log("[FormCliente] Cliente cadastrado com sucesso. Resposta do backend:", response.data);
         setMensagemSucesso(true);
+        // Limpar os campos após o sucesso
         setNome("");
         setEmail("");
         setDataNascimento("");
         setFoneCelular("");
         setPassword("");
         setConfirmaPassword("");
+        // if (typeof notifySuccess === 'function') notifySuccess("Cliente cadastrado com sucesso.");
       })
       .catch((error) => {
-        console.log("Erro ao incluir Expositor.", error);
         setMensagemErro(true);
+        console.error("[FormCliente] Erro ao incluir Cliente."); // Alterado de Expositor para Cliente
+        
+        if (error.response) {
+            console.error("[FormCliente] Resposta de erro do servidor (status " + error.response.status + "):", error.response.data);
+            if (error.response.data && typeof error.response.data === 'string' && error.response.data.includes("JSON parse error: Cannot deserialize value of type `java.time.LocalDate`")) {
+                console.error("[FormCliente] POSSÍVEL CAUSA: Formato da data incorreto no backend. Verifique a anotação @JsonFormat(pattern = \"dd/MM/yyyy\") na sua classe ClienteRequest.java.");
+            } else if (error.response.data && error.response.data.includes("rawPassword cannot be null")) { // <<-- Mensagem específica para este erro
+                console.error("[FormCliente] ERRO: Senha nula no backend. Verifique se o campo 'password' no seu ClienteRequest.java e UsuarioRequest.java (se existir) está correto, e se o método build() está a passar a senha para o Usuario.");
+            } else if (error.response.data && error.response.data.errors) {
+                error.response.data.errors.forEach(err => {
+                    console.error("[FormCliente] Erro de validação: Campo '" + err.field + "' - " + err.defaultMessage);
+                });
+            } else if (error.response.data && error.response.data.message) {
+                console.error("[FormCliente] Mensagem de erro do backend:", error.response.data.message);
+            } else {
+                console.error("[FormCliente] Resposta de erro inesperada do backend:", error.response.data);
+            }
+        } else if (error.request) {
+            console.error("[FormCliente] Nenhuma resposta do servidor. Verifique se o backend está rodando e se há problemas de CORS. Detalhes:", error.request);
+        } else {
+            console.error("[FormCliente] Erro na configuração da requisição:", error.message);
+        }
+        console.error("[FormCliente] Objeto erro completo:", error);
       });
   }
 
@@ -80,7 +116,7 @@ export default function FormCliente() {
             }}
           >
             <span style={{ color: "#8c8c8c", fontWeight: 400 }}>
-              Expositor &nbsp;
+              Cliente &nbsp;
               <span style={{ fontSize: 18, verticalAlign: "middle" }}>
                 &raquo;
               </span>
@@ -202,15 +238,15 @@ export default function FormCliente() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     style={{
-                    width: "100%",
-                    padding: "12px 10px",
-                    borderRadius: 8,
-                    border: "1.5px solid #e0e7ef",
-                    fontSize: 15,
-                    background: "#fafbfc",
-                    outline: "none",
-                    transition: "border 0.2s",
-                  }}
+                      width: "100%",
+                      padding: "12px 10px",
+                      borderRadius: 8,
+                      border: "1.5px solid #e0e7ef",
+                      fontSize: 15,
+                      background: "#fafbfc",
+                      outline: "none",
+                      transition: "border 0.2s",
+                    }}
                   />
                   <input
                     required
@@ -220,15 +256,15 @@ export default function FormCliente() {
                     value={confirmaPassword}
                     onChange={(e) => setConfirmaPassword(e.target.value)}
                     style={{
-                    width: "100%",
-                    padding: "12px 14px",
-                    borderRadius: 8,
-                    border: "1.5px solid #e0e7ef",
-                    fontSize: 15,
-                    background: "#fafbfc",
-                    outline: "none",
-                    transition: "border 0.2s",
-                  }}
+                      width: "100%",
+                      padding: "12px 14px",
+                      borderRadius: 8,
+                      border: "1.5px solid #e0e7ef",
+                      fontSize: 15,
+                      background: "#fafbfc",
+                      outline: "none",
+                      transition: "border 0.2s",
+                    }}
                   />
                 </div>
                 {erroPassword && (
@@ -268,7 +304,7 @@ export default function FormCliente() {
                   Data de Nascimento
                 </label>
                 <InputMask
-                  mask="99/99/9999"
+                  mask="99/99/9999" // Máscara para DD/MM/YYYY
                   maskChar={null}
                   required
                   placeholder="Ex: 20/03/1985"

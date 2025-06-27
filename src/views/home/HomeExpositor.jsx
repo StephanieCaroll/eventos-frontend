@@ -1,7 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { motion, AnimatePresence } from "framer-motion"; // Importe AnimatePresence
-import { CalendarCheck, Search, List, ChevronRight, Star, Clapperboard, Monitor, Paintbrush } from 'lucide-react'; 
+import { CalendarCheck, Search, List, ChevronRight, Star, Clapperboard, Monitor, Paintbrush } from 'lucide-react';
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../AuthContext';
@@ -78,7 +78,7 @@ function cardStyle(color1, color2) {
         zIndex: 1,
         position: 'relative',
         backdropFilter: 'blur(10px)',
-        cursor: 'pointer' 
+        cursor: 'pointer'
     };
 }
 
@@ -98,7 +98,7 @@ export default function HomeExpositor() {
     const { isAuthenticated, userRoles, userName, logout } = useContext(AuthContext);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('Todos os Eventos');
-    const [selectedEvent, setSelectedEvent] = useState(null); 
+    const [selectedEvent, setSelectedEvent] = useState(null);
 
     useEffect(() => {
         console.log('[HomeExpositor] Componente carregado.');
@@ -109,7 +109,7 @@ export default function HomeExpositor() {
 
     const handleLogout = () => {
         logout();
-        navigate('/', { replace: true }); 
+        navigate('/', { replace: true });
     };
 
     const firstName = userName ? userName.split(' ')[0] : 'Usuário';
@@ -124,13 +124,13 @@ export default function HomeExpositor() {
     ];
 
     const filteredEvents = fictitiousEvents.filter(event => {
-        const matchesCategory = selectedCategory === 'Todos os Eventos' || 
+        const matchesCategory = selectedCategory === 'Todos os Eventos' ||
                                 (selectedCategory === 'Eventos Ativos' && event.status === 'Ativo') ||
                                 (selectedCategory === 'Eventos Passados' && event.status === 'Encerrado') ||
                                 (selectedCategory === event.category); // Filtra por categoria específica
 
         const matchesSearch = event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                              event.description.toLowerCase().includes(searchTerm.toLowerCase());
+                                event.description.toLowerCase().includes(searchTerm.toLowerCase());
 
         return matchesCategory && matchesSearch;
     });
@@ -138,13 +138,13 @@ export default function HomeExpositor() {
     return (
         <div style={{ backgroundColor: '#0a192f', color: '#ffffff', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
             {/* Header Section */}
-            <section style={{ 
+            <section style={{
                 padding: '1.5em 2em',
-                background: 'linear-gradient(135deg, #000000 0%, #0a192f 100%)', 
-                color: '#fff', 
-                borderBottom: '1px solid #1e293b', 
-                display: 'flex', 
-                alignItems: 'center', 
+                background: 'linear-gradient(135deg, #000000 0%, #0a192f 100%)',
+                color: '#fff',
+                borderBottom: '1px solid #1e293b',
+                display: 'flex',
+                alignItems: 'center',
                 justifyContent: 'space-between',
                 flexWrap: 'wrap',
                 gap: '1em'
@@ -157,22 +157,25 @@ export default function HomeExpositor() {
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1.5em', flexShrink: 0, marginLeft: 'auto' }}>
                     {isAuthenticated && userName && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8em', color: '#fff' }}>
+                        <div
+                            style={{ display: 'flex', alignItems: 'center', gap: '0.8em', color: '#fff', cursor: 'pointer' }}
+                            onClick={() => navigate('/profile')} // Adicionado o onClick para navegar para /profile
+                        >
                             <div style={{
                                 width: '40px',
                                 height: '40px',
                                 borderRadius: '50%',
-                                backgroundColor: '#6b7280', 
+                                backgroundColor: '#6b7280',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 overflow: 'hidden',
                                 border: '2px solid #3b82f6'
                             }}>
-                                <img 
+                                <img
                                     src={`https://placehold.co/40x40/3b82f6/ffffff?text=${firstName.charAt(0).toUpperCase()}`} //Função foda para gerar avatar com a primeira letra do nome
-                                    alt="User Avatar" 
-                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                                    alt="Avatar do Usuário"
+                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                     onError={(e) => e.target.src = `https://placehold.co/40x40/3b82f6/ffffff?text=${firstName.charAt(0).toUpperCase()}`}
                                 />
                             </div>
@@ -207,22 +210,13 @@ export default function HomeExpositor() {
                     )}
                 </div>
             </section>
-            
-            {/* Boas-vindas ao usuário (caso esteja em duvida sem o usuario foi logado ou )
-            <section style={{ padding: '2em 0', background: 'linear-gradient(135deg, #000000 0%, #0a192f 100%)', color: '#fff', textAlign: 'center', borderBottom: '1px solid #1e293b' }}>
-                <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 2em' }}>
-                    <p style={{ fontSize: '1.5em', color: '#e0e0e0', maxWidth: '700px', margin: '0 auto', marginTop: '1em' }}>
-                        Bem-vindo(a), {userName || 'Carregando...'}! Você está logado como: {(userRoles && userRoles.length > 0) ? userRoles.join(', ') : 'Carregando Papéis...' }.
-                    </p>
-                </div>
-            </section> */}
-          
+
             <div style={{ display: 'flex', flex: 1, backgroundColor: '#0f172a' }}>
                 {/* Sidebar */}
-                <aside style={{ 
-                    width: '280px', 
-                    backgroundColor: '#1e293b', 
-                    padding: '2em 1.5em', 
+                <aside style={{
+                    width: '280px',
+                    backgroundColor: '#1e293b',
+                    padding: '2em 1.5em',
                     borderRight: '1px solid #334155',
                     boxShadow: '2px 0 10px rgba(0,0,0,0.2)',
                     display: 'flex',
@@ -238,7 +232,7 @@ export default function HomeExpositor() {
                             <li key={cat.name} style={{ marginBottom: '0.8em' }}>
                                 <motion.button
                                     onClick={() => setSelectedCategory(cat.name)}
-                                    whileHover={{ x: 8, color: '#60a5fa' }} 
+                                    whileHover={{ x: 8, color: '#60a5fa' }}
                                     style={{
                                         background: 'none',
                                         border: 'none',
@@ -251,7 +245,7 @@ export default function HomeExpositor() {
                                         alignItems: 'center',
                                         gap: '0.8em',
                                         fontWeight: selectedCategory === cat.name ? 'bold' : 'normal',
-                                        transition: 'all 0.2s ease-in-out' 
+                                        transition: 'all 0.2s ease-in-out'
                                     }}
                                 >
                                     {cat.icon} {cat.name}
@@ -262,9 +256,9 @@ export default function HomeExpositor() {
                 </aside>
 
                 {/* Eventos disponíveis */}
-                <main style={{ flex: 1, padding: '4em 2em', overflowY: 'auto' }}> 
+                <main style={{ flex: 1, padding: '4em 2em', overflowY: 'auto' }}>
                     <h2 className="text-center text-white mb-5" style={{ fontSize: '2.8em', fontWeight: '700', textShadow: '0 0 10px rgba(59, 130, 246, 0.5)' }}>Eventos Disponíveis</h2>
-                    
+
                     {/* Barra de Pesquisa */}
                     <div style={{ position: 'relative', marginBottom: '3em', maxWidth: '700px', margin: '0 auto 3em auto' }}>
                         <input
@@ -274,7 +268,7 @@ export default function HomeExpositor() {
                             onChange={(e) => setSearchTerm(e.target.value)}
                             style={{
                                 width: '100%',
-                                padding: '1em 1.5em 1em 3.5em', 
+                                padding: '1em 1.5em 1em 3.5em',
                                 borderRadius: 30,
                                 border: '1px solid #334155',
                                 backgroundColor: '#1e293b',
@@ -290,29 +284,29 @@ export default function HomeExpositor() {
                     <div className="row justify-content-center">
                         {filteredEvents.length > 0 ? (
                             filteredEvents.map(event => (
-                                <motion.div 
-                                    key={event.id} 
-                                    className="col-lg-4 col-md-6 col-sm-12 p-3" 
-                                    whileHover={{ scale: 1.03, boxShadow: '0 0 40px rgba(59, 130, 246, 0.7)' }} 
+                                <motion.div
+                                    key={event.id}
+                                    className="col-lg-4 col-md-6 col-sm-12 p-3"
+                                    whileHover={{ scale: 1.03, boxShadow: '0 0 40px rgba(59, 130, 246, 0.7)' }}
                                     initial={{ opacity: 0, y: 40 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ duration: 0.5 }}
-                                    onClick={() => setSelectedEvent(event)} 
+                                    onClick={() => setSelectedEvent(event)}
                                 >
-                                    <div style={{ 
-                                        ...cardStyle('#1e40af', '#2563eb'), 
-                                        height: 'auto', 
-                                        minHeight: '350px', 
+                                    <div style={{
+                                        ...cardStyle('#1e40af', '#2563eb'),
+                                        height: 'auto',
+                                        minHeight: '350px',
                                         justifyContent: 'space-between',
-                                        padding: '25px' 
+                                        padding: '25px'
                                     }}>
-                                        <div style={{width: '100%', height: '180px', marginBottom: '15px', borderRadius: '15px', overflow: 'hidden', boxShadow: '0 4px 10px rgba(0,0,0,0.3)'}}>
-                                            <img src={event.image} alt={event.name} style={{width: '100%', height: '100%', objectFit: 'cover'}} />
+                                        <div style={{ width: '100%', height: '180px', marginBottom: '15px', borderRadius: '15px', overflow: 'hidden', boxShadow: '0 4px 10px rgba(0,0,0,0.3)' }}>
+                                            <img src={event.image} alt={event.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                         </div>
-                                        <h4 style={{fontSize: '1.6em', marginBottom: '10px', textAlign: 'center'}}>{event.name}</h4>
-                                        <p style={{fontSize: '0.95em', color: '#e0e0e0', textAlign: 'center', flexGrow: 1}}>{event.description}</p>
-                                        <div style={{display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center', marginTop: '15px'}}>
-                                            <span style={{backgroundColor: '#0f172a', padding: '5px 15px', borderRadius: '20px', fontSize: '0.85em', fontWeight: 'bold', color: '#a78bfa'}}>
+                                        <h4 style={{ fontSize: '1.6em', marginBottom: '10px', textAlign: 'center' }}>{event.name}</h4>
+                                        <p style={{ fontSize: '0.95em', color: '#e0e0e0', textAlign: 'center', flexGrow: 1 }}>{event.description}</p>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center', marginTop: '15px' }}>
+                                            <span style={{ backgroundColor: '#0f172a', padding: '5px 15px', borderRadius: '20px', fontSize: '0.85em', fontWeight: 'bold', color: '#a78bfa' }}>
                                                 {event.category}
                                             </span>
                                             <span style={{
@@ -344,7 +338,7 @@ export default function HomeExpositor() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        onClick={() => setSelectedEvent(null)} 
+                        onClick={() => setSelectedEvent(null)}
                         style={{
                             position: 'fixed',
                             top: 0,
@@ -363,7 +357,7 @@ export default function HomeExpositor() {
                             initial={{ y: -50, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             exit={{ y: 50, opacity: 0 }}
-                            onClick={e => e.stopPropagation()} 
+                            onClick={e => e.stopPropagation()}
                             style={{
                                 background: 'linear-gradient(135deg, #1e293b, #0a192f)',
                                 borderRadius: 20,
@@ -398,7 +392,7 @@ export default function HomeExpositor() {
                             <img src={selectedEvent.image} alt={selectedEvent.name} style={{ width: '100%', maxHeight: '300px', objectFit: 'cover', borderRadius: '15px', marginBottom: '20px', boxShadow: '0 5px 15px rgba(0,0,0,0.4)' }} />
                             <h3 style={{ fontSize: '2.2em', marginBottom: '15px', color: '#3b82f6' }}>{selectedEvent.name}</h3>
                             <p style={{ fontSize: '1.1em', lineHeight: '1.6', marginBottom: '20px' }}>{selectedEvent.longDescription}</p>
-                            <span style={{backgroundColor: '#0f172a', padding: '8px 20px', borderRadius: '25px', fontSize: '1em', fontWeight: 'bold', color: '#a78bfa', marginBottom: '20px'}}>
+                            <span style={{ backgroundColor: '#0f172a', padding: '8px 20px', borderRadius: '25px', fontSize: '1em', fontWeight: 'bold', color: '#a78bfa', marginBottom: '20px' }}>
                                 Categoria: {selectedEvent.category}
                             </span>
                             <motion.button
@@ -418,8 +412,8 @@ export default function HomeExpositor() {
                                     outline: 'none'
                                 }}
                                 onClick={() => {
-                                    navigate(`/evento/${selectedEvent.id}`); 
-                                    setSelectedEvent(null); 
+                                    navigate(`/evento/${selectedEvent.id}`);
+                                    setSelectedEvent(null);
                                 }}
                             >
                                 Ver Detalhes do Evento

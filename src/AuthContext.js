@@ -1,55 +1,61 @@
-// src/AuthContext.js
-// Este arquivo define o contexto de autenticação e o provedor para a aplicação React.
 import React, { createContext, useState, useEffect, useCallback } from 'react';
 import {
   getToken,
   isTokenExpired,
-  logout as authLogout, // Renomeia para evitar conflito com a função local de logout do contexto
+  logout as authLogout,
   registerSuccessfulLoginForJwt,
-  decodeTokenData, // Importa decodeTokenData
-  getUsername // Importa getUsername para verificar o valor inicial
-} from './views/util/AuthenticationService'; // Caminho de importação para 'src/views/util'
+  decodeTokenData,
+} from './views/util/AuthenticationService';
 
 // Cria o contexto de autenticação
 export const AuthContext = createContext({
   isAuthenticated: false,
   userRoles: [],
-  userName: 'Convidado', // Adiciona userName ao contexto
+  userName: 'Convidado',
+  userEmail: null,
+  authToken: null,
   login: () => {},
   logout: () => {},
   hasRole: () => false,
-  isAuthReady: false, // Indica se a verificação inicial de autenticação foi concluída
+  isAuthReady: false,
 });
 
 // Componente Provedor de Autenticação
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userRoles, setUserRoles] = useState([]);
-  const [userName, setUserName] = useState('Convidado'); // Novo estado para userName
-  const [isAuthReady, setIsAuthReady] = useState(false); // Novo estado para prontidão da autenticação
+  const [userName, setUserName] = useState('Convidado');
+  const [userEmail, setUserEmail] = useState(null);
+  const [authToken, setAuthToken] = useState(null);
+  const [isAuthReady, setIsAuthReady] = useState(false);
 
-  // Função para verificar o status de autenticação do usuário
+  // Função para verificar o status de autenticação do utilizador
   const checkAuthentication = useCallback(() => {
     const token = getToken();
     const expired = isTokenExpired();
-    
+
     console.log('[AuthContext] Verificando autenticação...');
     console.log('[AuthContext] Token:', token ? 'Presente' : 'Ausente', 'Expirado:', expired);
 
     if (token && !expired) {
-      const decodedData = decodeTokenData(token); // Usa decodeTokenData
+      const decodedData = decodeTokenData(token);
       setIsAuthenticated(true);
       setUserRoles(decodedData.roles);
-      setUserName(decodedData.username); // Define o nome de usuário
-      console.log('[AuthContext] Usuário autenticado. Papéis:', decodedData.roles, 'Nome:', decodedData.username);
+      setUserName(decodedData.username);
+      const emailFromToken = decodedData.email || decodedData.username;
+      setUserEmail(emailFromToken);
+      setAuthToken(token);
+      console.log('[AuthContext] Utilizador autenticado. Papéis:', decodedData.roles, 'Nome:', decodedData.username, 'Email Set:', emailFromToken);
     } else {
       setIsAuthenticated(false);
       setUserRoles([]);
-      setUserName('Convidado'); // Limpa o nome de usuário
-      authLogout(); // Garante que o token inválido seja removido do localStorage
-      console.log('[AuthContext] Usuário não autenticado ou token expirado.');
+      setUserName('Convidado');
+      setUserEmail(null);
+      setAuthToken(null);
+      authLogout();
+      console.log('[AuthContext] Utilizador não autenticado ou token expirado.');
     }
-    setIsAuthReady(true); // Marca que a verificação inicial foi concluída
+    setIsAuthReady(true);
     console.log('[AuthContext] Autenticação pronta.');
   }, []);
 
@@ -60,22 +66,22 @@ export const AuthProvider = ({ children }) => {
 
   // Função de login que será exposta pelo contexto
   const login = (token, expiration) => {
-    // 'expiration' aqui é o tokenExpiresInSeconds do backend
     registerSuccessfulLoginForJwt(token, expiration);
-    // Não precisa decodificar novamente aqui, pois registerSuccessfulLoginForJwt já faz isso
-    checkAuthentication(); // Atualiza o estado de autenticação após o login com os dados frescos
+    checkAuthentication();
   };
 
   // Função de logout que será exposta pelo contexto
   const logout = () => {
-    authLogout(); // Chama a função de logout do serviço de autenticação
+    authLogout();
     setIsAuthenticated(false);
     setUserRoles([]);
-    setUserName('Convidado'); // Limpa o nome de usuário ao fazer logout
+    setUserName('Convidado');
+    setUserEmail(null);
+    setAuthToken(null);
     console.log('[AuthContext] Logout realizado.');
   };
 
-  // Função para verificar se o usuário possui um determinado papel
+  // Função para verificar se o utilizador possui um determinado papel
   const hasRole = (role) => {
     return userRoles.includes(role);
   };
@@ -85,7 +91,9 @@ export const AuthProvider = ({ children }) => {
       value={{
         isAuthenticated,
         userRoles,
-        userName, // Expõe o nome de usuário
+        userName,
+        userEmail,
+        authToken,
         login,
         logout,
         hasRole,
