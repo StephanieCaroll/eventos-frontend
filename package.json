@@ -11,6 +11,7 @@
     "bootstrap": "^5.3.6",
     "comigo-tech-react-input-mask": "^3.0.0-alpha.3",
     "framer-motion": "^12.12.1",
+    "jwt-decode": "^4.0.0",
     "lucide-react": "^0.514.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

@@ -47,9 +47,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: rgba(255, 255, 255, 0.85); 
-  z-index: 1000; 
-  opacity: 0; 
+  background-color: rgba(255, 255, 255, 0.85);
+  z-index: 1000;
+  opacity: 0;
   animation: fadeInDimmer 0.3s forwards;
 }
 
@@ -79,15 +79,22 @@
 
 /* Estilos base do modal */
 .modal-gerenciador-expositor-base.ui.mini.modal {
-  position: relative !important; 
+  position: relative !important;
   margin: 0 !important;
   width: auto !important;
-  max-width: 60% !important;
-  max-height: 40% !important;
-  overflow-y: auto !important;
-  box-sizing: border-box !important;
+  box-sizing: border-box !important; 
   opacity: 0;
   animation: fadeInModal 0.3s forwards;
+  max-width: 90vw !important;
+  max-height: 90vh !important;
+  width: fit-content !important;
+  height: fit-content !important; 
+  overflow: hidden !important;
+  display: flex !important; 
+  flex-direction: column !important; 
+  justify-content: space-between !important;
+  align-items: center !important;
+
 }
 
 /* Animação de fade-in para o modal */
@@ -111,5 +118,22 @@
   }
   to {
     opacity: 0;
+  }
+}
+
+/* Media query para telas muito pequenas */
+@media (max-width: 480px) {
+  .modal-gerenciador-expositor-base.ui.mini.modal {
+    max-width: 95vw !important; /* Maior largura em telas pequenas */
+    max-height: 95vh !important; /* Maior altura em telas pequenas */
+    padding: 0.5rem !important; /* Reduzir padding em telas muito pequenas */
+  }
+
+  .modal-gerenciador-expositor-base.ui.mini.modal .header {
+      font-size: 1.2em !important; /* Reduzir tamanho da fonte do header */
+  }
+
+  .modal-gerenciador-expositor-base.ui.mini.modal p {
+      font-size: 1em !important; /* Reduzir tamanho da fonte do parágrafo */
   }
 }

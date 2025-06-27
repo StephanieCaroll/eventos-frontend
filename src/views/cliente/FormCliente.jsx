@@ -201,6 +201,16 @@ export default function FormCliente() {
                     maxLength={100}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    style={{
+                    width: "100%",
+                    padding: "12px 10px",
+                    borderRadius: 8,
+                    border: "1.5px solid #e0e7ef",
+                    fontSize: 15,
+                    background: "#fafbfc",
+                    outline: "none",
+                    transition: "border 0.2s",
+                  }}
                   />
                   <input
                     required
@@ -209,6 +219,16 @@ export default function FormCliente() {
                     maxLength={100}
                     value={confirmaPassword}
                     onChange={(e) => setConfirmaPassword(e.target.value)}
+                    style={{
+                    width: "100%",
+                    padding: "12px 14px",
+                    borderRadius: 8,
+                    border: "1.5px solid #e0e7ef",
+                    fontSize: 15,
+                    background: "#fafbfc",
+                    outline: "none",
+                    transition: "border 0.2s",
+                  }}
                   />
                 </div>
                 {erroPassword && (

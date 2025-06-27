@@ -3,7 +3,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { motion } from "framer-motion";
 import { CalendarCheck, MonitorPlay, Star } from 'lucide-react';
 import MenuSistema from "../../MenuSistema";
-
+import { Link } from "react-router-dom";
 function cardStyle(color1, color2) {
     return {
         background: `linear-gradient(135deg, ${color1}, ${color2})`,
@@ -56,6 +56,7 @@ export default function Home() {
                     <p style={{ fontSize: '1.5em', color: '#e0e0e0', maxWidth: '700px', margin: '0 auto', marginTop: '1em' }}>
                         Descubra espaços tecnológicos para exposições inesquecíveis. Conecte ideias e oportunidades em ambientes de alto padrão.
                     </p>
+                     <Link to="/login" style={{ textDecoration: 'none', flex: 1 }}>
                     <motion.button
                         whileHover={{ scale: 1.05, backgroundColor: '#2563eb' }}
                         whileTap={{ scale: 0.97 }}
@@ -75,10 +76,11 @@ export default function Home() {
                             textDecoration: 'none',
                             display: 'inline-block'
                         }}
-                        onClick={() => window.location.href = '/stands'}
+                       
                     >
                         Explorar Stands <span style={{ marginLeft: 12, fontSize: 22 }}>→</span>
                     </motion.button>
+                    </Link>
                 </div>
             </section>
 
@@ -163,6 +165,7 @@ export default function Home() {
                                     <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} style={{ fontSize: '1.2em', maxWidth: 600 }}>
                                         Experiências digitais que geram resultados.
                                     </motion.p>
+                                     <Link to="/login" style={{ textDecoration: 'none', flex: 1 }}>
                                     <motion.button
                                         whileHover={{ scale: 1.05, backgroundColor: '#2563eb' }}
                                         whileTap={{ scale: 0.95 }}
@@ -181,8 +184,10 @@ export default function Home() {
                                         }}
                                         onClick={() => window.location.href = '/imersao'}
                                     >
+                                        
                                         Explorar Stands
                                     </motion.button>
+                                    </Link>
                                 </div>
                             </div>
                         </div>

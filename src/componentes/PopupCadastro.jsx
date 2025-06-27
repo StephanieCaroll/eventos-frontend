@@ -4,28 +4,25 @@ import { useState, useEffect, useRef } from "react";
 
 export default function PopupCadastro({ aberto, fechar }) {
   const navigate = useNavigate();
-  // Estado para controlar se o modal deve estar montado no DOM
   const [shouldRender, setShouldRender] = useState(aberto);
-  // Estado para controlar a classe de animação de saída
   const [isFadingOut, setIsFadingOut] = useState(false);
-  const timerRef = useRef(null); // Ref para o setTimeout
+  const timerRef = useRef(null);
 
   useEffect(() => {
     if (aberto) {
-      // Se 'aberto' for true, garante que o modal seja renderizado e não esteja animando para fora
       setShouldRender(true);
       setIsFadingOut(false);
       if (timerRef.current) {
-        clearTimeout(timerRef.current); 
+        clearTimeout(timerRef.current);
       }
     } else {
-      if (shouldRender) { 
+      if (shouldRender) {
         setIsFadingOut(true);
         timerRef.current = setTimeout(() => {
-          setShouldRender(false); 
-          setIsFadingOut(false); 
+          setShouldRender(false);
+          setIsFadingOut(false);
           timerRef.current = null;
-        }, 300); 
+        }, 300);
       }
     }
 
@@ -36,44 +33,40 @@ export default function PopupCadastro({ aberto, fechar }) {
     };
   }, [aberto, shouldRender]);
 
-  // Se o modal não deve ser renderizado, retorna null imediatamente
   if (!shouldRender) {
     return null;
   }
 
-  // Função para lidar com o fechamento do modal
   const handleClose = () => {
     fechar();
   };
 
-  // Função para navegar após o modal fechar com animação
   const handleNavigate = (rota) => {
-    fechar(); 
+    fechar();
     setTimeout(() => {
       navigate(rota);
-    }, 150); // Um pequeno atraso
+    }, 150);
   };
 
   return (
-
     <div className={`custom-dimmer ${isFadingOut ? 'fade-out-dimmer' : ''}`}>
       <Modal
-        open={true} 
+        open={true}
         onClose={handleClose}
-        size="mini"
+        size="mini" // Mantém o Semantic UI Modal como "mini" para um tamanho inicial menor
         closeIcon
-
         className={`modal-gerenciador-expositor-base ${isFadingOut ? 'fade-out-modal' : ''}`}
-        style={{ borderRadius: 16, padding: "1.5rem" }}
+        // Ajuste o padding para ser mais responsivo se necessário, ou deixe o CSS externo controlar
+        style={{ borderRadius: 16, padding: "1rem" }} // Reduzi o padding um pouco para dar mais espaço
       >
-        <Modal.Header style={{ fontSize: 24, fontWeight: 600, textAlign: "center" }}>
+        <Modal.Header style={{ fontSize: '1.5em', fontWeight: 600, textAlign: "center", marginBottom: '1rem' }}> {/* Use em ou vw/vh */}
           Qual tipo de cadastro?
         </Modal.Header>
-        <Modal.Content style={{ textAlign: "center" }}>
-          <p style={{ fontSize: 18, color: "#555" }}>
+        <Modal.Content style={{ textAlign: "center", flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '0 0.5rem' }}> {/* Ajuste padding e adicione flex para centralizar */}
+          <p style={{ fontSize: '1.1em', color: "#555", marginBottom: '1.5rem' }}> {/* Use em ou vw/vh */}
             Escolha como deseja continuar:
           </p>
-          <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 16 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: '0.8rem', width: '100%', maxWidth: '250px' }}> {/* Ajuste gap e adicione max-width para botões */}
             <Button primary fluid onClick={() => handleNavigate("/form-dono")}>
               Gerenciador
             </Button>
