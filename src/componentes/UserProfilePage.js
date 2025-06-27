@@ -1,15 +1,12 @@
-// src/componentes/UserProfilePage.js
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useContext, useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-// Permanece os mesmos ícones, CalendarCheck pode ser usado para data de aniversário
 import { User, Star, Briefcase, Settings, LogOut, PlusCircle, CalendarCheck, Phone } from 'lucide-react'; 
-import axios from 'axios'; // Importar axios
+import axios from 'axios';
 import { AuthContext } from '../AuthContext';
 
-// URL base do seu backend
-const API_BASE_URL = 'http://localhost:8080'; // Altere se o seu backend estiver noutra porta/endereço
+const API_BASE_URL = 'http://localhost:8080'; 
 
 function Footer() {
     return (
@@ -32,95 +29,93 @@ export default function UserProfilePage() {
 
     const firstName = userName ? userName.split(' ')[0] : 'Utilizador';
 
-    // Função para formatar a data de nascimento para o formato DD/MM/YYYY
-    const formatDate = (dateString) => {
-        if (!dateString) return 'Não informado';
-        try {
-            // Se a data vier como array [ano, mês, dia] (comum no Java LocalDate serializado)
-            if (Array.isArray(dateString) && dateString.length === 3) {
-                const [year, month, day] = dateString;
-                // Note: Month in JS Date constructor is 0-indexed (0-11)
-                const date = new Date(year, month - 1, day); 
-                if (isNaN(date.getTime())) {
-                    return 'Data inválida';
-                }
-                return date.toLocaleDateString('pt-BR');
-            }
-            // Se a data vier como string "YYYY-MM-DD"
-            const date = new Date(dateString);
-            if (isNaN(date.getTime())) { // Verifica se a data é inválida
-                return 'Data inválida';
-            }
-            return date.toLocaleDateString('pt-BR');
-        } catch (e) {
-            console.error("Erro ao formatar data:", e);
-            return 'Data inválida';
+    const formatDate = (dateParam) => {
+        if (!dateParam) return 'Não informado';
+
+        if (Array.isArray(dateParam) && dateParam.length === 3) {
+            const [year, month, day] = dateParam;
+            const date = new Date(year, month - 1, day); 
+            return isNaN(date.getTime()) ? 'Data inválida' : date.toLocaleDateString('pt-BR');
         }
+
+        if (typeof dateParam === 'string' && dateParam.includes('/')) {
+            const parts = dateParam.split('/');
+            if (parts.length === 3) {
+                const [day, month, year] = parts;
+                const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                return isNaN(date.getTime()) ? 'Data inválida' : date.toLocaleDateString('pt-BR');
+            }
+        }
+
+        if (typeof dateParam === 'string' && dateParam.includes('-')) {
+            const parts = dateParam.split('-');
+            if (parts.length === 3) {
+                const [year, month, day] = parts;
+                const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                return isNaN(date.getTime()) ? 'Data inválida' : date.toLocaleDateString('pt-BR');
+            }
+        }
+
+        return 'Data inválida';
     };
+
 
     const fetchUserProfile = useCallback(async () => {
         setLoading(true);
         setError(null);
 
-        console.log('[UserProfilePage - fetchUserProfile] userEmail:', userEmail);
-        console.log('[UserProfilePage - fetchUserProfile] authToken:', authToken ? 'Presente' : 'Ausente');
-
         if (!userEmail || !authToken) {
-            console.warn("[UserProfilePage] Email do utilizador ou token de autenticação não disponíveis. Não é possível buscar o perfil.");
+            console.warn("Email do utilizador ou token de autenticação não disponíveis. Não é possível buscar o perfil.");
             setError("Dados de autenticação incompletos. Por favor, tente iniciar sessão novamente.");
             setLoading(false);
             return;
         }
 
         try {
-            console.log(`[UserProfilePage] Enviando requisição GET para ${API_BASE_URL}/api/clientes/by-email/${encodeURIComponent(userEmail)}`); // Log de envio
             const response = await axios.get(`${API_BASE_URL}/api/clientes/by-email/${encodeURIComponent(userEmail)}`, {
-                // O AuthenticationService já configura o Authorization header para axios.
+                
             });
 
             const backendData = response.data;
-            console.log('[UserProfilePage] Dados do perfil recebidos do backend:', backendData);
 
-            // Mapeia os dados do backend para o estado do frontend
             setProfileData({
-                // Campos do Cliente.java: nome, email (do Usuario), dataNascimento, foneCelular
+                
                 name: backendData.nome || userName,
-                email: backendData.usuario?.username || userEmail, // Assumindo que o email está em backendData.usuario.username
-                phone: backendData.foneCelular || 'Não informado', // Mapeia foneCelular para phone
-                memberSince: formatDate(backendData.dataNascimento), // Mapeia dataNascimento para memberSince (o nome da variável interna)
-                
-                // Papéis ainda vêm do AuthContext/JWT
+                email: backendData.usuario?.username || userEmail,
+                phone: backendData.foneCelular || 'Não informado', 
+                memberSince: formatDate(backendData.dataNascimento), 
                 role: (Array.isArray(userRoles) && userRoles.length > 0) ? userRoles.join(', ') : 'Utilizador',
-                
-                // Força estes a estarem vazios conforme o requisito
+
                 favoritedEvents: [], 
                 myStands: [] 
             });
 
         } catch (err) {
             setError("Não foi possível carregar os dados do perfil do backend. Verifique o console para mais detalhes.");
-            console.error("[UserProfilePage] Erro ao buscar perfil do utilizador do backend.");
+            console.error("Erro ao buscar perfil do utilizador do backend.");
 
             if (err.response) {
-                // O servidor respondeu com um status diferente de 2xx (ex: 400, 404, 500)
-                console.error("[UserProfilePage] Resposta de erro do servidor (status " + err.response.status + "):", err.response.data);
+                
+                console.error("Resposta de erro do servidor (status " + err.response.status + "):", err.response.data);
                 if (err.response.data && typeof err.response.data === 'string' && err.response.data.includes("No static resource")) {
-                    console.error("[UserProfilePage] POSSÍVEL CAUSA: O backend não tem um endpoint GET mapeado para '/api/clientes/by-email/{email}'. Verifique o @RequestMapping e @GetMapping no ClienteController.java.");
+                    console.error("POSSÍVEL CAUSA: O backend não tem um endpoint GET mapeado para '/api/clientes/by-email/{email}'. Verifique o @RequestMapping e @GetMapping no ClienteController.java.");
+                } else if (err.response.data && typeof err.response.data === 'string' && err.response.data.includes("rawPassword cannot be null")) {
+                    console.error("ERRO: Senha nula no backend. Verifique se o campo 'password' no seu ClienteRequest.java e UsuarioRequest.java (se existir) está correto, e se o método build() está a passar a senha para o Usuario.");
                 } else if (err.response.data && err.response.data.message) {
-                    console.error("[UserProfilePage] Mensagem de erro do backend:", err.response.data.message);
+                    console.error("Mensagem de erro do backend:", err.response.data.message);
                 } else {
-                    console.error("[UserProfilePage] Resposta de erro inesperada do backend:", err.response.data);
+                    console.error("Resposta de erro inesperada do backend:", err.response.data);
                 }
             } else if (err.request) {
-                // A requisição foi feita, mas não houve resposta (servidor offline ou CORS bloqueando)
-                console.error("[UserProfilePage] Nenhuma resposta do servidor. Verifique se o backend está rodando e se há problemas de CORS. Detalhes:", err.request);
+                
+                console.error("Nenhuma resposta do servidor. Verifique se o backend está rodando e se há problemas de CORS. Detalhes:", err.request);
             } else {
-                // Algo aconteceu na configuração da requisição que disparou um erro
-                console.error("[UserProfilePage] Erro na configuração da requisição:", err.message);
+                
+                console.error("Erro na configuração da requisição:", err.message);
             }
-            console.error("[UserProfilePage] Objeto erro completo:", err); // Log do objeto erro completo
+            console.error("Objeto erro completo:", err);
 
-            setProfileData({ // Fallback para garantir que o UI não quebre
+            setProfileData({ 
                 name: userName || 'Utilizador',
                 email: userEmail || 'Não informado',
                 phone: "Não informado",
@@ -130,28 +125,23 @@ export default function UserProfilePage() {
                 myStands: []
             });
         } finally {
-            console.log('[UserProfilePage - fetchUserProfile - finally] Chamando setLoading(false).');
             setLoading(false);
         }
     }, [userEmail, authToken, userName, userRoles]);
 
     useEffect(() => {
         if (!isAuthReady) {
-            console.log('[UserProfilePage - useEffect] AuthContext não está pronto ainda.');
             return;
         }
 
         if (!isAuthenticated) {
-            console.log('[UserProfilePage - useEffect] Não autenticado, navegando para /login.');
             navigate('/login');
             return;
         }
 
         if (isAuthenticated && userEmail && authToken && profileData === null) {
-            console.log('[UserProfilePage - useEffect] Autenticado e dados disponíveis, chamando fetchUserProfile...');
             fetchUserProfile();
         } else if (isAuthenticated && (!userEmail || !authToken)) {
-            console.warn("[UserProfilePage] Utilizador autenticado, mas dados de contexto (email/token) ausentes APÓS AuthContext estar pronto. Redirecionando para login.");
             logout();
         }
     }, [isAuthenticated, navigate, userEmail, authToken, isAuthReady, logout, fetchUserProfile, profileData]);
@@ -163,7 +153,6 @@ export default function UserProfilePage() {
     };
 
     if (loading) {
-        console.log('[UserProfilePage - Render] Estado: Carregando...');
         return (
             <div style={{ backgroundColor: '#0f172a', color: '#ffffff', minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '1.5em' }}>
                 A carregar perfil...
@@ -172,7 +161,6 @@ export default function UserProfilePage() {
     }
 
     if (error) {
-        console.log('[UserProfilePage - Render] Estado: Erro:', error);
         return (
             <div style={{ backgroundColor: '#0f172a', color: '#ffffff', minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', fontSize: '1.2em', padding: '20px', textAlign: 'center' }}>
                 <p className="text-danger">{error}</p>
@@ -192,7 +180,6 @@ export default function UserProfilePage() {
     }
 
     if (!profileData) {
-        console.log('[UserProfilePage - Render] Estado: Nenhuns dados de perfil disponíveis (após carregamento e sem erro).');
         return (
             <div style={{ backgroundColor: '#0f172a', color: '#ffffff', minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '1.2em' }}>
                 Nenhuns dados de perfil disponíveis.
@@ -200,7 +187,6 @@ export default function UserProfilePage() {
         );
     }
 
-    console.log('[UserProfilePage - Render] Estado: Perfil Carregado e Pronto para Exibir.');
     return (
         <div style={{ backgroundColor: '#0f172a', color: '#ffffff', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
             <section style={{
@@ -214,7 +200,8 @@ export default function UserProfilePage() {
                 flexWrap: 'wrap',
                 gap: '1em'
             }}>
-                <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, cursor: 'pointer' }} onClick={() => navigate('/home')}>
+                <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, cursor: 'pointer' }} onClick={() => navigate('/homeExpositor')}>
+                    
                     <h1 style={{ fontSize: '2.5em', fontWeight: '800', letterSpacing: '1px', color: '#3b82f6', margin: 0 }}>
                         Events Stands
                     </h1>
@@ -262,7 +249,6 @@ export default function UserProfilePage() {
                                 boxShadow: '0 2px 12px #ff4d4f33',
                                 transition: 'background 0.2s',
                                 outline: 'none',
-                                textDecoration: 'none',
                                 display: 'inline-block'
                             }}
                             onClick={handleLogout}
@@ -370,12 +356,12 @@ export default function UserProfilePage() {
                     </div>
                 </motion.div>
 
-                <h3 className="text-white mb-4" style={{ fontSize: '2em', fontWeight: '600', borderBottom: '2px solid #3b82f6', paddingBottom: '10px', marginBottom: '2em' }}>
+                <h3 style={{ fontSize: '2em', fontWeight: '600', borderBottom: '2px solid #3b82f6', paddingBottom: '10px', marginBottom: '2em' }}>
                     <Star size={24} style={{ marginRight: '10px', verticalAlign: 'middle' }} /> Meus Eventos Favoritos
                 </h3>
-                {/* Sempre exibe a mensagem de que não há eventos favoritos e o botão */}
+                
                 <p style={{ fontSize: '1.1em', color: '#cbd5e1', textAlign: 'center', marginBottom: '20px' }}>Você ainda não favoritou nenhum evento.</p>
-                <div className="col-12 text-center">
+                <div style={{ textAlign: 'center' }}>
                     <motion.button
                         whileHover={{ scale: 1.05, backgroundColor: '#3b82f6' }}
                         whileTap={{ scale: 0.97 }}
@@ -395,22 +381,21 @@ export default function UserProfilePage() {
                             alignItems: 'center',
                             gap: '8px'
                         }}
-                        onClick={() => navigate('/eventos')}
+                        onClick={() => navigate('/homeExpositor')}
                     >
                         Veja alguns eventos
                     </motion.button>
                 </div>
 
-
-                {/* Renderiza "Meus Stands" somente se o utilizador tiver o papel de "EXPOSITOR" */}
+                {/* Seção "Meus Stands" - visível apenas para EXPOSITOR */}
                 {profileData.role && profileData.role.includes("EXPOSITOR") && (
                     <>
-                        <h3 className="text-white mb-4 mt-5" style={{ fontSize: '2em', fontWeight: '600', borderBottom: '2px solid #3b82f6', paddingBottom: '10px', marginBottom: '2em' }}>
+                        <h3 style={{ fontSize: '2em', fontWeight: '600', borderBottom: '2px solid #3b82f6', paddingBottom: '10px', marginTop: '3em', marginBottom: '2em' }}>
                             <Briefcase size={24} style={{ marginRight: '10px', verticalAlign: 'middle' }} /> Meus Stands
                         </h3>
-                        {/* Sempre exibe a mensagem de que não há stands e o botão */}
-                        <div className="text-center">
-                            <p style={{ fontSize: '1.1em', color: '#cbd5e1', marginBottom: '20px' }}>Você ainda não possui nenhum stand registado.</p>
+                        
+                        <div style={{ textAlign: 'center' }}>
+                            <p style={{ fontSize: '1.1em', color: '#cbd5e1', marginBottom: '20px' }}>Você ainda não possui nenhum stand registrado.</p>
                             <motion.button
                                 whileHover={{ scale: 1.05, backgroundColor: '#3b82f6' }}
                                 whileTap={{ scale: 0.97 }}
@@ -430,7 +415,7 @@ export default function UserProfilePage() {
                                     alignItems: 'center',
                                     gap: '8px'
                                 }}
-                                onClick={() => console.log('Criar novo stand')}
+                                onClick={() => navigate('/homeExpositor')}
                             >
                                 <PlusCircle size={20} /> Criar Novo Stand
                             </motion.button>

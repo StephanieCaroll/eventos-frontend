@@ -137,7 +137,7 @@ export default function HomeExpositor() {
 
     return (
         <div style={{ backgroundColor: '#0a192f', color: '#ffffff', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-            {/* Header Section */}
+           
             <section style={{
                 padding: '1.5em 2em',
                 background: 'linear-gradient(135deg, #000000 0%, #0a192f 100%)',
@@ -150,7 +150,7 @@ export default function HomeExpositor() {
                 gap: '1em'
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-                    <h1 style={{ fontSize: '2.5em', fontWeight: '800', letterSpacing: '1px', color: '#3b82f6', margin: 0 }}>
+                    <h1 style={{ fontSize: '2.5em', fontWeight: '800', letterSpacing: '1px', color: '#3b82f6', margin: 0  }}>
                         Events Stands
                     </h1>
                 </div>
@@ -159,7 +159,7 @@ export default function HomeExpositor() {
                     {isAuthenticated && userName && (
                         <div
                             style={{ display: 'flex', alignItems: 'center', gap: '0.8em', color: '#fff', cursor: 'pointer' }}
-                            onClick={() => navigate('/profile')} // Adicionado o onClick para navegar para /profile
+                            onClick={() => navigate('/profile')} 
                         >
                             <div style={{
                                 width: '40px',

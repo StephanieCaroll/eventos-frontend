@@ -5,14 +5,11 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import MenuSistema from "../../MenuSistema";
 import { Footer } from "../home/Home";
-// Se você tem notifyError e notifySuccess, certifique-se de que estão no local certo ou comente-os se não os usa.
-// import { notifyError, notifySuccess } from "../../views/util/Util";
-
 
 export default function FormCliente() {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
-  const [dataNascimento, setDataNascimento] = useState(""); // InputMask já está para DD/MM/YYYY
+  const [dataNascimento, setDataNascimento] = useState("");
   const [foneCelular, setFoneCelular] = useState("");
   const [password, setPassword] = useState("");
   const [confirmaPassword, setConfirmaPassword] = useState("");
@@ -27,65 +24,55 @@ export default function FormCliente() {
 
     if (password !== confirmaPassword) {
       setErroPassword("As senhas não são iguais.");
-      console.error("[FormCliente] Erro de validação: As senhas não são iguais.");
+      console.error("Erro de validação: As senhas não são iguais.");
       return;
     }
 
-    // A data é enviada no formato DD/MM/AAAA conforme InputMask
-    const dataParaBackend = dataNascimento; 
+    const dataParaBackend = dataNascimento; // DD/MM/AAAA, já do InputMask
 
     let clienteRequest = {
       nome: nome,
-      usuario: { // Objeto 'usuario' aninhado
+      usuario: {
           username: email,
-          password: password // <<-- AQUI A SENHA ESTÁ A SER ENVIADA
+          password: password
       },
       dataNascimento: dataParaBackend,
       foneCelular: foneCelular,
     };
 
-    // Log do objeto que está realmente a ser enviado
-    console.log("[FormCliente] Enviando requisição POST para /api/clientes com dados:", JSON.stringify(clienteRequest, null, 2));
-
     axios
       .post("http://localhost:8080/api/clientes", clienteRequest)
       .then((response) => {
-        console.log("[FormCliente] Cliente cadastrado com sucesso. Resposta do backend:", response.data);
+        console.log("Cliente cadastrado com sucesso. Resposta do backend:", response.data);
         setMensagemSucesso(true);
-        // Limpar os campos após o sucesso
         setNome("");
         setEmail("");
         setDataNascimento("");
         setFoneCelular("");
         setPassword("");
         setConfirmaPassword("");
-        // if (typeof notifySuccess === 'function') notifySuccess("Cliente cadastrado com sucesso.");
       })
       .catch((error) => {
         setMensagemErro(true);
-        console.error("[FormCliente] Erro ao incluir Cliente."); // Alterado de Expositor para Cliente
+        console.error("Erro ao incluir Cliente.");
         
         if (error.response) {
-            console.error("[FormCliente] Resposta de erro do servidor (status " + error.response.status + "):", error.response.data);
+            console.error("Resposta de erro do servidor (status " + error.response.status + "):", error.response.data);
             if (error.response.data && typeof error.response.data === 'string' && error.response.data.includes("JSON parse error: Cannot deserialize value of type `java.time.LocalDate`")) {
-                console.error("[FormCliente] POSSÍVEL CAUSA: Formato da data incorreto no backend. Verifique a anotação @JsonFormat(pattern = \"dd/MM/yyyy\") na sua classe ClienteRequest.java.");
-            } else if (error.response.data && error.response.data.includes("rawPassword cannot be null")) { // <<-- Mensagem específica para este erro
-                console.error("[FormCliente] ERRO: Senha nula no backend. Verifique se o campo 'password' no seu ClienteRequest.java e UsuarioRequest.java (se existir) está correto, e se o método build() está a passar a senha para o Usuario.");
-            } else if (error.response.data && error.response.data.errors) {
-                error.response.data.errors.forEach(err => {
-                    console.error("[FormCliente] Erro de validação: Campo '" + err.field + "' - " + err.defaultMessage);
-                });
+                console.error("POSSÍVEL CAUSA: Formato da data incorreto no backend. Verifique a anotação @JsonFormat(pattern = \"dd/MM/yyyy\") na sua classe ClienteRequest.java.");
+            } else if (error.response.data && typeof error.response.data === 'string' && error.response.data.includes("rawPassword cannot be null")) {
+                console.error("ERRO: Senha nula no backend. Verifique se o campo 'password' no seu ClienteRequest.java e UsuarioRequest.java (se existir) está correto, e se o método build() está a passar a senha para o Usuario.");
             } else if (error.response.data && error.response.data.message) {
-                console.error("[FormCliente] Mensagem de erro do backend:", error.response.data.message);
+                console.error("Mensagem de erro do backend:", error.response.data.message);
             } else {
-                console.error("[FormCliente] Resposta de erro inesperada do backend:", error.response.data);
+                console.error("Resposta de erro inesperada do backend:", error.response.data);
             }
         } else if (error.request) {
-            console.error("[FormCliente] Nenhuma resposta do servidor. Verifique se o backend está rodando e se há problemas de CORS. Detalhes:", error.request);
+            console.error("Nenhuma resposta do servidor. Verifique se o backend está rodando e se há problemas de CORS. Detalhes:", error.request);
         } else {
-            console.error("[FormCliente] Erro na configuração da requisição:", error.message);
+            console.error("Erro na configuração da requisição:", error.message);
         }
-        console.error("[FormCliente] Objeto erro completo:", error);
+        console.error("Objeto erro completo:", error);
       });
   }
 
@@ -304,7 +291,7 @@ export default function FormCliente() {
                   Data de Nascimento
                 </label>
                 <InputMask
-                  mask="99/99/9999" // Máscara para DD/MM/YYYY
+                  mask="99/99/9999"
                   maskChar={null}
                   required
                   placeholder="Ex: 20/03/1985"
