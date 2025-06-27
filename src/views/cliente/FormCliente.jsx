@@ -43,7 +43,7 @@ export default function FormCliente() {
     axios
       .post("http://localhost:8080/api/clientes", clienteRequest)
       .then((response) => {
-        console.log("Cliente cadastrado com sucesso. Resposta do backend:", response.data);
+        console.log("Expositor cadastrado com sucesso. Resposta do backend:", response.data);
         setMensagemSucesso(true);
         setNome("");
         setEmail("");
@@ -54,7 +54,7 @@ export default function FormCliente() {
       })
       .catch((error) => {
         setMensagemErro(true);
-        console.error("Erro ao incluir Cliente.");
+        console.error("Erro ao incluir Expositor.");
         
         if (error.response) {
             console.error("Resposta de erro do servidor (status " + error.response.status + "):", error.response.data);
@@ -103,7 +103,7 @@ export default function FormCliente() {
             }}
           >
             <span style={{ color: "#8c8c8c", fontWeight: 400 }}>
-              Cliente &nbsp;
+              Expositor &nbsp;
               <span style={{ fontSize: 18, verticalAlign: "middle" }}>
                 &raquo;
               </span>
@@ -356,7 +356,7 @@ export default function FormCliente() {
                   fontSize: 15,
                 }}
               >
-                <strong>Cadastro Realizado!</strong> Cliente cadastrado com
+                <strong>Cadastro Realizado!</strong> Expositor cadastrado com
                 sucesso.
               </motion.div>
             )}

@@ -27,7 +27,7 @@ export default function UserProfilePage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const firstName = userName ? userName.split(' ')[0] : 'Utilizador';
+    const firstName = userName ? userName.split(' ')[0] : 'Expositor';
 
     const formatDate = (dateParam) => {
         if (!dateParam) return 'Não informado';
@@ -84,7 +84,7 @@ export default function UserProfilePage() {
                 email: backendData.usuario?.username || userEmail,
                 phone: backendData.foneCelular || 'Não informado', 
                 memberSince: formatDate(backendData.dataNascimento), 
-                role: (Array.isArray(userRoles) && userRoles.length > 0) ? userRoles.join(', ') : 'Utilizador',
+                role: (Array.isArray(userRoles) && userRoles.length > 0) ? userRoles.join(', ') : 'Expositor',
 
                 favoritedEvents: [], 
                 myStands: [] 
@@ -120,7 +120,7 @@ export default function UserProfilePage() {
                 email: userEmail || 'Não informado',
                 phone: "Não informado",
                 memberSince: "Não informado",
-                role: (Array.isArray(userRoles) && userRoles.length > 0) ? userRoles.join(', ') : "Utilizador",
+                role: (Array.isArray(userRoles) && userRoles.length > 0) ? userRoles.join(', ') : "Expositor",
                 favoritedEvents: [],
                 myStands: []
             });
@@ -387,8 +387,7 @@ export default function UserProfilePage() {
                     </motion.button>
                 </div>
 
-                {/* Seção "Meus Stands" - visível apenas para EXPOSITOR */}
-                {profileData.role && profileData.role.includes("EXPOSITOR") && (
+               
                     <>
                         <h3 style={{ fontSize: '2em', fontWeight: '600', borderBottom: '2px solid #3b82f6', paddingBottom: '10px', marginTop: '3em', marginBottom: '2em' }}>
                             <Briefcase size={24} style={{ marginRight: '10px', verticalAlign: 'middle' }} /> Meus Stands
@@ -421,7 +420,6 @@ export default function UserProfilePage() {
                             </motion.button>
                         </div>
                     </>
-                )}
             </main>
             <Footer />
         </div>
