@@ -1,69 +1,13 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import { motion, AnimatePresence } from "framer-motion"; // Importe AnimatePresence
-import { CalendarCheck, Search, List, ChevronRight, Star, Clapperboard, Monitor, Paintbrush } from 'lucide-react';
+import { motion, AnimatePresence } from "framer-motion";
+import { CalendarCheck, Search, List, Star, Clapperboard, Monitor, Paintbrush } from 'lucide-react';
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../AuthContext';
+import { useEvents } from '../../contexts/EventContext'; 
 
-// Dados fictícios para os eventos
-const fictitiousEvents = [
-    {
-        id: 1,
-        name: "Tech Expo 2025",
-        description: "A maior feira de tecnologia da América Latina, apresentando inovações em IA, robótica e software.",
-        longDescription: "A Tech Expo 2025 é o ponto de encontro de líderes e entusiastas da tecnologia. Com palestras inspiradoras, workshops práticos e uma área de exposição com as mais recentes inovações em inteligência artificial, realidade virtual e cibersegurança, este evento é imperdível para quem busca se manter atualizado no mundo digital. Oportunidade perfeita para networking e descoberta de novas tendências.",
-        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSo0-kHojs43wQrnfQvM8It1k6oTjJwfyv2RQ&s",
-        category: "Tecnologia",
-        status: "Ativo"
-    },
-    {
-        id: 2,
-        name: "Festival de Artes Primavera",
-        description: "Celebração da arte e cultura com exposições, performances e oficinas para todas as idades.",
-        longDescription: "O Festival de Artes Primavera é um evento vibrante que transforma a cidade em uma galeria a céu aberto. Descubra talentos locais e internacionais através de exposições de pintura, escultura, fotografia e instalações interativas. Desfrute de apresentações de música, dança e teatro ao vivo, e participe de oficinas criativas para todas as idades. Uma verdadeira imersão no universo artístico.",
-        image: "https://i.ytimg.com/vi/UPtDj3iGEPY/maxresdefault.jpg",
-        category: "Arte",
-        status: "Ativo"
-    },
-    {
-        id: 3,
-        name: "GameCon Brasil",
-        description: "Imersão no mundo dos games, com lançamentos, torneios e áreas de experimentação.",
-        longDescription: "A GameCon Brasil é o paraíso dos gamers! Prepare-se para experimentar os jogos mais aguardados, participar de torneios emocionantes com grandes prêmios, encontrar desenvolvedores e influenciadores, e mergulhar em experiências de realidade virtual e esports. Não importa se você é um jogador casual ou competitivo, a GameCon tem algo para todos.",
-        image: "https://sm.ign.com/ign_br/screenshot/default/image_e7eh.jpg",
-        category: "Entretenimento",
-        status: "Ativo"
-    },
-    {
-        id: 4,
-        name: "Conferência de Inovação Sustentável",
-        description: "Debates e soluções sobre energias renováveis e desenvolvimento sustentável.",
-        longDescription: "A Conferência de Inovação Sustentável reúne especialistas, empresas e governos para discutir e apresentar soluções para os desafios ambientais atuais. Explore as últimas tendências em energias renováveis, economia circular e tecnologias verdes. Participe de painéis interativos e faça parte da construção de um futuro mais sustentável.",
-        image: "https://i.ytimg.com/vi/JkCpqu8CJEA/sddefault.jpg",
-        category: "Tecnologia",
-        status: "Encerrado"
-    },
-    {
-        id: 5,
-        name: "Feira Literária da Cidade",
-        description: "Encontro de autores, leitores e editoras com lançamentos e sessões de autógrafos.",
-        longDescription: "A Feira Literária da Cidade é um paraíso para os amantes de livros. Descubra novos autores, participe de sessões de autógrafos com seus escritores favoritos e explore uma vasta gama de gêneros literários. Há também contação de histórias para crianças, debates e workshops para aspirantes a escritores. Uma celebração da leitura e do conhecimento.",
-        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTeJZ623X0Orp9tRfYwBQcgd7cfZqVyWQb-nw&s",
-        category: "Arte",
-        status: "Ativo"
-    },
-    {
-        id: 6,
-        name: "Comic & Geek Fest",
-        description: "Tudo sobre quadrinhos, filmes, séries e cultura geek em um só lugar.",
-        longDescription: "O Comic & Geek Fest é o evento definitivo para fãs de cultura pop! Vista seu melhor cosplay, encontre seus artistas e dubladores favoritos, participe de concursos, painéis e workshops. Explore um mercado cheio de colecionáveis, quadrinhos raros e produtos exclusivos. Prepare-se para um dia épico de celebração nerd!",
-        image: "https://www.oliberal.com/image/contentid/policy:1.602555:1666191450/1-308.jpg?f=2x1&$p$f=42d70cd&w=1500&$w=f075b93",
-        category: "Entretenimento",
-        status: "Encerrado"
-    }
-];
-
+// Estilos para os cards de eventos
 function cardStyle(color1, color2) {
     return {
         background: `linear-gradient(135deg, ${color1}, ${color2})`,
@@ -82,6 +26,7 @@ function cardStyle(color1, color2) {
     };
 }
 
+// Componente de Rodapé
 function Footer() {
     return (
         <footer style={{ backgroundColor: '#0a192f', color: '#fff', padding: '2em 0', textAlign: 'center', borderTop: '1px solid #1e293b' }}>
@@ -96,9 +41,10 @@ function Footer() {
 export default function HomeExpositor() {
     const navigate = useNavigate();
     const { isAuthenticated, userRoles, userName, logout } = useContext(AuthContext);
+    const { events } = useEvents(); 
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('Todos os Eventos');
-    const [selectedEvent, setSelectedEvent] = useState(null);
+    const [selectedEvent, setSelectedEvent] = useState(null); 
 
     useEffect(() => {
         console.log('[HomeExpositor] Componente carregado.');
@@ -107,13 +53,16 @@ export default function HomeExpositor() {
         console.log('[HomeExpositor] userName:', userName);
     }, [isAuthenticated, userRoles, userName]);
 
+    // Função para lidar com o logout do usuário
     const handleLogout = () => {
         logout();
         navigate('/', { replace: true });
     };
 
+    // Obtém o primeiro nome do usuário para exibição
     const firstName = userName ? userName.split(' ')[0] : 'Usuário';
 
+    // Categorias de eventos para filtragem na sidebar
     const categories = [
         { name: 'Todos os Eventos', icon: <CalendarCheck size={20} /> },
         { name: 'Eventos Ativos', icon: <Star size={20} /> },
@@ -123,11 +72,11 @@ export default function HomeExpositor() {
         { name: 'Entretenimento', icon: <Clapperboard size={20} /> }
     ];
 
-    const filteredEvents = fictitiousEvents.filter(event => {
+    const filteredEvents = events.filter(event => { 
         const matchesCategory = selectedCategory === 'Todos os Eventos' ||
                                 (selectedCategory === 'Eventos Ativos' && event.status === 'Ativo') ||
                                 (selectedCategory === 'Eventos Passados' && event.status === 'Encerrado') ||
-                                (selectedCategory === event.category); // Filtra por categoria específica
+                                (selectedCategory === event.category);
 
         const matchesSearch = event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                                 event.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -135,9 +84,19 @@ export default function HomeExpositor() {
         return matchesCategory && matchesSearch;
     });
 
+    const handleCardClick = (event) => {
+        setSelectedEvent(event);
+    };
+
+    const handleRegisterStandClick = (eventId) => {
+        navigate(`/cadastro-stand/${eventId}`);
+        setSelectedEvent(null); 
+    };
+
     return (
         <div style={{ backgroundColor: '#0a192f', color: '#ffffff', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-           
+            
+            {/* Seção do cabeçalho com título, informações do usuário e botões */}
             <section style={{
                 padding: '1.5em 2em',
                 background: 'linear-gradient(135deg, #000000 0%, #0a192f 100%)',
@@ -150,7 +109,7 @@ export default function HomeExpositor() {
                 gap: '1em'
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-                    <h1 style={{ fontSize: '2.5em', fontWeight: '800', letterSpacing: '1px', color: '#3b82f6', margin: 0  }}>
+                    <h1 style={{ fontSize: '2.5em', fontWeight: '800', letterSpacing: '1px', color: '#3b82f6', margin: 0 }}>
                         Events Stands - Expositor
                     </h1>
                 </div>
@@ -173,7 +132,7 @@ export default function HomeExpositor() {
                                 border: '2px solid #3b82f6'
                             }}>
                                 <img
-                                    src={`https://placehold.co/40x40/3b82f6/ffffff?text=${firstName.charAt(0).toUpperCase()}`} //Função foda para gerar avatar com a primeira letra do nome
+                                    src={`https://placehold.co/40x40/3b82f6/ffffff?text=${firstName.charAt(0).toUpperCase()}`}
                                     alt="Avatar do Usuário"
                                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                     onError={(e) => e.target.src = `https://placehold.co/40x40/3b82f6/ffffff?text=${firstName.charAt(0).toUpperCase()}`}
@@ -184,7 +143,7 @@ export default function HomeExpositor() {
                             </span>
                         </div>
                     )}
-                    {/* {isAuthenticated && (
+                    {isAuthenticated && (
                         <motion.button
                             whileHover={{ scale: 1.05, backgroundColor: '#dc3545' }}
                             whileTap={{ scale: 0.97 }}
@@ -207,7 +166,7 @@ export default function HomeExpositor() {
                         >
                             Sair <span style={{ marginLeft: 8, fontSize: 18 }}>→</span>
                         </motion.button>
-                    )} */}
+                    )}
                 </div>
             </section>
 
@@ -291,7 +250,7 @@ export default function HomeExpositor() {
                                     initial={{ opacity: 0, y: 40 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ duration: 0.5 }}
-                                    onClick={() => setSelectedEvent(event)}
+                                    onClick={() => handleCardClick(event)} 
                                 >
                                     <div style={{
                                         ...cardStyle('#1e40af', '#2563eb'),
@@ -365,6 +324,8 @@ export default function HomeExpositor() {
                                 color: '#fff',
                                 maxWidth: '700px',
                                 width: '90%',
+                                maxHeight: '90vh', 
+                                overflowY: 'auto', 
                                 boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
                                 position: 'relative',
                                 display: 'flex',
@@ -392,32 +353,46 @@ export default function HomeExpositor() {
                             <img src={selectedEvent.image} alt={selectedEvent.name} style={{ width: '100%', maxHeight: '300px', objectFit: 'cover', borderRadius: '15px', marginBottom: '20px', boxShadow: '0 5px 15px rgba(0,0,0,0.4)' }} />
                             <h3 style={{ fontSize: '2.2em', marginBottom: '15px', color: '#3b82f6' }}>{selectedEvent.name}</h3>
                             <p style={{ fontSize: '1.1em', lineHeight: '1.6', marginBottom: '20px' }}>{selectedEvent.longDescription}</p>
-                            <span style={{ backgroundColor: '#0f172a', padding: '8px 20px', borderRadius: '25px', fontSize: '1em', fontWeight: 'bold', color: '#a78bfa', marginBottom: '20px' }}>
-                                Categoria: {selectedEvent.category}
-                            </span>
-                            <motion.button
-                                whileHover={{ scale: 1.05, backgroundColor: '#3b82f6' }}
-                                whileTap={{ scale: 0.97 }}
-                                style={{
-                                    backgroundColor: '#2563eb',
-                                    color: '#fff',
-                                    padding: '0.8em 2em',
-                                    fontSize: '1em',
-                                    fontWeight: '600',
-                                    border: 'none',
-                                    borderRadius: 30,
-                                    cursor: 'pointer',
-                                    boxShadow: '0 4px 15px #2563eb55',
-                                    transition: 'background 0.2s',
-                                    outline: 'none'
-                                }}
-                                onClick={() => {
-                                    navigate(`/evento/${selectedEvent.id}`);
-                                    setSelectedEvent(null);
-                                }}
-                            >
-                                Ver Detalhes do Evento
-                            </motion.button>
+                            
+                            {/* Detalhes do Evento */}
+                            <div style={{ textAlign: 'left', width: '100%', marginBottom: '20px', fontSize: '1em', color: '#e0e0e0' }}>
+                                <p><strong>Categoria:</strong> {selectedEvent.category}</p>
+                                <p><strong>Status:</strong> <span style={{ color: selectedEvent.status === 'Ativo' ? '#22c55e' : '#ef4444' }}>{selectedEvent.status}</span></p>
+                                <p><strong>Data de Início:</strong> {selectedEvent.date ? new Date(selectedEvent.date).toLocaleDateString('pt-BR') : 'N/A'}</p>
+                                <p><strong>Data de Término:</strong> {selectedEvent.dataFim ? new Date(selectedEvent.dataFim).toLocaleDateString('pt-BR') : 'N/A'}</p>
+                                <p><strong>Hora de Início:</strong> {selectedEvent.horaInicio || 'N/A'}</p>
+                                <p><strong>Hora de Término:</strong> {selectedEvent.horaFim || 'N/A'}</p>
+                                <p><strong>Organizador:</strong> {selectedEvent.organizador || 'N/A'}</p>
+                                <p><strong>Contato do Organizador:</strong> {selectedEvent.contatoOrganizador || 'N/A'}</p>
+                                <p><strong>Tipo de Ingresso:</strong> {selectedEvent.tipoIngresso || 'N/A'}</p>
+                                {selectedEvent.quantidadeIngressos && <p><strong>Quantidade de Ingressos:</strong> {selectedEvent.quantidadeIngressos}</p>}
+                                <p><strong>Início das Vendas:</strong> {selectedEvent.dataVendaInicio ? new Date(selectedEvent.dataVendaInicio).toLocaleDateString('pt-BR') : 'N/A'}</p>
+                                <p><strong>Fim das Vendas:</strong> {selectedEvent.dataVendaFim ? new Date(selectedEvent.dataVendaFim).toLocaleDateString('pt-BR') : 'N/A'}</p>
+                            </div>
+
+                            {selectedEvent.status === 'Ativo' && ( 
+                                <motion.button
+                                    whileHover={{ scale: 1.05, backgroundColor: '#10b981' }}
+                                    whileTap={{ scale: 0.97 }}
+                                    style={{
+                                        backgroundColor: '#22c55e',
+                                        color: '#fff',
+                                        padding: '0.8em 2em',
+                                        fontSize: '1em',
+                                        fontWeight: '600',
+                                        border: 'none',
+                                        borderRadius: 30,
+                                        cursor: 'pointer',
+                                        boxShadow: '0 4px 15px #22c55e55',
+                                        transition: 'background 0.2s',
+                                        outline: 'none',
+                                        marginTop: '20px'
+                                    }}
+                                    onClick={() => handleRegisterStandClick(selectedEvent.id)}
+                                >
+                                    Cadastrar Stands para Este Evento
+                                </motion.button>
+                            )}
                         </motion.div>
                     </motion.div>
                 )}
