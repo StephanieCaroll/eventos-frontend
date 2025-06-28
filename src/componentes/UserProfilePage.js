@@ -1,12 +1,63 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useContext, useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { User, Star, Briefcase, Settings, LogOut, PlusCircle, CalendarCheck, Phone, ChevronLeft } from 'lucide-react'; 
+import { motion, AnimatePresence } from 'framer-motion'; // Importar AnimatePresence
+import { User, Star, Briefcase, Settings, LogOut, PlusCircle, CalendarCheck, Phone, ChevronLeft, Heart, CheckCircle, XCircle } from 'lucide-react'; 
 import axios from 'axios';
 import { AuthContext } from '../AuthContext';
+import { useEvents } from '../contexts/EventContext';
 
 const API_BASE_URL = 'http://localhost:8080'; 
+
+// Notificação
+const NotificationModal = ({ message, type, onClose }) => {
+    const bgColor = type === 'success' ? '#22c55e' : '#ef4444';
+    const icon = type === 'success' ? <CheckCircle size={32} color="#fff" /> : <XCircle size={32} color="#fff" />;
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -50 }}
+            transition={{ duration: 0.3 }}
+            style={{
+                position: 'fixed',
+                top: '20px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                backgroundColor: bgColor,
+                color: '#fff',
+                padding: '15px 30px',
+                borderRadius: '10px',
+                boxShadow: '0 4px 15px rgba(0, 0, 0, 0.4)',
+                zIndex: 2000,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '15px',
+                fontSize: '1.1em',
+                fontWeight: 'bold',
+                minWidth: '300px',
+                textAlign: 'center'
+            }}
+        >
+            {icon}
+            <span>{message}</span>
+            <button
+                onClick={onClose}
+                style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#fff',
+                    fontSize: '1.5em',
+                    cursor: 'pointer',
+                    marginLeft: 'auto'
+                }}
+            >
+                &times;
+            </button>
+        </motion.div>
+    );
+};
 
 function Footer() {
     return (
@@ -22,6 +73,7 @@ function Footer() {
 export default function UserProfilePage() {
     const navigate = useNavigate();
     const { isAuthenticated, userName, userEmail, userRoles, logout, authToken, isAuthReady } = useContext(AuthContext);
+    const { favoritedEvents = [], toggleFavorite, notificationMessage, setNotificationMessage } = useEvents(); 
 
     const [profileData, setProfileData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -40,20 +92,16 @@ export default function UserProfilePage() {
 
         if (typeof dateParam === 'string' && dateParam.includes('/')) {
             const parts = dateParam.split('/');
-            if (parts.length === 3) {
-                const [day, month, year] = parts;
-                const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-                return isNaN(date.getTime()) ? 'Data inválida' : date.toLocaleDateString('pt-BR');
-            }
+            const [day, month, year] = parts;
+            const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+            return isNaN(date.getTime()) ? 'Data inválida' : date.toLocaleDateString('pt-BR');
         }
 
         if (typeof dateParam === 'string' && dateParam.includes('-')) {
             const parts = dateParam.split('-');
-            if (parts.length === 3) {
-                const [year, month, day] = parts;
-                const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-                return isNaN(date.getTime()) ? 'Data inválida' : date.toLocaleDateString('pt-BR');
-            }
+            const [year, month, day] = parts;
+            const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+            return isNaN(date.getTime()) ? 'Data inválida' : date.toLocaleDateString('pt-BR');
         }
 
         return 'Data inválida';
@@ -73,28 +121,23 @@ export default function UserProfilePage() {
 
         try {
             const response = await axios.get(`${API_BASE_URL}/api/clientes/by-email/${encodeURIComponent(userEmail)}`, {
-         
             });
 
             const backendData = response.data;
 
             setProfileData({
-
                 name: backendData.nome || userName,
                 email: backendData.usuario?.username || userEmail,
                 phone: backendData.foneCelular || 'Não informado', 
                 memberSince: formatDate(backendData.dataNascimento), 
                 role: (Array.isArray(userRoles) && userRoles.length > 0) ? userRoles.join(', ') : 'Expositor',
-                favoritedEvents: [], 
-                myStands: [] 
             });
 
-        } catch (err) {
+        } catch (err) { //Para testes
             setError("Não foi possível carregar os dados do perfil do backend. Verifique o console para mais detalhes.");
             console.error("Erro ao buscar perfil do utilizador do backend.");
 
             if (err.response) {
-              
                 console.error("Resposta de erro do servidor (status " + err.response.status + "):", err.response.data);
                 if (err.response.data && typeof err.response.data === 'string' && err.response.data.includes("No static resource")) {
                     console.error("POSSÍVEL CAUSA: O backend não tem um endpoint GET mapeado para '/api/clientes/by-email/{email}'. Verifique o @RequestMapping e @GetMapping no ClienteController.java.");
@@ -118,8 +161,6 @@ export default function UserProfilePage() {
                 phone: "Não informado",
                 memberSince: "Não informado",
                 role: (Array.isArray(userRoles) && userRoles.length > 0) ? userRoles.join(', ') : "Utilizador",
-                favoritedEvents: [],
-                myStands: []
             });
         } finally {
             setLoading(false);
@@ -136,14 +177,22 @@ export default function UserProfilePage() {
             return;
         }
 
-        // Busca o perfil apenas se estiver autenticado e ainda não houver dados de perfil
         if (isAuthenticated && userEmail && authToken && profileData === null) {
             fetchUserProfile();
         } else if (isAuthenticated && (!userEmail || !authToken)) {
-            // Se autenticado, mas sem email/token (estado inconsistente), faz logout
             logout();
         }
     }, [isAuthenticated, navigate, userEmail, authToken, isAuthReady, logout, fetchUserProfile, profileData]);
+
+    // Efeito para esconder a notificação após alguns segundos
+    useEffect(() => {
+        if (notificationMessage) {
+            const timer = setTimeout(() => {
+                setNotificationMessage(null);
+            }, 3000); 
+            return () => clearTimeout(timer);
+        }
+    }, [notificationMessage, setNotificationMessage]);
 
 
     const handleLogout = () => {
@@ -364,7 +413,69 @@ export default function UserProfilePage() {
                     <Star size={24} style={{ marginRight: '10px', verticalAlign: 'middle' }} /> Meus Eventos Favoritos
                 </h3>
                 
-                <p style={{ fontSize: '1.1em', color: '#cbd5e1', textAlign: 'center', marginBottom: '20px' }}>Você ainda não favoritou nenhum evento.</p>
+                {favoritedEvents.length > 0 ? (
+                    <div className="row justify-content-center">
+                        {favoritedEvents.map(event => (
+                            <motion.div
+                                key={event.id}
+                                className="col-lg-4 col-md-6 col-sm-12 p-3"
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.8 }}
+                                transition={{ duration: 0.3 }}
+                            >
+                                <div style={{
+                                    background: 'linear-gradient(135deg, #2a3d5b, #1a2a44)',
+                                    borderRadius: 15,
+                                    padding: 20,
+                                    color: '#fff',
+                                    boxShadow: '0 5px 20px rgba(0,0,0,0.3)',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    position: 'relative'
+                                }}>
+                                    <motion.button
+                                        whileHover={{ scale: 1.2 }}
+                                        whileTap={{ scale: 0.8 }}
+                                        style={{
+                                            position: 'absolute',
+                                            top: '10px',
+                                            right: '10px',
+                                            background: 'none',
+                                            border: 'none',
+                                            cursor: 'pointer',
+                                            padding: '5px',
+                                            zIndex: 10
+                                        }}
+                                        onClick={(e) => { e.stopPropagation(); toggleFavorite(event); }}
+                                    >
+                                        <Heart
+                                            size={24}
+                                            fill={'#ff6347'} 
+                                            color={'#ff6347'}
+                                            strokeWidth={0}
+                                        />
+                                    </motion.button>
+
+                                    <img src={event.image} alt={event.name} style={{ width: '100%', maxHeight: '150px', objectFit: 'cover', borderRadius: '10px', marginBottom: '15px' }} />
+                                    <h5 style={{ fontSize: '1.4em', marginBottom: '8px', textAlign: 'center' }}>{event.name}</h5>
+                                    <p style={{ fontSize: '0.9em', color: '#e0e0e0', textAlign: 'center', flexGrow: 1 }}>{event.description}</p>
+                                    <span style={{ backgroundColor: '#0f172a', padding: '4px 10px', borderRadius: '15px', fontSize: '0.75em', fontWeight: 'bold', color: '#a78bfa', marginTop: '10px' }}>
+                                        {event.category}
+                                    </span>
+                                    {event.date && (
+                                        <span style={{ fontSize: '0.8em', color: '#e0e0e0', marginTop: '5px' }}>
+                                            Data: {new Date(event.date).toLocaleDateString('pt-BR')}
+                                        </span>
+                                    )}
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                ) : (
+                    <p style={{ fontSize: '1.1em', color: '#cbd5e1', textAlign: 'center', marginBottom: '20px' }}>Você ainda não favoritou nenhum evento.</p>
+                )}
                 <div style={{ textAlign: 'center' }}>
                     <motion.button
                         whileHover={{ scale: 1.05, backgroundColor: '#3b82f6' }}
@@ -391,6 +502,7 @@ export default function UserProfilePage() {
                     </motion.button>
                 </div>
                 
+                {userRoles.includes('ROLE_EXPOSITOR') && (
                     <>
                         <h3 style={{ fontSize: '2em', fontWeight: '600', borderBottom: '2px solid #3b82f6', paddingBottom: '10px', marginTop: '3em', marginBottom: '2em' }}>
                             <Briefcase size={24} style={{ marginRight: '10px', verticalAlign: 'middle' }} /> Meus Stands
@@ -423,9 +535,20 @@ export default function UserProfilePage() {
                             </motion.button>
                         </div>
                     </>
+                )}
 
             </main>
             <Footer />
+            {/* Renderiza o modal de notificação aqui */}
+            <AnimatePresence>
+                {notificationMessage && (
+                    <NotificationModal 
+                        message={notificationMessage.text} 
+                        type={notificationMessage.type} 
+                        onClose={() => setNotificationMessage(null)} 
+                    />
+                )}
+            </AnimatePresence>
         </div>
     );
 }

@@ -1,111 +1,188 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../AuthContext';
 
-export const EventContext = createContext();
+const EventContext = createContext();
+
+const API_BASE_URL = 'http://localhost:8080';
 
 export const EventProvider = ({ children }) => {
-    const { authToken, isAuthenticated, isAuthReady } = useContext(AuthContext);
+    const { userEmail, authToken, isAuthenticated, isAuthReady } = useContext(AuthContext);
     const [events, setEvents] = useState([]);
+    const [favoritedEvents, setFavoritedEvents] = useState([]); 
+    const [loadingEvents, setLoadingEvents] = useState(true);
+    const [errorEvents, setErrorEvents] = useState(null);
+
+    // Função para buscar todos os eventos
+    const fetchEvents = useCallback(async () => {
+        setLoadingEvents(true);
+        setErrorEvents(null);
+        try {
+            console.log("EventContext Depuração: Buscando todos os eventos. AuthToken presente:", !!authToken, "UserEmail:", userEmail); 
+            const config = {
+                headers: {
+                    'Authorization': `Bearer ${authToken}` 
+                }
+            };
+            const response = await axios.get(`${API_BASE_URL}/api/evento`, config);
+            const fetchedAndMappedEvents = response.data.map(be => {
+                const vendaInicioDate = new Date(be.dataVendaInicio);
+                const currentDate = new Date();
+                currentDate.setHours(0, 0, 0, 0);
+                vendaInicioDate.setHours(0, 0, 0, 0);
+
+                const statusCalculated = (!isNaN(vendaInicioDate.getTime()) && vendaInicioDate >= currentDate) ? 'Ativo' : 'Encerrado';
+
+                return {
+                    id: be.id,
+                    name: be.nomeEvento,
+                    description: be.descricao,
+                    longDescription: be.descricao,
+                    image: be.urlImagem, 
+                    category: be.categoria,
+                    status: statusCalculated,
+                    date: be.dataInicio, 
+                    dataFim: be.dataFim,
+                    horaInicio: be.horaInicio,
+                    horaFim: be.horaFim,
+                    organizador: be.organizador,
+                    contatoOrganizador: be.contatoOrganizador,
+                    tipoIngresso: be.tipoIngresso,
+                    quantidadeIngressos: be.quantidadeIngressos,
+                    dataVendaInicio: be.dataVendaInicio,
+                    dataVendaFim: be.dataVendaFim,
+                };
+            });
+            setEvents(fetchedAndMappedEvents);
+            console.log("EventContext Depuração: Eventos carregados e mapeados com sucesso.");
+        } catch (error) {
+            console.error("EventContext Depuração: Erro ao carregar eventos:", error.response?.data || error.message);
+            setErrorEvents("Não foi possível carregar os eventos.");
+            setEvents([]); 
+        } finally {
+            setLoadingEvents(false);
+        }
+    }, [authToken, userEmail]); 
+
+    // Função para buscar eventos favoritados pelo usuário
+    const fetchFavoritedEvents = useCallback(async () => {
+        if (!isAuthenticated || !userEmail) {
+            console.log("EventContext Depuração: Usuário não autenticado ou email ausente. Não buscando favoritos.");
+            setFavoritedEvents([]); 
+            return;
+        }
+
+        try {
+            console.log("EventContext Depuração: Buscando eventos favoritos para:", userEmail);
+            const response = await axios.get(`${API_BASE_URL}/api/clientes/by-email/${encodeURIComponent(userEmail)}/favorited-events`, {
+                headers: {
+                    Authorization: `Bearer ${authToken}`
+                }
+            });
+
+            const mappedFavoritedEvents = response.data.map(favEvent => ({
+                id: favEvent.id,
+                name: favEvent.nomeEvento,     
+                description: favEvent.descricao,
+                longDescription: favEvent.descricao, 
+                image: favEvent.urlImagem,       
+                category: favEvent.categoria,
+                status: favEvent.status,         
+                date: favEvent.dataInicio,        
+                dataFim: favEvent.dataFim,
+                horaInicio: favEvent.horaInicio,
+                horaFim: favEvent.horaFim,
+                organizador: favEvent.organizador,
+                contatoOrganizador: favEvent.contatoOrganizador,
+                tipoIngresso: favEvent.tipoIngresso,
+                quantidadeIngressos: favEvent.quantidadeIngressos,
+                dataVendaInicio: favEvent.dataVendaInicio,
+                dataVendaFim: favEvent.dataVendaFim,
+            }));
+            setFavoritedEvents(mappedFavoritedEvents); 
+            console.log("EventContext Depuração: Eventos favoritos carregados e mapeados:", mappedFavoritedEvents.length);
+        } catch (err) {
+            console.error("EventContext Depuração: Erro ao buscar eventos favoritos:", err.response?.data || err.message);
+            setFavoritedEvents([]); 
+        }
+    }, [isAuthenticated, userEmail, authToken]);
 
     useEffect(() => {
-        const fetchEvents = async () => {
-            console.log("EventContext Depuração: Início do useEffect. isAuthReady:", isAuthReady, "isAuthenticated:", isAuthenticated, "authToken presente:", !!authToken);
-
-            if (isAuthReady && isAuthenticated && authToken) {
-                console.log("EventContext Depuração: Condição de busca de eventos atendida. Buscando do backend...");
-                try {
-                    const config = {
-                        headers: {
-                            'Authorization': `Bearer ${authToken}`
-                        }
-                    };
-                    const response = await axios.get("http://localhost:8080/api/evento", config);
-                    console.log("EventContext Depuração: Eventos carregados do backend (dados brutos):", response.data);
-
-                    const fetchedAndMappedEvents = response.data.map(be => {
-                        const vendaInicioDate = new Date(be.dataVendaInicio);
-                        const currentDate = new Date();
-
-                        // Ajusta a data atual para o início do dia para comparação apenas de data
-                        currentDate.setHours(0, 0, 0, 0);
-                        vendaInicioDate.setHours(0, 0, 0, 0);
-
-                        // O evento está 'Ativo' se a data de início das vendas for igual ou posterior ao dia de hoje
-                        const statusCalculated = (!isNaN(vendaInicioDate.getTime()) && vendaInicioDate >= currentDate) ? 'Ativo' : 'Encerrado';
-
-                        console.log(`--- Processando Evento: ${be.nomeEvento} ---`);
-                        console.log(`  Data Venda Início (backend): ${be.dataVendaInicio}`);
-                        console.log(`  Data Objeto JS (dataVendaInicio): ${vendaInicioDate}`);
-                        console.log(`  É uma data válida (dataVendaInicio)? ${!isNaN(vendaInicioDate.getTime())}`);
-                        console.log(`  Data Atual (apenas dia): ${currentDate}`);
-                        console.log(`  Comparação: ${vendaInicioDate.toISOString().split('T')[0]} >= ${currentDate.toISOString().split('T')[0]} ?`);
-                        console.log(`  Status Calculado: ${statusCalculated}`);
-                        console.log(`-------------------------------------`);
-
-
-                        return {
-                            id: be.id,
-                            name: be.nomeEvento,
-                            description: be.descricao,
-                            longDescription: be.descricao,
-                            image: be.urlImagem,
-                            category: be.categoria,
-                            status: statusCalculated,
-                            date: be.dataInicio, 
-                            dataFim: be.dataFim,
-                            horaInicio: be.horaInicio,
-                            horaFim: be.horaFim,
-                            organizador: be.organizador,
-                            contatoOrganizador: be.contatoOrganizador,
-                            tipoIngresso: be.tipoIngresso,
-                            quantidadeIngressos: be.quantidadeIngressos,
-                            dataVendaInicio: be.dataVendaInicio,
-                            dataVendaFim: be.dataVendaFim,
-                        };
-                    });
-                    setEvents(fetchedAndMappedEvents);
-                    console.log("EventContext Depuração: Eventos no estado atualizados.");
-                } catch (error) {
-                    console.error("EventContext Depuração: Erro ao carregar eventos do backend:", error);
-                    if (error.response) {
-                        console.error("EventContext Depuração: Resposta do erro:", error.response.status, error.response.data);
-                    }
-                    setEvents([]); 
-                    console.log("EventContext Depuração: Eventos definidos como vazios devido a erro na busca do backend.");
-                }
-
-            } else {
-                console.log("EventContext Depuração: Autenticação ainda não pronta ou token ausente. Não buscando eventos ainda.");
-            }
-        };
-
         fetchEvents();
-    }, [authToken, isAuthenticated, isAuthReady]);
+    }, [fetchEvents]);
 
-    const addEvent = (newEvent) => {
-        setEvents((prevEvents) => [{ id: newEvent.id, ...newEvent }, ...prevEvents]);
+    useEffect(() => {
+        if (isAuthReady) {
+            fetchFavoritedEvents();
+        }
+    }, [isAuthReady, fetchFavoritedEvents]);
+
+    // Função para adicionar/remover um evento dos favoritos
+    const toggleFavorite = useCallback(async (event) => {
+        if (!isAuthenticated || !userEmail) {
+            console.log('Você precisa estar logado para favoritar eventos.'); 
+            return;
+        }
+
+        let isFavorited = false;
+        try {
+            isFavorited = favoritedEvents.some(fav => fav.id === event.id); 
+            if (isFavorited) {
+                console.log("EventContext Depuração: Desfavoritando evento:", event.id);
+                await axios.delete(`${API_BASE_URL}/api/clientes/${userEmail}/desfavoritar/${event.id}`, {
+                    headers: {
+                        Authorization: `Bearer ${authToken}`
+                    }
+                });
+            } else {
+                console.log("EventContext Depuração: Favoritando evento:", event.id);
+                await axios.post(`${API_BASE_URL}/api/clientes/${userEmail}/favoritar/${event.id}`, {}, {
+                    headers: {
+                        Authorization: `Bearer ${authToken}`
+                    }
+                });
+            }
+            
+            await fetchFavoritedEvents();
+            console.log(`Evento ${isFavorited ? 'desfavoritado' : 'favoritado'} com sucesso!`); 
+        } catch (err) {
+            console.error(`EventContext Depuração: Erro ao ${isFavorited ? 'desfavoritar' : 'favoritar'} evento:`, err.response?.data || err.message);
+            console.log(`Erro ao ${isFavorited ? 'desfavoritar' : 'favoritar'} o evento. Verifique o console para mais detalhes.`); 
+        }
+    }, [isAuthenticated, userEmail, authToken, favoritedEvents, fetchFavoritedEvents]);
+
+    const addEvent = async (newEvent) => {
+        console.warn("Função addEvent não implementada no EventContext.");
     };
 
-    const updateEvent = (updatedEvent) => {
-        setEvents((prevEvents) =>
-            prevEvents.map((event) =>
-                event.id === updatedEvent.id ? updatedEvent : event
-            )
-        );
+    const updateEvent = async (id, updatedEvent) => {
+        console.warn("Função updateEvent não implementada no EventContext.");
     };
 
-    const deleteEvent = (id) => {
-        setEvents((prevEvents) => prevEvents.filter((event) => event.id !== id));
+    const deleteEvent = async (id) => {
+        console.warn("Função deleteEvent não implementada no EventContext.");
     };
 
     return (
-        <EventContext.Provider value={{ events, addEvent, updateEvent, deleteEvent }}>
+        <EventContext.Provider value={{ 
+            events, 
+            loadingEvents, 
+            errorEvents, 
+            addEvent, 
+            updateEvent, 
+            deleteEvent, 
+            favoritedEvents, 
+            toggleFavorite
+        }}>
             {children}
         </EventContext.Provider>
     );
 };
 
 export const useEvents = () => {
-    return useContext(EventContext);
+    const context = useContext(EventContext);
+    if (context === undefined) {
+        throw new Error('useEvents deve ser usado dentro de um EventProvider');
+    }
+    return context;
 };

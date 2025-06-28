@@ -1,13 +1,12 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { motion, AnimatePresence } from "framer-motion";
-import { CalendarCheck, Search, List, Star, Clapperboard, Monitor, Paintbrush } from 'lucide-react';
+import { CalendarCheck, Search, List, Star, Clapperboard, Monitor, Paintbrush, Heart } from 'lucide-react';
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../AuthContext';
 import { useEvents } from '../../contexts/EventContext'; 
 
-// Estilos para os cards de eventos
 function cardStyle(color1, color2) {
     return {
         background: `linear-gradient(135deg, ${color1}, ${color2})`,
@@ -26,7 +25,6 @@ function cardStyle(color1, color2) {
     };
 }
 
-// Componente de Rodapé
 function Footer() {
     return (
         <footer style={{ backgroundColor: '#0a192f', color: '#fff', padding: '2em 0', textAlign: 'center', borderTop: '1px solid #1e293b' }}>
@@ -41,7 +39,8 @@ function Footer() {
 export default function HomeExpositor() {
     const navigate = useNavigate();
     const { isAuthenticated, userRoles, userName, logout } = useContext(AuthContext);
-    const { events } = useEvents(); 
+    // Adicionado `= []` para garantir que favoritedEvents é sempre um array
+    const { events, favoritedEvents = [], toggleFavorite } = useEvents(); 
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('Todos os Eventos');
     const [selectedEvent, setSelectedEvent] = useState(null); 
@@ -53,16 +52,13 @@ export default function HomeExpositor() {
         console.log('[HomeExpositor] userName:', userName);
     }, [isAuthenticated, userRoles, userName]);
 
-    // Função para lidar com o logout do usuário
     const handleLogout = () => {
         logout();
         navigate('/', { replace: true });
     };
 
-    // Obtém o primeiro nome do usuário para exibição
     const firstName = userName ? userName.split(' ')[0] : 'Usuário';
 
-    // Categorias de eventos para filtragem na sidebar
     const categories = [
         { name: 'Todos os Eventos', icon: <CalendarCheck size={20} /> },
         { name: 'Eventos Ativos', icon: <Star size={20} /> },
@@ -93,10 +89,19 @@ export default function HomeExpositor() {
         setSelectedEvent(null); 
     };
 
+    const handleFavoriteClick = async (e, event) => {
+        e.stopPropagation(); 
+        await toggleFavorite(event);
+    };
+
+    const isEventFavorited = (eventId) => {
+        // favoritedEvents já está garantido como um array vazio por padrão
+        return favoritedEvents.some(fav => fav.id === eventId);
+    };
+
     return (
         <div style={{ backgroundColor: '#0a192f', color: '#ffffff', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
             
-            {/* Seção do cabeçalho com título, informações do usuário e botões */}
             <section style={{
                 padding: '1.5em 2em',
                 background: 'linear-gradient(135deg, #000000 0%, #0a192f 100%)',
@@ -171,7 +176,6 @@ export default function HomeExpositor() {
             </section>
 
             <div style={{ display: 'flex', flex: 1, backgroundColor: '#0f172a' }}>
-                {/* Barra Lateral */}
                 <aside style={{
                     width: '280px',
                     backgroundColor: '#1e293b',
@@ -214,11 +218,9 @@ export default function HomeExpositor() {
                     </ul>
                 </aside>
 
-                {/* Eventos disponíveis */}
                 <main style={{ flex: 1, padding: '4em 2em', overflowY: 'auto' }}>
                     <h2 className="text-center text-white mb-5" style={{ fontSize: '2.8em', fontWeight: '700', textShadow: '0 0 10px rgba(59, 130, 246, 0.5)' }}>Eventos Disponíveis</h2>
 
-                    {/* Barra de Pesquisa */}
                     <div style={{ position: 'relative', marginBottom: '3em', maxWidth: '700px', margin: '0 auto 3em auto' }}>
                         <input
                             type="text"
@@ -250,14 +252,15 @@ export default function HomeExpositor() {
                                     initial={{ opacity: 0, y: 40 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ duration: 0.5 }}
-                                    onClick={() => handleCardClick(event)} 
+                                    onClick={() => handleCardClick(event)}
                                 >
                                     <div style={{
                                         ...cardStyle('#1e40af', '#2563eb'),
                                         height: 'auto',
                                         minHeight: '350px',
                                         justifyContent: 'space-between',
-                                        padding: '25px'
+                                        padding: '25px',
+                                        position: 'relative'
                                     }}>
                                         <div style={{ width: '100%', height: '180px', marginBottom: '15px', borderRadius: '15px', overflow: 'hidden', boxShadow: '0 4px 10px rgba(0,0,0,0.3)' }}>
                                             <img src={event.image} alt={event.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -290,7 +293,6 @@ export default function HomeExpositor() {
                 </main>
             </div>
 
-            {/* Modal de Detalhes do Evento */}
             <AnimatePresence>
                 {selectedEvent && (
                     <motion.div
@@ -354,7 +356,6 @@ export default function HomeExpositor() {
                             <h3 style={{ fontSize: '2.2em', marginBottom: '15px', color: '#3b82f6' }}>{selectedEvent.name}</h3>
                             <p style={{ fontSize: '1.1em', lineHeight: '1.6', marginBottom: '20px' }}>{selectedEvent.longDescription}</p>
                             
-                            {/* Detalhes do Evento */}
                             <div style={{ textAlign: 'left', width: '100%', marginBottom: '20px', fontSize: '1em', color: '#e0e0e0' }}>
                                 <p><strong>Categoria:</strong> {selectedEvent.category}</p>
                                 <p><strong>Status:</strong> <span style={{ color: selectedEvent.status === 'Ativo' ? '#22c55e' : '#ef4444' }}>{selectedEvent.status}</span></p>
@@ -371,27 +372,58 @@ export default function HomeExpositor() {
                             </div>
 
                             {selectedEvent.status === 'Ativo' && ( 
-                                <motion.button
-                                    whileHover={{ scale: 1.05, backgroundColor: '#10b981' }}
-                                    whileTap={{ scale: 0.97 }}
-                                    style={{
-                                        backgroundColor: '#22c55e',
-                                        color: '#fff',
-                                        padding: '0.8em 2em',
-                                        fontSize: '1em',
-                                        fontWeight: '600',
-                                        border: 'none',
-                                        borderRadius: 30,
-                                        cursor: 'pointer',
-                                        boxShadow: '0 4px 15px #22c55e55',
-                                        transition: 'background 0.2s',
-                                        outline: 'none',
-                                        marginTop: '20px'
-                                    }}
-                                    onClick={() => handleRegisterStandClick(selectedEvent.id)}
-                                >
-                                    Cadastrar Stands para Este Evento
-                                </motion.button>
+                                <div style={{ display: 'flex', gap: '15px', marginTop: '20px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                                    <motion.button
+                                        whileHover={{ scale: 1.05, backgroundColor: '#10b981' }}
+                                        whileTap={{ scale: 0.97 }}
+                                        style={{
+                                            backgroundColor: '#22c55e',
+                                            color: '#fff',
+                                            padding: '0.8em 2em',
+                                            fontSize: '1em',
+                                            fontWeight: '600',
+                                            border: 'none',
+                                            borderRadius: 30,
+                                            cursor: 'pointer',
+                                            boxShadow: '0 4px 15px #22c55e55',
+                                            transition: 'background 0.2s',
+                                            outline: 'none',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '8px'
+                                        }}
+                                        onClick={() => handleRegisterStandClick(selectedEvent.id)}
+                                    >
+                                        Cadastrar Stands para Este Evento
+                                    </motion.button>
+
+                                    {isAuthenticated && (
+                                        <motion.button
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.97 }}
+                                            style={{
+                                                backgroundColor: isEventFavorited(selectedEvent.id) ? '#ff6347' : '#6b7280', 
+                                                color: '#fff',
+                                                padding: '0.8em 2em',
+                                                fontSize: '1em',
+                                                fontWeight: '600',
+                                                border: 'none',
+                                                borderRadius: 30,
+                                                cursor: 'pointer',
+                                                boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+                                                transition: 'background 0.2s',
+                                                outline: 'none',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '8px'
+                                            }}
+                                            onClick={(e) => handleFavoriteClick(e, selectedEvent)}
+                                        >
+                                            <Heart size={20} fill={isEventFavorited(selectedEvent.id) ? '#fff' : 'none'} color={'#fff'} />
+                                            {isEventFavorited(selectedEvent.id) ? 'Desfavoritar Evento' : 'Favoritar Evento'}
+                                        </motion.button>
+                                    )}
+                                </div>
                             )}
                         </motion.div>
                     </motion.div>
