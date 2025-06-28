@@ -184,7 +184,7 @@ export default function HomeExpositor() {
                             </span>
                         </div>
                     )}
-                    {isAuthenticated && (
+                    {/* {isAuthenticated && (
                         <motion.button
                             whileHover={{ scale: 1.05, backgroundColor: '#dc3545' }}
                             whileTap={{ scale: 0.97 }}
@@ -207,7 +207,7 @@ export default function HomeExpositor() {
                         >
                             Sair <span style={{ marginLeft: 8, fontSize: 18 }}>→</span>
                         </motion.button>
-                    )}
+                    )} */}
                 </div>
             </section>
 

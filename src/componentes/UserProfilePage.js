@@ -2,7 +2,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useContext, useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { User, Star, Briefcase, Settings, LogOut, PlusCircle, CalendarCheck, Phone } from 'lucide-react'; 
+// Ícone ChevronLeft adicionado, Home removido.
+import { User, Star, Briefcase, Settings, LogOut, PlusCircle, CalendarCheck, Phone, ChevronLeft } from 'lucide-react'; 
 import axios from 'axios';
 import { AuthContext } from '../AuthContext';
 
@@ -27,7 +28,7 @@ export default function UserProfilePage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const firstName = userName ? userName.split(' ')[0] : 'Expositor';
+    const firstName = userName ? userName.split(' ')[0] : 'Utilizador';
 
     const formatDate = (dateParam) => {
         if (!dateParam) return 'Não informado';
@@ -73,19 +74,18 @@ export default function UserProfilePage() {
 
         try {
             const response = await axios.get(`${API_BASE_URL}/api/clientes/by-email/${encodeURIComponent(userEmail)}`, {
-                
+         
             });
 
             const backendData = response.data;
 
             setProfileData({
-                
+
                 name: backendData.nome || userName,
                 email: backendData.usuario?.username || userEmail,
                 phone: backendData.foneCelular || 'Não informado', 
                 memberSince: formatDate(backendData.dataNascimento), 
                 role: (Array.isArray(userRoles) && userRoles.length > 0) ? userRoles.join(', ') : 'Expositor',
-
                 favoritedEvents: [], 
                 myStands: [] 
             });
@@ -95,7 +95,7 @@ export default function UserProfilePage() {
             console.error("Erro ao buscar perfil do utilizador do backend.");
 
             if (err.response) {
-                
+              
                 console.error("Resposta de erro do servidor (status " + err.response.status + "):", err.response.data);
                 if (err.response.data && typeof err.response.data === 'string' && err.response.data.includes("No static resource")) {
                     console.error("POSSÍVEL CAUSA: O backend não tem um endpoint GET mapeado para '/api/clientes/by-email/{email}'. Verifique o @RequestMapping e @GetMapping no ClienteController.java.");
@@ -107,20 +107,21 @@ export default function UserProfilePage() {
                     console.error("Resposta de erro inesperada do backend:", err.response.data);
                 }
             } else if (err.request) {
-                
+                // A requisição foi feita, mas não houve resposta do servidor
                 console.error("Nenhuma resposta do servidor. Verifique se o backend está rodando e se há problemas de CORS. Detalhes:", err.request);
             } else {
-                
+                // Algo aconteceu na configuração da requisição que disparou um erro
                 console.error("Erro na configuração da requisição:", err.message);
             }
             console.error("Objeto erro completo:", err);
 
+            // Define dados de perfil padrão ou mínimos em caso de erro
             setProfileData({ 
                 name: userName || 'Utilizador',
                 email: userEmail || 'Não informado',
                 phone: "Não informado",
                 memberSince: "Não informado",
-                role: (Array.isArray(userRoles) && userRoles.length > 0) ? userRoles.join(', ') : "Expositor",
+                role: (Array.isArray(userRoles) && userRoles.length > 0) ? userRoles.join(', ') : "Utilizador",
                 favoritedEvents: [],
                 myStands: []
             });
@@ -139,9 +140,11 @@ export default function UserProfilePage() {
             return;
         }
 
+        // Busca o perfil apenas se estiver autenticado e ainda não houver dados de perfil
         if (isAuthenticated && userEmail && authToken && profileData === null) {
             fetchUserProfile();
         } else if (isAuthenticated && (!userEmail || !authToken)) {
+            // Se autenticado, mas sem email/token (estado inconsistente), faz logout
             logout();
         }
     }, [isAuthenticated, navigate, userEmail, authToken, isAuthReady, logout, fetchUserProfile, profileData]);
@@ -173,6 +176,7 @@ export default function UserProfilePage() {
                     border: 'none',
                     borderRadius: 30,
                     cursor: 'pointer',
+                    boxShadow: '0 4px 15px #2563eb55',
                     marginTop: '20px'
                 }}>Tentar Novamente</button>
             </div>
@@ -202,14 +206,16 @@ export default function UserProfilePage() {
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, cursor: 'pointer' }} onClick={() => navigate('/homeExpositor')}>
                     
-                    <h1 style={{ fontSize: '2.5em', fontWeight: '800', letterSpacing: '1px', color: '#3b82f6', margin: 0 }}>
+                    <h1 style={{ fontSize: '2.5em', fontWeight: '800', letterSpacing: '1px', color: '#3b82f6', margin: 0 }}
+                    onClick={() => navigate('/homeExpositor')}
+                    >
                         Events Stands
                     </h1>
                 </div>
 
                 <div className="d-flex align-items-center gap-3 ms-auto">
                     {isAuthenticated && userName && (
-                        <div className="d-flex align-items-center gap-2 text-white" style={{cursor: 'pointer'}} onClick={() => navigate('/profile')}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '2px', color: '#fff', cursor: 'pointer' }} onClick={() => navigate('/profile')}>
                             <div style={{
                                 width: '40px',
                                 height: '40px',
@@ -228,17 +234,17 @@ export default function UserProfilePage() {
                                     onError={(e) => e.target.src = `https://placehold.co/40x40/3b82f6/ffffff?text=${firstName.charAt(0).toUpperCase()}`}
                                 />
                             </div>
-                            <span className="d-none d-md-inline" style={{ fontSize: '1.2em', fontWeight: 'bold' }}>
+                            <span style={{ fontSize: '1.2em', fontWeight: 'bold' }}>
                                 {firstName}
                             </span>
                         </div>
                     )}
                     {isAuthenticated && (
                         <motion.button
-                            whileHover={{ scale: 1.05, backgroundColor: '#dc3545' }}
+                            whileHover={{ scale: 1.05, backgroundColor: '#3b82f6' }}
                             whileTap={{ scale: 0.97 }}
                             style={{
-                                backgroundColor: '#ff4d4f',
+                                backgroundColor: '#2563eb', 
                                 color: '#fff',
                                 padding: '0.6em 1.5em',
                                 fontSize: '0.9em',
@@ -246,21 +252,23 @@ export default function UserProfilePage() {
                                 border: 'none',
                                 borderRadius: 32,
                                 cursor: 'pointer',
-                                boxShadow: '0 2px 12px #ff4d4f33',
+                                boxShadow: '0 2px 12px rgba(59, 130, 246, 0.2)', 
                                 transition: 'background 0.2s',
                                 outline: 'none',
-                                display: 'inline-block'
+                                display: 'inline-flex', 
+                                alignItems: 'center',
+                                gap: '8px' 
                             }}
-                            onClick={handleLogout}
+                            onClick={() => navigate('/homeExpositor')}
                         >
-                            Sair <span style={{ marginLeft: 8, fontSize: 18 }}>→</span>
+                            <ChevronLeft size={20} /> Retornar 
                         </motion.button>
                     )}
                 </div>
             </section>
 
             <main style={{ flex: 1, padding: '4em 2em', maxWidth: '1200px', margin: '0 auto' }}>
-                <h2 className="text-center text-white mb-5" style={{ fontSize: '2.8em', fontWeight: '700', textShadow: '0 0 10px rgba(59, 130, 246, 0.5)' }}>
+                <h2 style={{ textAlign: 'center', color: '#fff', marginBottom: '5px', fontSize: '2.8em', fontWeight: '700', textShadow: '0 0 10px rgba(59, 130, 246, 0.5)' }}>
                     Meu Perfil
                 </h2>
 
@@ -386,8 +394,7 @@ export default function UserProfilePage() {
                         Veja alguns eventos
                     </motion.button>
                 </div>
-
-               
+                
                     <>
                         <h3 style={{ fontSize: '2em', fontWeight: '600', borderBottom: '2px solid #3b82f6', paddingBottom: '10px', marginTop: '3em', marginBottom: '2em' }}>
                             <Briefcase size={24} style={{ marginRight: '10px', verticalAlign: 'middle' }} /> Meus Stands
@@ -420,6 +427,7 @@ export default function UserProfilePage() {
                             </motion.button>
                         </div>
                     </>
+
             </main>
             <Footer />
         </div>

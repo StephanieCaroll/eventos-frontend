@@ -64,10 +64,11 @@ export default function MenuSistema(props) {
               <Button primary>Login</Button>
             </MenuItem>
           ) : (
-            // Se o usuário estiver autenticado, mostra o botão de Sair
-            <MenuItem onClick={logout}>
-              <Button secondary>Sair</Button>
-            </MenuItem>
+            // Se o usuário estiver autenticado, o botão de Sair (logout) foi removido daqui
+            // <MenuItem onClick={logout}>
+            //   // Botão de Logout
+            // </MenuItem>
+            null // Renderiza nada quando o usuário está autenticado, pois o botão de logout foi removido
           )}
         </Menu.Menu>
       </Menu>
