@@ -3,7 +3,8 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { motion } from "framer-motion";
 import { CalendarCheck, MonitorPlay, Star } from 'lucide-react';
 import MenuSistema from "../../MenuSistema";
-import { Link } from "react-router-dom";
+import { Link } from "react-router-dom"; 
+
 function cardStyle(color1, color2) {
     return {
         background: `linear-gradient(135deg, ${color1}, ${color2})`,
@@ -29,9 +30,9 @@ export default function Home() {
 
     return (
         <div style={{ backgroundColor: '#0a192f', color: '#ffffff' }}>
+           
             <MenuSistema tela={'Home'} />
 
-            {/* Hero */}
             <section
                 style={{
                     padding: '7em 0',
@@ -56,35 +57,33 @@ export default function Home() {
                     <p style={{ fontSize: '1.5em', color: '#e0e0e0', maxWidth: '700px', margin: '0 auto', marginTop: '1em' }}>
                         Descubra espaços tecnológicos para exposições inesquecíveis. Conecte ideias e oportunidades em ambientes de alto padrão.
                     </p>
-                     <Link to="/login" style={{ textDecoration: 'none', flex: 1 }}>
-                    <motion.button
-                        whileHover={{ scale: 1.05, backgroundColor: '#2563eb' }}
-                        whileTap={{ scale: 0.97 }}
-                        style={{
-                            marginTop: '2.5em',
-                            backgroundColor: '#3b82f6',
-                            color: '#fff',
-                            padding: '1em 2.5em',
-                            fontSize: '1.2em',
-                            fontWeight: '600',
-                            border: 'none',
-                            borderRadius: 32,
-                            cursor: 'pointer',
-                            boxShadow: '0 2px 12px #1e293b33',
-                            transition: 'background 0.2s',
-                            outline: 'none',
-                            textDecoration: 'none',
-                            display: 'inline-block'
-                        }}
-                       
-                    >
-                        Explorar Stands <span style={{ marginLeft: 12, fontSize: 22 }}>→</span>
-                    </motion.button>
+                    
+                    <Link to="/eventos" style={{ textDecoration: 'none', flex: 1 }}>
+                        <motion.button
+                            whileHover={{ scale: 1.05, backgroundColor: '#2563eb' }}
+                            whileTap={{ scale: 0.97 }}
+                            style={{
+                                marginTop: '2.5em',
+                                backgroundColor: '#3b82f6',
+                                color: '#fff',
+                                padding: '1em 2.5em',
+                                fontSize: '1.2em',
+                                fontWeight: '600',
+                                border: 'none',
+                                borderRadius: 32,
+                                cursor: 'pointer',
+                                boxShadow: '0 2px 12px #1e293b33',
+                                transition: 'background 0.2s',
+                                outline: 'none',
+                                display: 'inline-block'
+                            }}
+                        >
+                            Explorar Stands <span style={{ marginLeft: 12, fontSize: 22 }}>→</span>
+                        </motion.button>
                     </Link>
                 </div>
             </section>
 
-            {/* Carrossel de Stands */}
             <section style={{ backgroundColor: '#0f172a', padding: '4em 0' }}>
                 <div className="container">
                     <div id="carouselTecnologia" className="carousel slide" data-bs-ride="carousel">
@@ -115,7 +114,7 @@ export default function Home() {
                                             cursor: 'pointer',
                                             boxShadow: '0 0 20px #1e40af77'
                                         }}
-                                        onClick={() => window.location.href = '/tecnologia'}
+                                        onClick={() => window.location.href = '/eventos'} 
                                     >
                                         Explorar Stands
                                     </motion.button>
@@ -148,7 +147,7 @@ export default function Home() {
                                             cursor: 'pointer',
                                             boxShadow: '0 0 20px #1e40af77'
                                         }}
-                                        onClick={() => window.location.href = '/design'}
+                                        onClick={() => window.location.href = '/eventos'} 
                                     >
                                         Explorar Stands
                                     </motion.button>
@@ -165,7 +164,6 @@ export default function Home() {
                                     <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} style={{ fontSize: '1.2em', maxWidth: 600 }}>
                                         Experiências digitais que geram resultados.
                                     </motion.p>
-                                     <Link to="/login" style={{ textDecoration: 'none', flex: 1 }}>
                                     <motion.button
                                         whileHover={{ scale: 1.05, backgroundColor: '#2563eb' }}
                                         whileTap={{ scale: 0.95 }}
@@ -182,12 +180,10 @@ export default function Home() {
                                             cursor: 'pointer',
                                             boxShadow: '0 0 20px #1e40af77'
                                         }}
-                                        onClick={() => window.location.href = '/imersao'}
+                                        onClick={() => window.location.href = '/eventos'} 
                                     >
-                                        
                                         Explorar Stands
                                     </motion.button>
-                                    </Link>
                                 </div>
                             </div>
                         </div>

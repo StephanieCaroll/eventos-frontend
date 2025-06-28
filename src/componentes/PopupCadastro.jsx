@@ -53,20 +53,19 @@ export default function PopupCadastro({ aberto, fechar }) {
       <Modal
         open={true}
         onClose={handleClose}
-        size="mini" // Mantém o Semantic UI Modal como "mini" para um tamanho inicial menor
+        size="mini" 
         closeIcon
         className={`modal-gerenciador-expositor-base ${isFadingOut ? 'fade-out-modal' : ''}`}
-        // Ajuste o padding para ser mais responsivo se necessário, ou deixe o CSS externo controlar
-        style={{ borderRadius: 16, padding: "1rem" }} // Reduzi o padding um pouco para dar mais espaço
+        style={{ borderRadius: 16, padding: "1rem" }}
       >
-        <Modal.Header style={{ fontSize: '1.5em', fontWeight: 600, textAlign: "center", marginBottom: '1rem' }}> {/* Use em ou vw/vh */}
+        <Modal.Header style={{ fontSize: '1.5em', fontWeight: 600, textAlign: "center", marginBottom: '1rem' }}>
           Qual tipo de cadastro?
         </Modal.Header>
         <Modal.Content style={{ textAlign: "center", flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '0 0.5rem' }}> {/* Ajuste padding e adicione flex para centralizar */}
-          <p style={{ fontSize: '1.1em', color: "#555", marginBottom: '1.5rem' }}> {/* Use em ou vw/vh */}
+          <p style={{ fontSize: '1.1em', color: "#555", marginBottom: '1.5rem' }}> 
             Escolha como deseja continuar:
           </p>
-          <div style={{ display: "flex", flexDirection: "column", gap: '0.8rem', width: '100%', maxWidth: '250px' }}> {/* Ajuste gap e adicione max-width para botões */}
+          <div style={{ display: "flex", flexDirection: "column", gap: '0.8rem', width: '100%', maxWidth: '250px' }}> 
             <Button primary fluid onClick={() => handleNavigate("/form-dono")}>
               Gerenciador
             </Button>
