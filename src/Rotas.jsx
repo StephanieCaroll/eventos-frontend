@@ -12,6 +12,7 @@ import UserProfilePage from './componentes/UserProfilePage';
 import EditProfilePage from './views/cliente/EditProfilePage';
 import React from 'react';
 import HomeGerenciador from './views/home/HomeGerenciador';
+import ManagerProfilePage from './componentes/ManagerProfilePage';
 
 // Componente placeholder para o Dashboard do Administrador
 const DashboardAdmin = () => (
@@ -46,6 +47,7 @@ function Rotas() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/profile" element={<UserProfilePage />} />
+         <Route path="/profileManager" element={<ManagerProfilePage />} />
         <Route path="/edit-profile" element={<EditProfilePage />} />
         <Route path="login" element={<FormLogin />} />
         <Route path="form-dono" element={<FormDono />} />

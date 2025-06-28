@@ -1,14 +1,25 @@
-import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useContext, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { Button, Menu, MenuItem } from 'semantic-ui-react';
 import { AuthContext } from './AuthContext';
 
 export default function MenuSistema(props) {
     const { isAuthenticated, userRoles } = useContext(AuthContext);
+    const location = useLocation();
+
+    useEffect(() => {
+        console.log('--- MenuSistema State ---');
+        console.log('isAuthenticated (MenuSistema):', isAuthenticated);
+        console.log('location.pathname (MenuSistema):', location.pathname);
+        console.log('isHomePage (MenuSistema):', location.pathname === '/');
+        console.log('-------------------------');
+    }, [isAuthenticated, location.pathname]);
 
     const hasRole = (role) => userRoles.includes(role);
 
-    const isFormEventoPage = props.tela === 'form-evento';
+    const isHomePage = location.pathname === '/';
+    const isFormEventoPage = location.pathname === '/form-evento';
+    const isLoginPage = location.pathname === '/login';
 
     return (
         <>
@@ -16,7 +27,7 @@ export default function MenuSistema(props) {
 
                 <Menu.Item
                     content={<span style={{ fontFamily: 'Roboto, sans-serif', fontSize: '30px', fontWeight: 'bold', color: '#3b82f6' }}>EVENTS</span>}
-                    active={props.tela === 'home' || props.tela === 'Home'}
+                    active={isHomePage}
                     as={Link}
                     to={isAuthenticated ? '/' : '/'}
                 />
@@ -24,17 +35,16 @@ export default function MenuSistema(props) {
                 {isAuthenticated && hasRole('ROLE_ADMINISTRADOR') && (
                     <MenuItem
                         content="Cadastro Adm"
-                        active={props.tela === 'form-adm'}
+                        active={location.pathname === '/form-adm'}
                         as={Link}
                         to="/form-adm"
                     />
                 )}
 
-                {/* Hide "Cadastro Evento" if on the form-evento page, even if authenticated and has role */}
-                {isAuthenticated && hasRole('ROLE_GERENCIADOR') && !isFormEventoPage && (
+                {isAuthenticated && hasRole('ROLE_GERENCIADOR') && !isHomePage && !isFormEventoPage && (
                     <MenuItem
                         content="Cadastro Evento"
-                        active={props.tela === 'form-evento'}
+                        active={isFormEventoPage}
                         as={Link}
                         to="/form-evento"
                     />
@@ -43,17 +53,16 @@ export default function MenuSistema(props) {
                 {isAuthenticated && hasRole('ROLE_EXPOSITOR') && (
                     <MenuItem
                         content="Meu Perfil Expositor"
-                        active={props.tela === 'form-cliente'}
+                        active={location.pathname === '/form-cliente'}
                         as={Link}
                         to="/form-cliente"
                     />
                 )}
 
                 <Menu.Menu position="right">
-                    {!isAuthenticated && !isFormEventoPage && (
-                        <MenuItem
-                            content="Login"
-                            active={props.tela === 'Login'}
+                    {!isAuthenticated && (
+                        <MenuItem 
+                            active={isLoginPage}
                             as={Link}
                             to="/login"
                         >

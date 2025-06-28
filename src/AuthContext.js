@@ -3,7 +3,7 @@ import React, { createContext, useState, useEffect, useCallback } from 'react';
 import {
   getToken,
   isTokenExpired,
-  logout as authLogout,
+  logout as authLogout, // Renomeado para evitar conflito com a função logout local
   registerSuccessfulLoginForJwt,
   decodeTokenData,
 } from './views/util/AuthenticationService';
@@ -32,20 +32,28 @@ export const AuthProvider = ({ children }) => {
     const token = getToken();
     const expired = isTokenExpired();
 
+    // Adicione console.log para depurar o token e seu estado
+    console.log('AuthContext: checkAuthentication executado.');
+    console.log('AuthContext: Token encontrado:', token ? 'Sim' : 'Não');
+    console.log('AuthContext: Token expirado:', expired);
+
     if (token && !expired) {
       const decodedData = decodeTokenData(token);
       setIsAuthenticated(true);
-      setUserRoles(decodedData.roles);
+      setUserRoles(decodedData.roles || []); // Garanta que roles seja um array
       setUserName(decodedData.username);
       setUserEmail(decodedData.email || decodedData.username);
       setAuthToken(token);
+      console.log('AuthContext: Usuário está autenticado.');
     } else {
+      // Se não há token válido, apenas reseta o estado, mas NÃO CHAMA authLogout() aqui
       setIsAuthenticated(false);
       setUserRoles([]);
       setUserName('Convidado');
       setUserEmail(null);
       setAuthToken(null);
-      authLogout();
+      console.log('AuthContext: Usuário NÃO está autenticado (ou token expirado/ausente).');
+      // NOTA: authLogout() FOI REMOVIDO DAQUI. Ela só deve ser chamada em logout().
     }
     setIsAuthReady(true);
   }, []);
@@ -54,23 +62,26 @@ export const AuthProvider = ({ children }) => {
     checkAuthentication();
   }, [checkAuthentication]);
 
-  const login = (token, expiration) => {
+  const login = useCallback((token, expiration) => {
     registerSuccessfulLoginForJwt(token, expiration);
-    checkAuthentication();
-  };
+    checkAuthentication(); // Re-verifica o estado após o login
+  }, [checkAuthentication]);
 
-  const logout = () => {
-    authLogout();
+
+  const logout = useCallback(() => {
+    authLogout(); // Chama a função de logout do serviço de autenticação
     setIsAuthenticated(false);
     setUserRoles([]);
     setUserName('Convidado');
     setUserEmail(null);
     setAuthToken(null);
-  };
+    setIsAuthReady(true); // O estado de autenticação está pronto (não logado)
+    console.log('AuthContext: Logout realizado com sucesso.');
+  }, []); // Dependências para o useCallback
 
-  const hasRole = (role) => {
+  const hasRole = useCallback((role) => {
     return userRoles.includes(role);
-  };
+  }, [userRoles]); // Dependências para o useCallback
 
   return (
     <AuthContext.Provider

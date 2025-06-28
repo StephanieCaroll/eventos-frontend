@@ -164,7 +164,7 @@ export default function HomeGerenciador() {
                     {isAuthenticated && userName && (
                         <div
                             style={{ display: 'flex', alignItems: 'center', gap: '0.8em', color: '#fff', cursor: 'pointer' }}
-                            onClick={() => navigate('/profile')}
+                            onClick={() => navigate('/profileManager')}
                         >
                             <div style={{
                                 width: '40px',

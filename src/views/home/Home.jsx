@@ -58,7 +58,7 @@ export default function Home() {
                         Descubra espaços tecnológicos para exposições inesquecíveis. Conecte ideias e oportunidades em ambientes de alto padrão.
                     </p>
                     
-                    <Link to="/eventos" style={{ textDecoration: 'none', flex: 1 }}>
+                    <Link to="/login" style={{ textDecoration: 'none', flex: 1 }}>
                         <motion.button
                             whileHover={{ scale: 1.05, backgroundColor: '#2563eb' }}
                             whileTap={{ scale: 0.97 }}
