@@ -151,7 +151,7 @@ export default function HomeExpositor() {
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
                     <h1 style={{ fontSize: '2.5em', fontWeight: '800', letterSpacing: '1px', color: '#3b82f6', margin: 0  }}>
-                        Events Stands
+                        Events Stands - Expositor
                     </h1>
                 </div>
 

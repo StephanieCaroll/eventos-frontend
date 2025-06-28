@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { CalendarCheck, Search, List, ChevronRight, Star, Clapperboard, Monitor, Paintbrush, PlusCircle, Edit, Trash2 } from 'lucide-react';
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../../AuthContext'; // Certifique-se de que o caminho está correto
+import { AuthContext } from '../../AuthContext'; 
 
 // Dados fictícios para os eventos (agora mutáveis para adicionar novos)
 let fictitiousEvents = [
@@ -367,7 +367,7 @@ export default function HomeGerenciador() {
                                                     justifyContent: 'center',
                                                     boxShadow: '0 2px 10px rgba(0,0,0,0.2)'
                                                 }}
-                                                onClick={() => setSelectedEvent(event)} // Abrir modal de detalhes/edição
+                                                onClick={() => setSelectedEvent(event)} 
                                             >
                                                 <Edit size={20} />
                                             </motion.button>
