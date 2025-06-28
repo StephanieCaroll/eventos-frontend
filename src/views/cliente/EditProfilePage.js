@@ -27,15 +27,12 @@ export default function EditProfilePage() {
 
     const formatDateForInput = useCallback((dateParam) => {
         if (!dateParam) return '';
-
-        // Handle array format [year, month, day] often returned by some backends
         if (Array.isArray(dateParam) && dateParam.length === 3) {
             const [year, month, day] = dateParam;
-            const date = new Date(year, month - 1, day); // Month is 0-indexed in Date constructor
+            const date = new Date(year, month - 1, day); 
             return isNaN(date.getTime()) ? 'Data inválida' : date.toLocaleDateString('pt-BR');
         }
 
-        // Handle ISO string format 'YYYY-MM-DD'
         if (typeof dateParam === 'string' && dateParam.includes('-') && dateParam.split('-').length === 3) {
             const parts = dateParam.split('-');
             const [year, month, day] = parts;
@@ -43,7 +40,6 @@ export default function EditProfilePage() {
             return isNaN(date.getTime()) ? '' : date.toLocaleDateString('pt-BR');
         }
 
-        // Assume already in DD/MM/YYYY if it matches the pattern
         if (typeof dateParam === 'string' && dateParam.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
             return dateParam;
         }
@@ -77,7 +73,7 @@ export default function EditProfilePage() {
             setFormData({
                 nome: backendData.nome || userName,
                 foneCelular: backendData.foneCelular || '',
-                dataNascimento: formatDateForInput(backendData.dataNascimento) // Formats data for input (DD/MM/AAAA)
+                dataNascimento: formatDateForInput(backendData.dataNascimento) // Formatação -> (DD/MM/AAAA)
             });
         } catch (err) {
             setError("Não foi possível carregar os dados do perfil. Verifique o console.");
@@ -123,17 +119,15 @@ export default function EditProfilePage() {
             return;
         }
 
-        // Crucial Change: Send date as DD/MM/YYYY string as backend's ClienteRequest expects it
-        // due to @JsonFormat(pattern = "dd/MM/yyyy")
         const dateToSend = formData.dataNascimento;
 
         const updateRequest = {
             nome: formData.nome,
             foneCelular: formData.foneCelular,
-            dataNascimento: dateToSend, // Sending DD/MM/YYYY string directly
+            dataNascimento: dateToSend, 
             usuario: {
                 username: userEmail,
-                password: "" // Keep empty or null as password is not updated here
+                password: "" 
             }
         };
 

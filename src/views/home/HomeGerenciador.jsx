@@ -1,13 +1,13 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import { motion, AnimatePresence } from "framer-motion"; // Importe AnimatePresence
-import { CalendarCheck, Search, List, ChevronRight, Star, Clapperboard, Monitor, Paintbrush } from 'lucide-react';
+import { motion, AnimatePresence } from "framer-motion";
+import { CalendarCheck, Search, List, ChevronRight, Star, Clapperboard, Monitor, Paintbrush, PlusCircle, Edit, Trash2 } from 'lucide-react';
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../../AuthContext';
+import { AuthContext } from '../../AuthContext'; // Certifique-se de que o caminho está correto
 
-// Dados fictícios para os eventos
-const fictitiousEvents = [
+// Dados fictícios para os eventos (agora mutáveis para adicionar novos)
+let fictitiousEvents = [
     {
         id: 1,
         name: "Tech Expo 2025",
@@ -93,18 +93,19 @@ function Footer() {
     );
 }
 
-export default function HomeExpositor() {
+export default function HomeGerenciador() {
     const navigate = useNavigate();
     const { isAuthenticated, userRoles, userName, logout } = useContext(AuthContext);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('Todos os Eventos');
     const [selectedEvent, setSelectedEvent] = useState(null);
+    const [events, setEvents] = useState(fictitiousEvents); // Gerencia os eventos no estado
 
     useEffect(() => {
-        console.log('[HomeExpositor] Componente carregado.');
-        console.log('[HomeExpositor] isAuthenticated:', isAuthenticated);
-        console.log('[HomeExpositor] userRoles:', userRoles);
-        console.log('[HomeExpositor] userName:', userName);
+        console.log('[HomeGerenciador] Componente carregado.');
+        console.log('[HomeGerenciador] isAuthenticated:', isAuthenticated);
+        console.log('[HomeGerenciador] userRoles:', userRoles);
+        console.log('[HomeGerenciador] userName:', userName);
     }, [isAuthenticated, userRoles, userName]);
 
     const handleLogout = () => {
@@ -123,11 +124,11 @@ export default function HomeExpositor() {
         { name: 'Entretenimento', icon: <Clapperboard size={20} /> }
     ];
 
-    const filteredEvents = fictitiousEvents.filter(event => {
+    const filteredEvents = events.filter(event => {
         const matchesCategory = selectedCategory === 'Todos os Eventos' ||
                                 (selectedCategory === 'Eventos Ativos' && event.status === 'Ativo') ||
                                 (selectedCategory === 'Eventos Passados' && event.status === 'Encerrado') ||
-                                (selectedCategory === event.category); // Filtra por categoria específica
+                                (selectedCategory === event.category);
 
         const matchesSearch = event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                                 event.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -135,9 +136,13 @@ export default function HomeExpositor() {
         return matchesCategory && matchesSearch;
     });
 
+    const handleDeleteEvent = (id) => {
+        setEvents(prevEvents => prevEvents.filter(event => event.id !== id));
+    };
+
     return (
         <div style={{ backgroundColor: '#0a192f', color: '#ffffff', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-           
+
             <section style={{
                 padding: '1.5em 2em',
                 background: 'linear-gradient(135deg, #000000 0%, #0a192f 100%)',
@@ -150,8 +155,8 @@ export default function HomeExpositor() {
                 gap: '1em'
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-                    <h1 style={{ fontSize: '2.5em', fontWeight: '800', letterSpacing: '1px', color: '#3b82f6', margin: 0  }}>
-                        Events Stands
+                    <h1 style={{ fontSize: '2.5em', fontWeight: '800', letterSpacing: '1px', color: '#3b82f6', margin: 0 }}>
+                        Events Stands - Gerenciador
                     </h1>
                 </div>
 
@@ -159,7 +164,7 @@ export default function HomeExpositor() {
                     {isAuthenticated && userName && (
                         <div
                             style={{ display: 'flex', alignItems: 'center', gap: '0.8em', color: '#fff', cursor: 'pointer' }}
-                            onClick={() => navigate('/profile')} 
+                            onClick={() => navigate('/profile')}
                         >
                             <div style={{
                                 width: '40px',
@@ -173,7 +178,7 @@ export default function HomeExpositor() {
                                 border: '2px solid #3b82f6'
                             }}>
                                 <img
-                                    src={`https://placehold.co/40x40/3b82f6/ffffff?text=${firstName.charAt(0).toUpperCase()}`} //Função foda para gerar avatar com a primeira letra do nome
+                                    src={`https://placehold.co/40x40/3b82f6/ffffff?text=${firstName.charAt(0).toUpperCase()}`}
                                     alt="Avatar do Usuário"
                                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                     onError={(e) => e.target.src = `https://placehold.co/40x40/3b82f6/ffffff?text=${firstName.charAt(0).toUpperCase()}`}
@@ -184,7 +189,32 @@ export default function HomeExpositor() {
                             </span>
                         </div>
                     )}
-                    {/* {isAuthenticated && (
+                    {/* Botão de Criar Novo Evento */}
+                    <motion.button
+                        whileHover={{ scale: 1.05, backgroundColor: '#22c55e' }}
+                        whileTap={{ scale: 0.97 }}
+                        style={{
+                            backgroundColor: '#10b981',
+                            color: '#fff',
+                            padding: '0.6em 1.5em',
+                            fontSize: '0.9em',
+                            fontWeight: '600',
+                            border: 'none',
+                            borderRadius: 32,
+                            cursor: 'pointer',
+                            boxShadow: '0 2px 12px #10b98133',
+                            transition: 'background 0.2s',
+                            outline: 'none',
+                            textDecoration: 'none',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.5em'
+                        }}
+                        onClick={() => navigate('/form-evento')} 
+                    >
+                        <PlusCircle size={20} /> Novo Evento
+                    </motion.button>
+                     {isAuthenticated && (
                         <motion.button
                             whileHover={{ scale: 1.05, backgroundColor: '#dc3545' }}
                             whileTap={{ scale: 0.97 }}
@@ -207,12 +237,12 @@ export default function HomeExpositor() {
                         >
                             Sair <span style={{ marginLeft: 8, fontSize: 18 }}>→</span>
                         </motion.button>
-                    )} */}
+                    )}
                 </div>
             </section>
 
             <div style={{ display: 'flex', flex: 1, backgroundColor: '#0f172a' }}>
-                {/* Barra Lateral */}
+                {/* Sidebar */}
                 <aside style={{
                     width: '280px',
                     backgroundColor: '#1e293b',
@@ -257,7 +287,7 @@ export default function HomeExpositor() {
 
                 {/* Eventos disponíveis */}
                 <main style={{ flex: 1, padding: '4em 2em', overflowY: 'auto' }}>
-                    <h2 className="text-center text-white mb-5" style={{ fontSize: '2.8em', fontWeight: '700', textShadow: '0 0 10px rgba(59, 130, 246, 0.5)' }}>Eventos Disponíveis</h2>
+                    <h2 className="text-center text-white mb-5" style={{ fontSize: '2.8em', fontWeight: '700', textShadow: '0 0 10px rgba(59, 130, 246, 0.5)' }}>Eventos Disponíveis para Gerenciamento</h2>
 
                     {/* Barra de Pesquisa */}
                     <div style={{ position: 'relative', marginBottom: '3em', maxWidth: '700px', margin: '0 auto 3em auto' }}>
@@ -291,14 +321,14 @@ export default function HomeExpositor() {
                                     initial={{ opacity: 0, y: 40 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ duration: 0.5 }}
-                                    onClick={() => setSelectedEvent(event)}
                                 >
                                     <div style={{
                                         ...cardStyle('#1e40af', '#2563eb'),
                                         height: 'auto',
                                         minHeight: '350px',
                                         justifyContent: 'space-between',
-                                        padding: '25px'
+                                        padding: '25px',
+                                        position: 'relative' // Added for button positioning
                                     }}>
                                         <div style={{ width: '100%', height: '180px', marginBottom: '15px', borderRadius: '15px', overflow: 'hidden', boxShadow: '0 4px 10px rgba(0,0,0,0.3)' }}>
                                             <img src={event.image} alt={event.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -319,6 +349,49 @@ export default function HomeExpositor() {
                                                 verticalAlign: 'middle'
                                             }} title={event.status}></span>
                                         </div>
+                                        {/* Botões de Ação para Gerenciamento */}
+                                        <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '20px' }}>
+                                            <motion.button
+                                                whileHover={{ scale: 1.1 }}
+                                                whileTap={{ scale: 0.9 }}
+                                                style={{
+                                                    background: 'none',
+                                                    border: 'none',
+                                                    cursor: 'pointer',
+                                                    color: '#fff',
+                                                    padding: '8px',
+                                                    borderRadius: '50%',
+                                                    backgroundColor: '#3b82f6',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    boxShadow: '0 2px 10px rgba(0,0,0,0.2)'
+                                                }}
+                                                onClick={() => setSelectedEvent(event)} // Abrir modal de detalhes/edição
+                                            >
+                                                <Edit size={20} />
+                                            </motion.button>
+                                            <motion.button
+                                                whileHover={{ scale: 1.1 }}
+                                                whileTap={{ scale: 0.9 }}
+                                                style={{
+                                                    background: 'none',
+                                                    border: 'none',
+                                                    cursor: 'pointer',
+                                                    color: '#fff',
+                                                    padding: '8px',
+                                                    borderRadius: '50%',
+                                                    backgroundColor: '#ef4444',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    boxShadow: '0 2px 10px rgba(0,0,0,0.2)'
+                                                }}
+                                                onClick={(e) => { e.stopPropagation(); handleDeleteEvent(event.id); }}
+                                            >
+                                                <Trash2 size={20} />
+                                            </motion.button>
+                                        </div>
                                     </div>
                                 </motion.div>
                             ))
@@ -331,7 +404,7 @@ export default function HomeExpositor() {
                 </main>
             </div>
 
-            {/* Modal de Detalhes do Evento */}
+            {/* Modal de Detalhes do Evento (para visualização e futura edição) */}
             <AnimatePresence>
                 {selectedEvent && (
                     <motion.div
@@ -422,7 +495,6 @@ export default function HomeExpositor() {
                     </motion.div>
                 )}
             </AnimatePresence>
-
             <Footer />
         </div>
     );

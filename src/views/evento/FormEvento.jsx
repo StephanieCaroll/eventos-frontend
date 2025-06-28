@@ -307,7 +307,7 @@ export default function FormEvento() {
 
             {/* Botões de Ação */}
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 36, gap: 16 }}>
-              <Link to={"/"} style={{ textDecoration: 'none' }}> 
+              <Link to={"/homeGerenciador"} style={{ textDecoration: 'none' }}> 
                 <motion.button
                   type="button"
                   whileHover={{ scale: 1, backgroundColor: '#ffd591' }}

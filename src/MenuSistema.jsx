@@ -4,9 +4,11 @@ import { Button, Menu, MenuItem } from 'semantic-ui-react';
 import { AuthContext } from './AuthContext';
 
 export default function MenuSistema(props) {
-    const { isAuthenticated, userRoles, logout } = useContext(AuthContext);
+    const { isAuthenticated, userRoles } = useContext(AuthContext);
 
     const hasRole = (role) => userRoles.includes(role);
+
+    const isFormEventoPage = props.tela === 'form-evento';
 
     return (
         <>
@@ -28,7 +30,8 @@ export default function MenuSistema(props) {
                     />
                 )}
 
-                {isAuthenticated && hasRole('ROLE_GERENCIADOR') && (
+                {/* Hide "Cadastro Evento" if on the form-evento page, even if authenticated and has role */}
+                {isAuthenticated && hasRole('ROLE_GERENCIADOR') && !isFormEventoPage && (
                     <MenuItem
                         content="Cadastro Evento"
                         active={props.tela === 'form-evento'}
@@ -47,14 +50,16 @@ export default function MenuSistema(props) {
                 )}
 
                 <Menu.Menu position="right">
-                    <MenuItem
-                        content="Login"
-                        active={props.tela === 'Login'}
-                        as={Link}
-                        to="/login"
-                    >
-                        <Button primary>Login</Button>
-                    </MenuItem>
+                    {!isAuthenticated && !isFormEventoPage && (
+                        <MenuItem
+                            content="Login"
+                            active={props.tela === 'Login'}
+                            as={Link}
+                            to="/login"
+                        >
+                            <Button primary>Login</Button>
+                        </MenuItem>
+                    )}
                 </Menu.Menu>
             </Menu>
         </>

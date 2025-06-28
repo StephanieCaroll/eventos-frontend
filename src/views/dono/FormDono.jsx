@@ -12,8 +12,8 @@ export default function FormDono() {
   const [email, setEmail] = useState("");
   const [cpf, setCpf] = useState("");
   const [dataNascimento, setDataNascimento] = useState("");
-  const [password, setPassword] = useState(""); // Renomeado
-  const [confirmaPassword, setConfirmaPassword] = useState(""); // Renomeado
+  const [password, setPassword] = useState(""); 
+  const [confirmaPassword, setConfirmaPassword] = useState(""); 
   const [erroPassword, setErroPassword] = useState("");
   const [fonecelular, setFonecelular] = useState("");
   const [mensagemSucesso, setMensagemSucesso] = useState(false);

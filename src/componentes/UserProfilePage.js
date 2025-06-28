@@ -2,7 +2,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useContext, useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-// Ícone ChevronLeft adicionado, Home removido.
 import { User, Star, Briefcase, Settings, LogOut, PlusCircle, CalendarCheck, Phone, ChevronLeft } from 'lucide-react'; 
 import axios from 'axios';
 import { AuthContext } from '../AuthContext';
@@ -107,15 +106,12 @@ export default function UserProfilePage() {
                     console.error("Resposta de erro inesperada do backend:", err.response.data);
                 }
             } else if (err.request) {
-                // A requisição foi feita, mas não houve resposta do servidor
                 console.error("Nenhuma resposta do servidor. Verifique se o backend está rodando e se há problemas de CORS. Detalhes:", err.request);
             } else {
-                // Algo aconteceu na configuração da requisição que disparou um erro
                 console.error("Erro na configuração da requisição:", err.message);
             }
             console.error("Objeto erro completo:", err);
 
-            // Define dados de perfil padrão ou mínimos em caso de erro
             setProfileData({ 
                 name: userName || 'Utilizador',
                 email: userEmail || 'Não informado',

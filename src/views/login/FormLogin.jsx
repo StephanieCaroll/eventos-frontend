@@ -48,15 +48,16 @@ export default function FormLogin() {
         
         console.log('[FormLogin] Login bem-sucedido. Token JWT recebido:', token);
         console.log('[FormLogin] Papéis detectados para redirecionamento:', rolesFromToken, 'Nome de usuário:', loggedInUsername);
-//vou ajeitar conforme for adicionando os paineis
+
         // Redireciona o usuário para a página correspondente ao seu papel
         if (rolesFromToken.includes('ROLE_ADMINISTRADOR')) {
           navigate('/dashboard-admin'); // Redireciona para o dashboard do administrador
         } else if (rolesFromToken.includes('ROLE_GERENCIADOR')) {
-          navigate('/form-dono'); // Redireciona para a página do dono (gerenciador)
+          navigate('/homeGerenciador'); // Redireciona para a página do dono (gerenciador)
         } else if (rolesFromToken.includes('ROLE_EXPOSITOR')) {
           navigate('/homeExpositor'); // Redireciona para a HomeExpositor para o Expositor
         } else {
+          
 
           navigate('/homeExpositor');
         }

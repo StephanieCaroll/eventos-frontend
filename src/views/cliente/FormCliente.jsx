@@ -28,7 +28,7 @@ export default function FormCliente() {
       return;
     }
 
-    const dataParaBackend = dataNascimento; // DD/MM/AAAA, já do InputMask
+    const dataParaBackend = dataNascimento; // DD/MM/AAAA
 
     let clienteRequest = {
       nome: nome,
@@ -52,6 +52,7 @@ export default function FormCliente() {
         setPassword("");
         setConfirmaPassword("");
       })
+      //Para testes
       .catch((error) => {
         setMensagemErro(true);
         console.error("Erro ao incluir Expositor.");
