@@ -328,7 +328,7 @@ export default function HomeGerenciador() {
                                         minHeight: '350px',
                                         justifyContent: 'space-between',
                                         padding: '25px',
-                                        position: 'relative' // Added for button positioning
+                                        position: 'relative'
                                     }}>
                                         <div style={{ width: '100%', height: '180px', marginBottom: '15px', borderRadius: '15px', overflow: 'hidden', boxShadow: '0 4px 10px rgba(0,0,0,0.3)' }}>
                                             <img src={event.image} alt={event.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />

@@ -385,7 +385,7 @@ export default function ManagerProfilePage() {
                             alignItems: 'center',
                             gap: '8px'
                         }}
-                        onClick={() => navigate('/manage-events')}
+                        onClick={() => navigate('/homeGerenciador')}
                     >
                         <CalendarCheck size={20} /> Gerenciar Eventos
                     </motion.button>
@@ -409,7 +409,7 @@ export default function ManagerProfilePage() {
                             alignItems: 'center',
                             gap: '8px'
                         }}
-                        onClick={() => navigate('/manage-stands')}
+                        onClick={() => navigate('/homeGerenciador')}
                     >
                         <Component size={20} /> Gerenciar Stands
                     </motion.button>
