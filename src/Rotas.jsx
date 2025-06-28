@@ -1,44 +1,25 @@
-
-import { Route, Routes, useNavigate } from 'react-router-dom'; 
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import { ProtectedRoute } from './views/util/ProtectedRoute';
 import FormCliente from './views/cliente/FormCliente';
 import FormLogin from './views/login/FormLogin';
 import FormDono from './views/dono/FormDono';
 import Home from './views/home/Home';
 import FormEvento from './views/evento/FormEvento';
-import FormAdm from './views/administrador/FormAdm'; 
-import HomeExpositor from './views/home/HomeExpositor'; 
+import FormAdm from './views/administrador/FormAdm';
+import HomeExpositor from './views/home/HomeExpositor';
 import UserProfilePage from './componentes/UserProfilePage';
 import EditProfilePage from './views/cliente/EditProfilePage';
 import React from 'react';
-import HomeGerenciador from './views/home/HomeGerenciador';
+import HomeGerenciador from './views/home/HomeGerenciador'; 
 import ManagerProfilePage from './componentes/ManagerProfilePage';
 
 // Componente placeholder para o Dashboard do Administrador
+//talvez eu use
 const DashboardAdmin = () => (
   <div style={{ padding: '2em', textAlign: 'center', background: '#f5f7fa', minHeight: '100vh' }}>
     <h1 style={{ color: '#3b82f6' }}>Dashboard do Administrador</h1>
     <p style={{ color: '#444' }}>Bem-vindo(a), Administrador! Esta é a sua área restrita.</p>
   </div>
-);
-
-// Componente placeholder para a Página de Eventos
-const EventosPage = () => (
-    <div style={{ backgroundColor: '#0f172a', color: '#ffffff', minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', fontSize: '1.5em' }}>
-        <h2>Página de Eventos</h2>
-        <p>Aqui você verá a lista de todos os eventos!</p>
-        <button onClick={() => window.history.back()} style={{
-            backgroundColor: '#2563eb',
-            color: '#fff',
-            padding: '0.8em 2em',
-            fontSize: '1em',
-            fontWeight: '600',
-            border: 'none',
-            borderRadius: 30,
-            cursor: 'pointer',
-            marginTop: '20px'
-        }}>Voltar</button>
-    </div>
 );
 
 function Rotas() {
@@ -47,7 +28,7 @@ function Rotas() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/profile" element={<UserProfilePage />} />
-         <Route path="/profileManager" element={<ManagerProfilePage />} />
+        <Route path="/profileManager" element={<ManagerProfilePage />} />
         <Route path="/edit-profile" element={<EditProfilePage />} />
         <Route path="login" element={<FormLogin />} />
         <Route path="form-dono" element={<FormDono />} />
@@ -72,7 +53,8 @@ function Rotas() {
           }
         />
 
-        {/* Cadastro de Evento, acessível apenas para GERENCIADORES e ADMINISTRADORES */}
+        {/* Cadastro de Evento (Criação), acessível apenas para GERENCIADORES e ADMINISTRADORES */}
+        {/* Esta é a única definição para '/form-evento' agora, e é protegida. */}
         <Route
           path="form-evento"
           element={
@@ -82,19 +64,26 @@ function Rotas() {
           }
         />
 
-        {/* NOVA ROTA: Home do Gerenciador */}
+        {/* Edição de Evento, acessível apenas para GERENCIADORES e ADMINISTRADORES */}
+        {/* O :id é um parâmetro que será capturado por useParams no FormEvento */}
+        <Route
+          path="/editar-evento/:id"
+          element={
+            <ProtectedRoute allowedRoles={['ROLE_GERENCIADOR', 'ROLE_ADMINISTRADOR']}>
+              <FormEvento /> 
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Home do Gerenciador */}
         <Route
           path="/homeGerenciador"
           element={
-            <ProtectedRoute allowedRoles={['ROLE_GERENCIADOR', 'ROLE_ADMINISTRADOR']}> 
+            <ProtectedRoute allowedRoles={['ROLE_GERENCIADOR', 'ROLE_ADMINISTRADOR']}>
               <HomeGerenciador />
             </ProtectedRoute>
           }
         />
-        
-        <Route path="/form-evento" element={<FormEvento />} />
-        
-
       </Routes>
     </>
   );

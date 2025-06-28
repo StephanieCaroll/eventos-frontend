@@ -116,7 +116,7 @@ export default function ManagerProfilePage() {
             setProfileData({
                 name: userName || 'Utilizador',
                 email: userEmail || 'Não informado',
-                phone: "Não informado",
+                // phone: "Não informado",
                 memberSince: "Não informado",
                 role: (Array.isArray(userRoles) && userRoles.length > 0) ? userRoles.join(', ') : "Dono",
                 razaoSocial: 'Não informado',
@@ -252,7 +252,7 @@ export default function ManagerProfilePage() {
                                 alignItems: 'center',
                                 gap: '8px'
                             }}
-                            onClick={() => navigate('/homeDono')}
+                            onClick={() => navigate('/homeGerenciador')}
                         >
                             <ChevronLeft size={20} /> Retornar
                         </motion.button>
@@ -305,7 +305,7 @@ export default function ManagerProfilePage() {
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '15px', width: '100%', maxWidth: '500px', textAlign: 'left' }}>
                         <p><strong style={{ color: '#3b82f6' }}><User size={18} style={{ marginRight: '8px', verticalAlign: 'middle' }} />E-mail:</strong> {profileData.email}</p>
-                        <p><strong style={{ color: '#3b82f6' }}><Phone size={18} style={{ marginRight: '8px', verticalAlign: 'middle' }} />Telefone:</strong> {profileData.phone || 'Não informado'}</p>
+                        {/* <p><strong style={{ color: '#3b82f6' }}><Phone size={18} style={{ marginRight: '8px', verticalAlign: 'middle' }} />Telefone:</strong> {profileData.phone || 'Não informado'}</p> */}
                         <p><strong style={{ color: '#3b82f6' }}><CalendarCheck size={18} style={{ marginRight: '8px', verticalAlign: 'middle' }} />Data de Aniversário:</strong> {profileData.memberSince || 'Não informado'}</p>
                         <p><strong style={{ color: '#3b82f6' }}><Briefcase size={18} style={{ marginRight: '8px', verticalAlign: 'middle' }} />Razão Social:</strong> {profileData.razaoSocial || 'Não informado'}</p>
                         <p><strong style={{ color: '#3b82f6' }}><IdCard size={18} style={{ marginRight: '8px', verticalAlign: 'middle' }} />CPF:</strong> {profileData.cpf || 'Não informado'}</p>

@@ -4,66 +4,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { CalendarCheck, Search, List, ChevronRight, Star, Clapperboard, Monitor, Paintbrush, PlusCircle, Edit, Trash2 } from 'lucide-react';
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../../AuthContext'; 
+import { AuthContext } from '../../AuthContext';
+import { useEvents } from '../../contexts/EventContext'; 
 
-// Dados fictícios para os eventos (agora mutáveis para adicionar novos)
-let fictitiousEvents = [
-    {
-        id: 1,
-        name: "Tech Expo 2025",
-        description: "A maior feira de tecnologia da América Latina, apresentando inovações em IA, robótica e software.",
-        longDescription: "A Tech Expo 2025 é o ponto de encontro de líderes e entusiastas da tecnologia. Com palestras inspiradoras, workshops práticos e uma área de exposição com as mais recentes inovações em inteligência artificial, realidade virtual e cibersegurança, este evento é imperdível para quem busca se manter atualizado no mundo digital. Oportunidade perfeita para networking e descoberta de novas tendências.",
-        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSo0-kHojs43wQrnfQvM8It1k6oTjJwfyv2RQ&s",
-        category: "Tecnologia",
-        status: "Ativo"
-    },
-    {
-        id: 2,
-        name: "Festival de Artes Primavera",
-        description: "Celebração da arte e cultura com exposições, performances e oficinas para todas as idades.",
-        longDescription: "O Festival de Artes Primavera é um evento vibrante que transforma a cidade em uma galeria a céu aberto. Descubra talentos locais e internacionais através de exposições de pintura, escultura, fotografia e instalações interativas. Desfrute de apresentações de música, dança e teatro ao vivo, e participe de oficinas criativas para todas as idades. Uma verdadeira imersão no universo artístico.",
-        image: "https://i.ytimg.com/vi/UPtDj3iGEPY/maxresdefault.jpg",
-        category: "Arte",
-        status: "Ativo"
-    },
-    {
-        id: 3,
-        name: "GameCon Brasil",
-        description: "Imersão no mundo dos games, com lançamentos, torneios e áreas de experimentação.",
-        longDescription: "A GameCon Brasil é o paraíso dos gamers! Prepare-se para experimentar os jogos mais aguardados, participar de torneios emocionantes com grandes prêmios, encontrar desenvolvedores e influenciadores, e mergulhar em experiências de realidade virtual e esports. Não importa se você é um jogador casual ou competitivo, a GameCon tem algo para todos.",
-        image: "https://sm.ign.com/ign_br/screenshot/default/image_e7eh.jpg",
-        category: "Entretenimento",
-        status: "Ativo"
-    },
-    {
-        id: 4,
-        name: "Conferência de Inovação Sustentável",
-        description: "Debates e soluções sobre energias renováveis e desenvolvimento sustentável.",
-        longDescription: "A Conferência de Inovação Sustentável reúne especialistas, empresas e governos para discutir e apresentar soluções para os desafios ambientais atuais. Explore as últimas tendências em energias renováveis, economia circular e tecnologias verdes. Participe de painéis interativos e faça parte da construção de um futuro mais sustentável.",
-        image: "https://i.ytimg.com/vi/JkCpqu8CJEA/sddefault.jpg",
-        category: "Tecnologia",
-        status: "Encerrado"
-    },
-    {
-        id: 5,
-        name: "Feira Literária da Cidade",
-        description: "Encontro de autores, leitores e editoras com lançamentos e sessões de autógrafos.",
-        longDescription: "A Feira Literária da Cidade é um paraíso para os amantes de livros. Descubra novos autores, participe de sessões de autógrafos com seus escritores favoritos e explore uma vasta gama de gêneros literários. Há também contação de histórias para crianças, debates e workshops para aspirantes a escritores. Uma celebração da leitura e do conhecimento.",
-        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTeJZ623X0Orp9tRfYwBQcgd7cfZqVyWQb-nw&s",
-        category: "Arte",
-        status: "Ativo"
-    },
-    {
-        id: 6,
-        name: "Comic & Geek Fest",
-        description: "Tudo sobre quadrinhos, filmes, séries e cultura geek em um só lugar.",
-        longDescription: "O Comic & Geek Fest é o evento definitivo para fãs de cultura pop! Vista seu melhor cosplay, encontre seus artistas e dubladores favoritos, participe de concursos, painéis e workshops. Explore um mercado cheio de colecionáveis, quadrinhos raros e produtos exclusivos. Prepare-se para um dia épico de celebração nerd!",
-        image: "https://www.oliberal.com/image/contentid/policy:1.602555:1666191450/1-308.jpg?f=2x1&$p$f=42d70cd&w=1500&$w=f075b93",
-        category: "Entretenimento",
-        status: "Encerrado"
-    }
-];
-
+// Estilos para os cards de eventos
 function cardStyle(color1, color2) {
     return {
         background: `linear-gradient(135deg, ${color1}, ${color2})`,
@@ -82,6 +26,7 @@ function cardStyle(color1, color2) {
     };
 }
 
+// Componente de Rodapé
 function Footer() {
     return (
         <footer style={{ backgroundColor: '#0a192f', color: '#fff', padding: '2em 0', textAlign: 'center', borderTop: '1px solid #1e293b' }}>
@@ -96,11 +41,12 @@ function Footer() {
 export default function HomeGerenciador() {
     const navigate = useNavigate();
     const { isAuthenticated, userRoles, userName, logout } = useContext(AuthContext);
+    const { events, deleteEvent } = useEvents(); 
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('Todos os Eventos');
     const [selectedEvent, setSelectedEvent] = useState(null);
-    const [events, setEvents] = useState(fictitiousEvents); // Gerencia os eventos no estado
 
+    // Efeito para logar o estado de autenticação e perfis do usuário
     useEffect(() => {
         console.log('[HomeGerenciador] Componente carregado.');
         console.log('[HomeGerenciador] isAuthenticated:', isAuthenticated);
@@ -108,13 +54,16 @@ export default function HomeGerenciador() {
         console.log('[HomeGerenciador] userName:', userName);
     }, [isAuthenticated, userRoles, userName]);
 
+    // Função para lidar com o logout do usuário
     const handleLogout = () => {
         logout();
         navigate('/', { replace: true });
     };
 
+    // Obtém o primeiro nome do usuário para exibição
     const firstName = userName ? userName.split(' ')[0] : 'Usuário';
 
+    // Categorias de eventos para filtragem na sidebar
     const categories = [
         { name: 'Todos os Eventos', icon: <CalendarCheck size={20} /> },
         { name: 'Eventos Ativos', icon: <Star size={20} /> },
@@ -124,6 +73,7 @@ export default function HomeGerenciador() {
         { name: 'Entretenimento', icon: <Clapperboard size={20} /> }
     ];
 
+    // Filtra os eventos com base no termo de busca e na categoria selecionada
     const filteredEvents = events.filter(event => {
         const matchesCategory = selectedCategory === 'Todos os Eventos' ||
                                 (selectedCategory === 'Eventos Ativos' && event.status === 'Ativo') ||
@@ -136,13 +86,22 @@ export default function HomeGerenciador() {
         return matchesCategory && matchesSearch;
     });
 
+    // Função para lidar com a exclusão de um evento
     const handleDeleteEvent = (id) => {
-        setEvents(prevEvents => prevEvents.filter(event => event.id !== id));
+        if (window.confirm("Tem certeza que deseja remover este evento?")) {
+            deleteEvent(id); 
+        }
+    };
+
+    // Função para lidar com a edição de um evento
+    const handleEditEvent = (event) => {
+        navigate(`/editar-evento/${event.id}`, { state: { event } });
     };
 
     return (
         <div style={{ backgroundColor: '#0a192f', color: '#ffffff', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
 
+            {/* Seção do cabeçalho com título, informações do usuário e botões */}
             <section style={{
                 padding: '1.5em 2em',
                 background: 'linear-gradient(135deg, #000000 0%, #0a192f 100%)',
@@ -210,7 +169,7 @@ export default function HomeGerenciador() {
                             alignItems: 'center',
                             gap: '0.5em'
                         }}
-                        onClick={() => navigate('/form-evento')} 
+                        onClick={() => navigate('/form-evento')}
                     >
                         <PlusCircle size={20} /> Novo Evento
                     </motion.button>
@@ -242,7 +201,7 @@ export default function HomeGerenciador() {
             </section>
 
             <div style={{ display: 'flex', flex: 1, backgroundColor: '#0f172a' }}>
-                {/* Sidebar */}
+                {/* Sidebar para filtros e categorias */}
                 <aside style={{
                     width: '280px',
                     backgroundColor: '#1e293b',
@@ -285,7 +244,7 @@ export default function HomeGerenciador() {
                     </ul>
                 </aside>
 
-                {/* Eventos disponíveis */}
+                {/* Área principal para exibição dos eventos */}
                 <main style={{ flex: 1, padding: '4em 2em', overflowY: 'auto' }}>
                     <h2 className="text-center text-white mb-5" style={{ fontSize: '2.8em', fontWeight: '700', textShadow: '0 0 10px rgba(59, 130, 246, 0.5)' }}>Eventos Disponíveis para Gerenciamento</h2>
 
@@ -335,10 +294,16 @@ export default function HomeGerenciador() {
                                         </div>
                                         <h4 style={{ fontSize: '1.6em', marginBottom: '10px', textAlign: 'center' }}>{event.name}</h4>
                                         <p style={{ fontSize: '0.95em', color: '#e0e0e0', textAlign: 'center', flexGrow: 1 }}>{event.description}</p>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center', marginTop: '15px' }}>
-                                            <span style={{ backgroundColor: '#0f172a', padding: '5px 15px', borderRadius: '20px', fontSize: '0.85em', fontWeight: 'bold', color: '#a78bfa' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center', marginTop: '15px', flexDirection: 'column' }}>
+                                            <span style={{ backgroundColor: '#0f172a', padding: '5px 15px', borderRadius: '20px', fontSize: '0.85em', fontWeight: 'bold', color: '#a78bfa', marginBottom: '10px' }}>
                                                 {event.category}
                                             </span>
+                                            {/* Exibindo a data do evento, formatada para o Brasil */}
+                                            {event.date && (
+                                                <span style={{ fontSize: '0.9em', color: '#e0e0e0', marginBottom: '10px' }}>
+                                                    Data: {new Date(event.date).toLocaleDateString('pt-BR')}
+                                                </span>
+                                            )}
                                             <span style={{
                                                 backgroundColor: event.status === 'Ativo' ? '#22c55e' : '#ef4444',
                                                 width: '12px',
@@ -349,7 +314,7 @@ export default function HomeGerenciador() {
                                                 verticalAlign: 'middle'
                                             }} title={event.status}></span>
                                         </div>
-                                        {/* Botões de Ação para Gerenciamento */}
+                                        {/* Botões de Ação para Gerenciamento (Editar e Remover) */}
                                         <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '20px' }}>
                                             <motion.button
                                                 whileHover={{ scale: 1.1 }}
@@ -367,7 +332,7 @@ export default function HomeGerenciador() {
                                                     justifyContent: 'center',
                                                     boxShadow: '0 2px 10px rgba(0,0,0,0.2)'
                                                 }}
-                                                onClick={() => setSelectedEvent(event)} 
+                                                onClick={(e) => { e.stopPropagation(); handleEditEvent(event); }}
                                             >
                                                 <Edit size={20} />
                                             </motion.button>
@@ -468,6 +433,11 @@ export default function HomeGerenciador() {
                             <span style={{ backgroundColor: '#0f172a', padding: '8px 20px', borderRadius: '25px', fontSize: '1em', fontWeight: 'bold', color: '#a78bfa', marginBottom: '20px' }}>
                                 Categoria: {selectedEvent.category}
                             </span>
+                            {selectedEvent.date && (
+                                <span style={{ fontSize: '1em', color: '#e0e0e0', marginBottom: '20px' }}>
+                                    Data do Evento: {new Date(selectedEvent.date).toLocaleDateString('pt-BR')}
+                                </span>
+                            )}
                             <motion.button
                                 whileHover={{ scale: 1.05, backgroundColor: '#3b82f6' }}
                                 whileTap={{ scale: 0.97 }}
