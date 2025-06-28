@@ -9,18 +9,17 @@ import { Footer } from "../home/Home";
 export default function FormCliente() {
     const [nome, setNome] = useState("");
     const [email, setEmail] = useState("");
-    const [dataNascimento, setDataNascimento] = useState(""); // Stores DD/MM/YYYY string
+    const [dataNascimento, setDataNascimento] = useState("");
     const [foneCelular, setFoneCelular] = useState("");
     const [password, setPassword] = useState("");
     const [confirmaPassword, setConfirmaPassword] = useState("");
     const [erroPassword, setErroPassword] = useState("");
     const [mensagemSucesso, setMensagemSucesso] = useState(false);
     const [mensagemErro, setMensagemErro] = useState(false);
-    const [erroData, setErroData] = useState(""); // New state for date validation error
+    const [erroData, setErroData] = useState(""); 
 
-    // Helper function to validate DD/MM/YYYY format
     const isValidDate = (dateString) => {
-        // Check if the string matches the DD/MM/YYYY pattern exactly
+
         if (!/^\d{2}\/\d{2}\/\d{4}$/.test(dateString)) {
             return false;
         }
@@ -29,11 +28,10 @@ export default function FormCliente() {
         const month = parseInt(parts[1], 10);
         const year = parseInt(parts[2], 10);
 
-        // Basic date sanity check (more robust validation might involve Date objects)
         if (year < 1900 || year > 2100 || month === 0 || month > 12 || day === 0 || day > 31) {
             return false;
         }
-        // Create a Date object to check for valid days in month (e.g., Feb 30)
+
         const date = new Date(year, month - 1, day);
         return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
     };
@@ -43,7 +41,7 @@ export default function FormCliente() {
         setMensagemSucesso(false);
         setMensagemErro(false);
         setErroPassword("");
-        setErroData(""); // Clear previous date error
+        setErroData(""); 
 
         if (password !== confirmaPassword) {
             setErroPassword("As senhas não são iguais.");
@@ -51,7 +49,6 @@ export default function FormCliente() {
             return;
         }
 
-        // Validate dataNascimento format before sending
         if (dataNascimento && !isValidDate(dataNascimento)) {
             setErroData("Data de nascimento inválida. Use DD/MM/AAAA.");
             console.error("Erro de validação: Formato de data incorreto.");
@@ -64,7 +61,7 @@ export default function FormCliente() {
                 username: email,
                 password: password
             },
-            dataNascimento: dataNascimento, // Send as DD/MM/AAAA string
+            dataNascimento: dataNascimento, 
             foneCelular: foneCelular,
         };
 
@@ -73,7 +70,6 @@ export default function FormCliente() {
             .then((response) => {
                 console.log("Expositor cadastrado com sucesso. Resposta do backend:", response.data);
                 setMensagemSucesso(true);
-                // Clear form fields on success
                 setNome("");
                 setEmail("");
                 setDataNascimento("");
