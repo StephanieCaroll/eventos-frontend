@@ -1,29 +1,26 @@
 
-// Componente de formulário de login para autenticação do usuário.
 import axios from 'axios';
-import React, { useState, useContext } from 'react'; // CORREÇÃO AQUI: de '=>' para 'from'
+import React, { useState, useContext } from 'react'; 
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import MenuSistema from '../../MenuSistema'; // O MenuSistema está em 'src/'
-import { Footer } from '../home/Home'; // O Footer está em 'src/views/home/'
-import PopupCadastro from '../../componentes/PopupCadastro'; // O PopupCadastro está em 'src/componentes/'
-import { AuthContext } from '../../AuthContext'; // O AuthContext está em 'src/'
-import { decodeTokenData } from '../../views/util/AuthenticationService'; // Importa decodeTokenData diretamente
+import MenuSistema from '../../MenuSistema'; 
+import { Footer } from '../home/Home'; 
+import PopupCadastro from '../../componentes/PopupCadastro'; 
+import { AuthContext } from '../../AuthContext'; 
+import { decodeTokenData } from '../../views/util/AuthenticationService'; 
 
 export default function FormLogin() {
-  const navigate = useNavigate(); // Hook para navegação programática
-  const { login: authLogin } = useContext(AuthContext); // Usa o `login` do contexto para registrar o login
+  const navigate = useNavigate(); 
+  const { login: authLogin } = useContext(AuthContext); 
 
   const [username, setUsername] = useState('');
   const [senha, setSenha] = useState('');
   const [erro, setErro] = useState('');
   const [mostrarPopup, setMostrarPopup] = useState(false);
 
-  // Função para lidar com o processo de login
   async function entrar() {
-    setErro(''); // Limpa mensagens de erro anteriores
+    setErro(''); 
 
-    // Verifica se os campos de usuário e senha não estão vazios
     if (username !== '' && senha !== '') {
       let authenticationRequest = {
         username: username,
@@ -32,16 +29,13 @@ export default function FormLogin() {
 
       try {
         console.log('[FormLogin] Tentando login para:', username);
-        // Envia a requisição de autenticação para o backend
+      
         const response = await axios.post('http://localhost:8080/api/auth', authenticationRequest);
         
-        const { token, tokenExpiresIn } = response.data; // tokenExpiresIn deve ser o timestamp em SEGUNDOS
+        const { token, tokenExpiresIn } = response.data; 
 
-        // Chama a função de login do contexto para registrar o token e a expiração no localStorage
         authLogin(token, tokenExpiresIn);
-
-        // **Lógica de Redirecionamento Baseada em Papéis**
-        // Decodifica o token *diretamente* da resposta para obter os papéis mais recentes e o nome de usuário.
+      
         const decodedData = decodeTokenData(token); 
         const rolesFromToken = decodedData.roles;
         const loggedInUsername = decodedData.username;
@@ -49,7 +43,6 @@ export default function FormLogin() {
         console.log('[FormLogin] Login bem-sucedido. Token JWT recebido:', token);
         console.log('[FormLogin] Papéis detectados para redirecionamento:', rolesFromToken, 'Nome de usuário:', loggedInUsername);
 
-        // Redireciona o usuário para a página correspondente ao seu papel
         if (rolesFromToken.includes('ROLE_ADMINISTRADOR')) {
           navigate('/dashboard-admin'); // Redireciona para o dashboard do administrador
         } else if (rolesFromToken.includes('ROLE_GERENCIADOR')) {
@@ -62,7 +55,7 @@ export default function FormLogin() {
           navigate('/homeExpositor');
         }
       } catch (error) {
-        // Em caso de erro na autenticação (ex: credenciais inválidas)
+
         console.error('[FormLogin] Erro ao fazer login:', error.response?.data || error.message);
         setErro('Usuário ou senha inválidos.');
       }

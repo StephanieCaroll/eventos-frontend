@@ -43,7 +43,7 @@ export default function MenuSistema(props) {
 
                 {isAuthenticated && hasRole('ROLE_GERENCIADOR') && !isHomePage && !isFormEventoPage && (
                     <MenuItem
-                        content="Cadastro Evento"
+                        // content="Cadastro Evento"
                         active={isFormEventoPage}
                         as={Link}
                         to="/form-evento"

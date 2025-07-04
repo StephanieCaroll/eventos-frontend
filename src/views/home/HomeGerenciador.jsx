@@ -7,7 +7,6 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../AuthContext';
 import { useEvents } from '../../contexts/EventContext'; 
 
-// Estilos para os cards de eventos
 function cardStyle(color1, color2) {
     return {
         background: `linear-gradient(135deg, ${color1}, ${color2})`,
@@ -26,7 +25,6 @@ function cardStyle(color1, color2) {
     };
 }
 
-// Componente de Rodapé
 function Footer() {
     return (
         <footer style={{ backgroundColor: '#0a192f', color: '#fff', padding: '2em 0', textAlign: 'center', borderTop: '1px solid #1e293b' }}>
@@ -46,7 +44,6 @@ export default function HomeGerenciador() {
     const [selectedCategory, setSelectedCategory] = useState('Todos os Eventos');
     const [selectedEvent, setSelectedEvent] = useState(null);
 
-    // Efeito para logar o estado de autenticação e perfis do usuário
     useEffect(() => {
         console.log('[HomeGerenciador] Componente carregado.');
         console.log('[HomeGerenciador] isAuthenticated:', isAuthenticated);
@@ -54,16 +51,13 @@ export default function HomeGerenciador() {
         console.log('[HomeGerenciador] userName:', userName);
     }, [isAuthenticated, userRoles, userName]);
 
-    // Função para lidar com o logout do usuário
     const handleLogout = () => {
         logout();
         navigate('/', { replace: true });
     };
 
-    // Obtém o primeiro nome do usuário para exibição
     const firstName = userName ? userName.split(' ')[0] : 'Usuário';
 
-    // Categorias de eventos para filtragem na sidebar
     const categories = [
         { name: 'Todos os Eventos', icon: <CalendarCheck size={20} /> },
         { name: 'Eventos Ativos', icon: <Star size={20} /> },
@@ -73,7 +67,6 @@ export default function HomeGerenciador() {
         { name: 'Entretenimento', icon: <Clapperboard size={20} /> }
     ];
 
-    // Filtra os eventos com base no termo de busca e na categoria selecionada
     const filteredEvents = events.filter(event => {
         const matchesCategory = selectedCategory === 'Todos os Eventos' ||
                                 (selectedCategory === 'Eventos Ativos' && event.status === 'Ativo') ||
@@ -86,14 +79,12 @@ export default function HomeGerenciador() {
         return matchesCategory && matchesSearch;
     });
 
-    // Função para lidar com a exclusão de um evento
     const handleDeleteEvent = (id) => {
         if (window.confirm("Tem certeza que deseja remover este evento?")) {
             deleteEvent(id); 
         }
     };
 
-    // Função para lidar com a edição de um evento
     const handleEditEvent = (event) => {
         navigate(`/editar-evento/${event.id}`, { state: { event } });
     };
@@ -101,7 +92,6 @@ export default function HomeGerenciador() {
     return (
         <div style={{ backgroundColor: '#0a192f', color: '#ffffff', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
 
-            {/* Seção do cabeçalho com título, informações do usuário e botões */}
             <section style={{
                 padding: '1.5em 2em',
                 background: 'linear-gradient(135deg, #000000 0%, #0a192f 100%)',
@@ -148,7 +138,7 @@ export default function HomeGerenciador() {
                             </span>
                         </div>
                     )}
-                    {/* Botão de Criar Novo Evento */}
+    
                     <motion.button
                         whileHover={{ scale: 1.05, backgroundColor: '#22c55e' }}
                         whileTap={{ scale: 0.97 }}
@@ -201,7 +191,7 @@ export default function HomeGerenciador() {
             </section>
 
             <div style={{ display: 'flex', flex: 1, backgroundColor: '#0f172a' }}>
-                {/* Sidebar para filtros e categorias */}
+             
                 <aside style={{
                     width: '280px',
                     backgroundColor: '#1e293b',
@@ -244,11 +234,9 @@ export default function HomeGerenciador() {
                     </ul>
                 </aside>
 
-                {/* Área principal para exibição dos eventos */}
                 <main style={{ flex: 1, padding: '4em 2em', overflowY: 'auto' }}>
                     <h2 className="text-center text-white mb-5" style={{ fontSize: '2.8em', fontWeight: '700', textShadow: '0 0 10px rgba(59, 130, 246, 0.5)' }}>Eventos Disponíveis para Gerenciamento</h2>
 
-                    {/* Barra de Pesquisa */}
                     <div style={{ position: 'relative', marginBottom: '3em', maxWidth: '700px', margin: '0 auto 3em auto' }}>
                         <input
                             type="text"
@@ -298,7 +286,7 @@ export default function HomeGerenciador() {
                                             <span style={{ backgroundColor: '#0f172a', padding: '5px 15px', borderRadius: '20px', fontSize: '0.85em', fontWeight: 'bold', color: '#a78bfa', marginBottom: '10px' }}>
                                                 {event.category}
                                             </span>
-                                            {/* Exibindo a data do evento, formatada para o Brasil */}
+                                         
                                             {event.date && (
                                                 <span style={{ fontSize: '0.9em', color: '#e0e0e0', marginBottom: '10px' }}>
                                                     Data: {new Date(event.date).toLocaleDateString('pt-BR')}
@@ -314,7 +302,7 @@ export default function HomeGerenciador() {
                                                 verticalAlign: 'middle'
                                             }} title={event.status}></span>
                                         </div>
-                                        {/* Botões de Ação para Gerenciamento (Editar e Remover) */}
+                                      
                                         <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '20px' }}>
                                             <motion.button
                                                 whileHover={{ scale: 1.1 }}
@@ -369,7 +357,6 @@ export default function HomeGerenciador() {
                 </main>
             </div>
 
-            {/* Modal de Detalhes do Evento (para visualização e futura edição) */}
             <AnimatePresence>
                 {selectedEvent && (
                     <motion.div

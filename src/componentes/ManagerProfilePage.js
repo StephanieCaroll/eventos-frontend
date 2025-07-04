@@ -208,7 +208,7 @@ export default function ManagerProfilePage() {
 
                 <div className="d-flex align-items-center gap-3 ms-auto">
                     {isAuthenticated && userName && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '2px', color: '#fff', cursor: 'pointer' }} onClick={() => navigate('/profile')}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '2px', color: '#fff', cursor: 'pointer' }} onClick={() => navigate('/profileManager')}>
                             <div style={{
                                 width: '40px',
                                 height: '40px',
@@ -331,7 +331,7 @@ export default function ManagerProfilePage() {
                                 alignItems: 'center',
                                 gap: '8px'
                             }}
-                            onClick={() => navigate('/edit-profile')}
+                            onClick={() => navigate('/edit-Manager')}
                         >
                             <Settings size={20} /> Editar Perfil
                         </motion.button>
@@ -358,8 +358,6 @@ export default function ManagerProfilePage() {
                         </motion.button>
                     </div>
                 </motion.div>
-
-                ---
 
                 <h3 style={{ fontSize: '2em', fontWeight: '600', borderBottom: '2px solid #3b82f6', paddingBottom: '10px', marginBottom: '2em' }}>
                     <LayoutDashboard size={24} style={{ marginRight: '10px', verticalAlign: 'middle' }} /> Gerenciar Eventos e Stands

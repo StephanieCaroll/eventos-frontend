@@ -39,7 +39,6 @@ function Footer() {
 export default function HomeExpositor() {
     const navigate = useNavigate();
     const { isAuthenticated, userRoles, userName, logout } = useContext(AuthContext);
-    // Adicionado `= []` para garantir que favoritedEvents é sempre um array
     const { events, favoritedEvents = [], toggleFavorite } = useEvents(); 
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('Todos os Eventos');
@@ -95,7 +94,6 @@ export default function HomeExpositor() {
     };
 
     const isEventFavorited = (eventId) => {
-        // favoritedEvents já está garantido como um array vazio por padrão
         return favoritedEvents.some(fav => fav.id === eventId);
     };
 

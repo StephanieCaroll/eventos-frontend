@@ -124,16 +124,16 @@
 /* Media query para telas muito pequenas */
 @media (max-width: 480px) {
   .modal-gerenciador-expositor-base.ui.mini.modal {
-    max-width: 95vw !important; /* Maior largura em telas pequenas */
-    max-height: 95vh !important; /* Maior altura em telas pequenas */
-    padding: 0.5rem !important; /* Reduzir padding em telas muito pequenas */
+    max-width: 95vw !important; 
+    max-height: 95vh !important; 
+    padding: 0.5rem !important; 
   }
 
   .modal-gerenciador-expositor-base.ui.mini.modal .header {
-      font-size: 1.2em !important; /* Reduzir tamanho da fonte do header */
+      font-size: 1.2em !important; 
   }
 
   .modal-gerenciador-expositor-base.ui.mini.modal p {
-      font-size: 1em !important; /* Reduzir tamanho da fonte do parágrafo */
+      font-size: 1em !important; 
   }
 }

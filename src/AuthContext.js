@@ -1,9 +1,8 @@
-// src/AuthContext.js
 import React, { createContext, useState, useEffect, useCallback } from 'react';
 import {
   getToken,
   isTokenExpired,
-  logout as authLogout, // Renomeado para evitar conflito com a função logout local
+  logout as authLogout, 
   registerSuccessfulLoginForJwt,
   decodeTokenData,
 } from './views/util/AuthenticationService';
@@ -40,7 +39,7 @@ export const AuthProvider = ({ children }) => {
     if (token && !expired) {
       const decodedData = decodeTokenData(token);
       setIsAuthenticated(true);
-      setUserRoles(decodedData.roles || []); // Garanta que roles seja um array
+      setUserRoles(decodedData.roles || []); 
       setUserName(decodedData.username);
       setUserEmail(decodedData.email || decodedData.username);
       setAuthToken(token);
@@ -53,7 +52,7 @@ export const AuthProvider = ({ children }) => {
       setUserEmail(null);
       setAuthToken(null);
       console.log('AuthContext: Usuário NÃO está autenticado (ou token expirado/ausente).');
-      // NOTA: authLogout() FOI REMOVIDO DAQUI. Ela só deve ser chamada em logout().
+
     }
     setIsAuthReady(true);
   }, []);
@@ -64,24 +63,24 @@ export const AuthProvider = ({ children }) => {
 
   const login = useCallback((token, expiration) => {
     registerSuccessfulLoginForJwt(token, expiration);
-    checkAuthentication(); // Re-verifica o estado após o login
+    checkAuthentication(); 
   }, [checkAuthentication]);
 
 
   const logout = useCallback(() => {
-    authLogout(); // Chama a função de logout do serviço de autenticação
+    authLogout(); 
     setIsAuthenticated(false);
     setUserRoles([]);
     setUserName('Convidado');
     setUserEmail(null);
     setAuthToken(null);
-    setIsAuthReady(true); // O estado de autenticação está pronto (não logado)
+    setIsAuthReady(true); 
     console.log('AuthContext: Logout realizado com sucesso.');
-  }, []); // Dependências para o useCallback
+  }, []);
 
   const hasRole = useCallback((role) => {
     return userRoles.includes(role);
-  }, [userRoles]); // Dependências para o useCallback
+  }, [userRoles]); 
 
   return (
     <AuthContext.Provider

@@ -12,6 +12,8 @@ import EditProfilePage from './views/cliente/EditProfilePage';
 import React from 'react';
 import HomeGerenciador from './views/home/HomeGerenciador'; 
 import ManagerProfilePage from './componentes/ManagerProfilePage';
+import EditManagerPage from './views/dono/EditManagerPage';
+
 
 // Componente placeholder para o Dashboard do Administrador
 //talvez eu use
@@ -29,7 +31,11 @@ function Rotas() {
         <Route path="/" element={<Home />} />
         <Route path="/profile" element={<UserProfilePage />} />
         <Route path="/profileManager" element={<ManagerProfilePage />} />
+
+        {/* Rotas para Edição (Retirar Protected PAra testes) */}
+        <Route path="/edit-Manager" element={<EditManagerPage />} />
         <Route path="/edit-profile" element={<EditProfilePage />} />
+
         <Route path="login" element={<FormLogin />} />
         <Route path="form-dono" element={<FormDono />} />
         <Route path="form-cliente" element={<FormCliente />} />
@@ -54,7 +60,6 @@ function Rotas() {
         />
 
         {/* Cadastro de Evento (Criação), acessível apenas para GERENCIADORES e ADMINISTRADORES */}
-        {/* Esta é a única definição para '/form-evento' agora, e é protegida. */}
         <Route
           path="form-evento"
           element={

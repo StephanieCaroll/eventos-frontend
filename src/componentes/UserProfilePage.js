@@ -1,7 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useContext, useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion'; // Importar AnimatePresence
+import { motion, AnimatePresence } from 'framer-motion'; 
 import { User, Star, Briefcase, Settings, LogOut, PlusCircle, CalendarCheck, Phone, ChevronLeft, Heart, CheckCircle, XCircle } from 'lucide-react'; 
 import axios from 'axios';
 import { AuthContext } from '../AuthContext';
@@ -9,7 +9,6 @@ import { useEvents } from '../contexts/EventContext';
 
 const API_BASE_URL = 'http://localhost:8080'; 
 
-// Notificação
 const NotificationModal = ({ message, type, onClose }) => {
     const bgColor = type === 'success' ? '#22c55e' : '#ef4444';
     const icon = type === 'success' ? <CheckCircle size={32} color="#fff" /> : <XCircle size={32} color="#fff" />;
