@@ -1,18 +1,17 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { motion, AnimatePresence } from "framer-motion";
-import { CalendarCheck, 
-Search, 
-List, 
-ChevronRight, 
-Star, Clapperboard, 
-Monitor, Paintbrush, 
-PlusCircle, Edit, Trash2, 
-Mic, Lightbulb, Music, LayoutList, 
-Trophy, GraduationCap, Utensils, Globe } from 'lucide-react';
-import React, { useContext, useEffect, useState } from 'react';
+import { CalendarCheck,
+Search, Mic,GraduationCap,
+Utensils, Globe,
+List, Lightbulb,
+Music, LayoutList,
+Star, Trophy,
+Clapperboard,
+Monitor,
+Paintbrush } from 'lucide-react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../../AuthContext';
 import { useEvents } from '../../contexts/EventContext'; 
 
 function cardStyle(color1, color2) {
@@ -44,30 +43,18 @@ function Footer() {
     );
 }
 
-export default function HomeGerenciador() {
+export default function HomeSemLogin() {
     const navigate = useNavigate();
-    const { isAuthenticated, userRoles, userName, logout } = useContext(AuthContext);
-    const { events, deleteEvent } = useEvents(); 
+    const { events } = useEvents(); 
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('Todos os Eventos');
-    const [selectedEvent, setSelectedEvent] = useState(null);
+    const [selectedEvent, setSelectedEvent] = useState(null); 
 
-    useEffect(() => {
-        console.log('[HomeGerenciador] Componente carregado.');
-        console.log('[HomeGerenciador] isAuthenticated:', isAuthenticated);
-        console.log('[HomeGerenciador] userRoles:', userRoles);
-        console.log('[HomeGerenciador] userName:', userName);
-    }, [isAuthenticated, userRoles, userName]);
-
-    const handleLogout = () => {
-        logout();
-        navigate('/', { replace: true });
+    const handleLoginNavigate = () => {
+        navigate('/login');
     };
 
-    const firstName = userName ? userName.split(' ')[0] : 'Usuário';
-
     const categories = [
-
         { name: 'Todos os Eventos', icon: <CalendarCheck size={20} /> },
         { name: 'Eventos Ativos', icon: <Star size={20} /> },
         { name: 'Eventos Passados', icon: <Clapperboard size={20} /> },
@@ -82,10 +69,9 @@ export default function HomeGerenciador() {
         { name: 'Educacional', icon: <GraduationCap size={20} /> }, 
         { name: 'Gastronomico', icon: <Utensils size={20} /> }, 
         { name: 'Cultural', icon: <Globe size={20} /> } 
-
     ];
 
-    const filteredEvents = events.filter(event => {
+    const filteredEvents = events.filter(event => { 
         const matchesCategory = selectedCategory === 'Todos os Eventos' ||
                                 (selectedCategory === 'Eventos Ativos' && event.status === 'Ativo') ||
                                 (selectedCategory === 'Eventos Passados' && event.status === 'Encerrado') ||
@@ -97,19 +83,18 @@ export default function HomeGerenciador() {
         return matchesCategory && matchesSearch;
     });
 
-    const handleDeleteEvent = (id) => {
-        if (window.confirm("Tem certeza que deseja remover este evento?")) {
-            deleteEvent(id); 
-        }
+    const handleCardClick = (event) => {
+        setSelectedEvent(event);
     };
 
-    const handleEditEvent = (event) => {
-        navigate(`/editar-evento/${event.id}`, { state: { event } });
+    const handleRegisterStandClick = () => {
+        navigate('/login');
+        setSelectedEvent(null); 
     };
 
     return (
         <div style={{ backgroundColor: '#0a192f', color: '#ffffff', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-
+            
             <section style={{
                 padding: '1.5em 2em',
                 background: 'linear-gradient(135deg, #000000 0%, #0a192f 100%)',
@@ -122,94 +107,38 @@ export default function HomeGerenciador() {
                 gap: '1em'
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-                    <h1 style={{ fontSize: '2.5em', fontWeight: '800', letterSpacing: '1px', color: '#3b82f6', margin: 0 }}>
-                        Events Stands - Gerenciador
+                    <h1 style={{ fontSize: '2.5em', fontWeight: '800', letterSpacing: '1px', color: '#3b82f6', margin: 0 }} onClick={() => navigate('/')}>
+                        Events Stands
                     </h1>
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1.5em', flexShrink: 0, marginLeft: 'auto' }}>
-                    {isAuthenticated && userName && (
-                        <div
-                            style={{ display: 'flex', alignItems: 'center', gap: '0.8em', color: '#fff', cursor: 'pointer' }}
-                            onClick={() => navigate('/profileManager')}
-                        >
-                            <div style={{
-                                width: '40px',
-                                height: '40px',
-                                borderRadius: '50%',
-                                backgroundColor: '#6b7280',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                overflow: 'hidden',
-                                border: '2px solid #3b82f6'
-                            }}>
-                                <img
-                                    src={`https://placehold.co/40x40/3b82f6/ffffff?text=${firstName.charAt(0).toUpperCase()}`}
-                                    alt="Avatar do Usuário"
-                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                    onError={(e) => e.target.src = `https://placehold.co/40x40/3b82f6/ffffff?text=${firstName.charAt(0).toUpperCase()}`}
-                                />
-                            </div>
-                            <span style={{ fontSize: '1.2em', fontWeight: 'bold' }}>
-                                {firstName}
-                            </span>
-                        </div>
-                    )}
-    
                     <motion.button
-                        whileHover={{ scale: 1.05, backgroundColor: '#22c55e' }}
+                        whileHover={{ scale: 1.05, backgroundColor: '#2563eb' }}
                         whileTap={{ scale: 0.97 }}
                         style={{
-                            backgroundColor: '#10b981',
+                            backgroundColor: '#3b82f6',
                             color: '#fff',
-                            padding: '0.6em 1.5em',
-                            fontSize: '0.9em',
+                            padding: '0.8em 2em',
+                            fontSize: '1em',
                             fontWeight: '600',
                             border: 'none',
                             borderRadius: 32,
                             cursor: 'pointer',
-                            boxShadow: '0 2px 12px #10b98133',
+                            boxShadow: '0 2px 12px #3b82f633',
                             transition: 'background 0.2s',
                             outline: 'none',
                             textDecoration: 'none',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '0.5em'
+                            display: 'inline-block'
                         }}
-                        onClick={() => navigate('/form-evento')}
+                        onClick={handleLoginNavigate}
                     >
-                        <PlusCircle size={20} /> Novo Evento
+                        Fazer Login <span style={{ marginLeft: 8, fontSize: 18 }}>→</span>
                     </motion.button>
-                     {isAuthenticated && (
-                        <motion.button
-                            whileHover={{ scale: 1.05, backgroundColor: '#dc3545' }}
-                            whileTap={{ scale: 0.97 }}
-                            style={{
-                                backgroundColor: '#ff4d4f',
-                                color: '#fff',
-                                padding: '0.6em 1.5em',
-                                fontSize: '0.9em',
-                                fontWeight: '600',
-                                border: 'none',
-                                borderRadius: 32,
-                                cursor: 'pointer',
-                                boxShadow: '0 2px 12px #ff4d4f33',
-                                transition: 'background 0.2s',
-                                outline: 'none',
-                                textDecoration: 'none',
-                                display: 'inline-block'
-                            }}
-                            onClick={handleLogout}
-                        >
-                            Sair <span style={{ marginLeft: 8, fontSize: 18 }}>→</span>
-                        </motion.button>
-                    )}
                 </div>
             </section>
 
             <div style={{ display: 'flex', flex: 1, backgroundColor: '#0f172a' }}>
-             
                 <aside style={{
                     width: '280px',
                     backgroundColor: '#1e293b',
@@ -253,7 +182,7 @@ export default function HomeGerenciador() {
                 </aside>
 
                 <main style={{ flex: 1, padding: '4em 2em', overflowY: 'auto' }}>
-                    <h2 className="text-center text-white mb-5" style={{ fontSize: '2.8em', fontWeight: '700', textShadow: '0 0 10px rgba(59, 130, 246, 0.5)' }}>Eventos Disponíveis para Gerenciamento</h2>
+                    <h2 className="text-center text-white mb-5" style={{ fontSize: '2.8em', fontWeight: '700', textShadow: '0 0 10px rgba(59, 130, 246, 0.5)' }}>Eventos Disponíveis</h2>
 
                     <div style={{ position: 'relative', marginBottom: '3em', maxWidth: '700px', margin: '0 auto 3em auto' }}>
                         <input
@@ -286,6 +215,7 @@ export default function HomeGerenciador() {
                                     initial={{ opacity: 0, y: 40 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ duration: 0.5 }}
+                                    onClick={() => handleCardClick(event)}
                                 >
                                     <div style={{
                                         ...cardStyle('#1e40af', '#2563eb'),
@@ -300,16 +230,10 @@ export default function HomeGerenciador() {
                                         </div>
                                         <h4 style={{ fontSize: '1.6em', marginBottom: '10px', textAlign: 'center' }}>{event.name}</h4>
                                         <p style={{ fontSize: '0.95em', color: '#e0e0e0', textAlign: 'center', flexGrow: 1 }}>{event.description}</p>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center', marginTop: '15px', flexDirection: 'column' }}>
-                                            <span style={{ backgroundColor: '#0f172a', padding: '5px 15px', borderRadius: '20px', fontSize: '0.85em', fontWeight: 'bold', color: '#a78bfa', marginBottom: '10px' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center', marginTop: '15px' }}>
+                                            <span style={{ backgroundColor: '#0f172a', padding: '5px 15px', borderRadius: '20px', fontSize: '0.85em', fontWeight: 'bold', color: '#a78bfa' }}>
                                                 {event.category}
                                             </span>
-                                         
-                                            {event.date && (
-                                                <span style={{ fontSize: '0.9em', color: '#e0e0e0', marginBottom: '10px' }}>
-                                                    Data: {new Date(event.date).toLocaleDateString('pt-BR')}
-                                                </span>
-                                            )}
                                             <span style={{
                                                 backgroundColor: event.status === 'Ativo' ? '#22c55e' : '#ef4444',
                                                 width: '12px',
@@ -319,49 +243,6 @@ export default function HomeGerenciador() {
                                                 marginLeft: '8px',
                                                 verticalAlign: 'middle'
                                             }} title={event.status}></span>
-                                        </div>
-                                      
-                                        <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '20px' }}>
-                                            <motion.button
-                                                whileHover={{ scale: 1.1 }}
-                                                whileTap={{ scale: 0.9 }}
-                                                style={{
-                                                    background: 'none',
-                                                    border: 'none',
-                                                    cursor: 'pointer',
-                                                    color: '#fff',
-                                                    padding: '8px',
-                                                    borderRadius: '50%',
-                                                    backgroundColor: '#3b82f6',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    boxShadow: '0 2px 10px rgba(0,0,0,0.2)'
-                                                }}
-                                                onClick={(e) => { e.stopPropagation(); handleEditEvent(event); }}
-                                            >
-                                                <Edit size={20} />
-                                            </motion.button>
-                                            <motion.button
-                                                whileHover={{ scale: 1.1 }}
-                                                whileTap={{ scale: 0.9 }}
-                                                style={{
-                                                    background: 'none',
-                                                    border: 'none',
-                                                    cursor: 'pointer',
-                                                    color: '#fff',
-                                                    padding: '8px',
-                                                    borderRadius: '50%',
-                                                    backgroundColor: '#ef4444',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    boxShadow: '0 2px 10px rgba(0,0,0,0.2)'
-                                                }}
-                                                onClick={(e) => { e.stopPropagation(); handleDeleteEvent(event.id); }}
-                                            >
-                                                <Trash2 size={20} />
-                                            </motion.button>
                                         </div>
                                     </div>
                                 </motion.div>
@@ -408,6 +289,8 @@ export default function HomeGerenciador() {
                                 color: '#fff',
                                 maxWidth: '700px',
                                 width: '90%',
+                                maxHeight: '90vh', 
+                                overflowY: 'auto', 
                                 boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
                                 position: 'relative',
                                 display: 'flex',
@@ -435,41 +318,54 @@ export default function HomeGerenciador() {
                             <img src={selectedEvent.image} alt={selectedEvent.name} style={{ width: '100%', maxHeight: '300px', objectFit: 'cover', borderRadius: '15px', marginBottom: '20px', boxShadow: '0 5px 15px rgba(0,0,0,0.4)' }} />
                             <h3 style={{ fontSize: '2.2em', marginBottom: '15px', color: '#3b82f6' }}>{selectedEvent.name}</h3>
                             <p style={{ fontSize: '1.1em', lineHeight: '1.6', marginBottom: '20px' }}>{selectedEvent.longDescription}</p>
-                            <span style={{ backgroundColor: '#0f172a', padding: '8px 20px', borderRadius: '25px', fontSize: '1em', fontWeight: 'bold', color: '#a78bfa', marginBottom: '20px' }}>
-                                Categoria: {selectedEvent.category}
-                            </span>
-                            {selectedEvent.date && (
-                                <span style={{ fontSize: '1em', color: '#e0e0e0', marginBottom: '20px' }}>
-                                    Data do Evento: {new Date(selectedEvent.date).toLocaleDateString('pt-BR')}
-                                </span>
+                            
+                            <div style={{ textAlign: 'left', width: '100%', marginBottom: '20px', fontSize: '1em', color: '#e0e0e0' }}>
+                                <p><strong>Categoria:</strong> {selectedEvent.category}</p>
+                                <p><strong>Status:</strong> <span style={{ color: selectedEvent.status === 'Ativo' ? '#22c55e' : '#ef4444' }}>{selectedEvent.status}</span></p>
+                                <p><strong>Data de Início:</strong> {selectedEvent.date ? new Date(selectedEvent.date).toLocaleDateString('pt-BR') : 'N/A'}</p>
+                                <p><strong>Data de Término:</strong> {selectedEvent.dataFim ? new Date(selectedEvent.dataFim).toLocaleDateString('pt-BR') : 'N/A'}</p>
+                                <p><strong>Hora de Início:</strong> {selectedEvent.horaInicio || 'N/A'}</p>
+                                <p><strong>Hora de Término:</strong> {selectedEvent.horaFim || 'N/A'}</p>
+                                <p><strong>Organizador:</strong> {selectedEvent.organizador || 'N/A'}</p>
+                                <p><strong>Contato do Organizador:</strong> {selectedEvent.contatoOrganizador || 'N/A'}</p>
+                                <p><strong>Tipo de Ingresso:</strong> {selectedEvent.tipoIngresso || 'N/A'}</p>
+                                {selectedEvent.quantidadeIngressos && <p><strong>Quantidade de Ingressos:</strong> {selectedEvent.quantidadeIngressos}</p>}
+                                <p><strong>Início das Vendas:</strong> {selectedEvent.dataVendaInicio ? new Date(selectedEvent.dataVendaInicio).toLocaleDateString('pt-BR') : 'N/A'}</p>
+                                <p><strong>Fim das Vendas:</strong> {selectedEvent.dataVendaFim ? new Date(selectedEvent.dataVendaFim).toLocaleDateString('pt-BR') : 'N/A'}</p>
+                            </div>
+
+                            {selectedEvent.status === 'Ativo' && ( 
+                                <div style={{ display: 'flex', gap: '15px', marginTop: '20px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                                    <motion.button
+                                        whileHover={{ scale: 1.05, backgroundColor: '#10b981' }}
+                                        whileTap={{ scale: 0.97 }}
+                                        style={{
+                                            backgroundColor: '#22c55e',
+                                            color: '#fff',
+                                            padding: '0.8em 2em',
+                                            fontSize: '1em',
+                                            fontWeight: '600',
+                                            border: 'none',
+                                            borderRadius: 30,
+                                            cursor: 'pointer',
+                                            boxShadow: '0 4px 15px #22c55e55',
+                                            transition: 'background 0.2s',
+                                            outline: 'none',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '8px'
+                                        }}
+                                        onClick={handleRegisterStandClick} 
+                                    >
+                                        Cadastrar Stands para Este Evento
+                                    </motion.button>
+                                </div>
                             )}
-                            <motion.button
-                                whileHover={{ scale: 1.05, backgroundColor: '#3b82f6' }}
-                                whileTap={{ scale: 0.97 }}
-                                style={{
-                                    backgroundColor: '#2563eb',
-                                    color: '#fff',
-                                    padding: '0.8em 2em',
-                                    fontSize: '1em',
-                                    fontWeight: '600',
-                                    border: 'none',
-                                    borderRadius: 30,
-                                    cursor: 'pointer',
-                                    boxShadow: '0 4px 15px #2563eb55',
-                                    transition: 'background 0.2s',
-                                    outline: 'none'
-                                }}
-                                onClick={() => {
-                                    navigate(`/evento/${selectedEvent.id}`);
-                                    setSelectedEvent(null);
-                                }}
-                            >
-                                Ver Detalhes do Evento
-                            </motion.button>
                         </motion.div>
                     </motion.div>
                 )}
             </AnimatePresence>
+
             <Footer />
         </div>
     );

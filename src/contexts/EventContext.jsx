@@ -1,10 +1,28 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { AuthContext } from '../AuthContext';
+import { AuthContext } from '../AuthContext'; 
 
 const EventContext = createContext();
 
 const API_BASE_URL = 'http://localhost:8080';
+
+const createLocalDate = (dateString) => {
+    if (!dateString) return null;
+
+    return new Date(dateString + 'T00:00:00');
+};
+
+export const formatDateForInput = (dateObject) => {
+    if (!dateObject) return '';
+    const date = new Date(dateObject);
+    if (isNaN(date.getTime())) { 
+        return '';
+    }
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); 
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
 
 export const EventProvider = ({ children }) => {
     const { userEmail, authToken, isAuthenticated, isAuthReady } = useContext(AuthContext);
@@ -26,31 +44,33 @@ export const EventProvider = ({ children }) => {
             };
             const response = await axios.get(`${API_BASE_URL}/api/evento`, config);
             const fetchedAndMappedEvents = response.data.map(be => {
-                const vendaInicioDate = new Date(be.dataVendaInicio);
-                const currentDate = new Date();
-                currentDate.setHours(0, 0, 0, 0);
-                vendaInicioDate.setHours(0, 0, 0, 0);
+                const dataInicioEvento = createLocalDate(be.dataInicio);
+                const dataFimEvento = createLocalDate(be.dataFim);
+                const dataVendaInicioEvento = createLocalDate(be.dataVendaInicio);
+                const dataVendaFimEvento = createLocalDate(be.dataVendaFim);
 
-                const statusCalculated = (!isNaN(vendaInicioDate.getTime()) && vendaInicioDate >= currentDate) ? 'Ativo' : 'Encerrado';
+                const currentDate = new Date();
+                currentDate.setHours(0, 0, 0, 0); 
+                const statusCalculated = (dataVendaInicioEvento && dataVendaInicioEvento.getTime() >= currentDate.getTime()) ? 'Ativo' : 'Encerrado';
 
                 return {
                     id: be.id,
-                    name: be.nomeEvento,
-                    description: be.descricao,
-                    longDescription: be.descricao,
-                    image: be.urlImagem, 
-                    category: be.categoria,
+                    name: be.nomeEvento || '', 
+                    description: be.descricao || '', 
+                    longDescription: be.descricao || '', 
+                    image: be.urlImagem || '', 
+                    category: be.categoria || '', 
                     status: statusCalculated,
-                    date: be.dataInicio, 
-                    dataFim: be.dataFim,
-                    horaInicio: be.horaInicio,
-                    horaFim: be.horaFim,
-                    organizador: be.organizador,
-                    contatoOrganizador: be.contatoOrganizador,
-                    tipoIngresso: be.tipoIngresso,
-                    quantidadeIngressos: be.quantidadeIngressos,
-                    dataVendaInicio: be.dataVendaInicio,
-                    dataVendaFim: be.dataVendaFim,
+                    date: dataInicioEvento, 
+                    dataFim: dataFimEvento,
+                    horaInicio: be.horaInicio || '', 
+                    horaFim: be.horaFim || '',       
+                    organizador: be.organizador || '', 
+                    contatoOrganizador: be.contatoOrganizador || '', 
+                    tipoIngresso: be.tipoIngresso || '', 
+                    quantidadeIngressos: be.quantidadeIngressos || 0, 
+                    dataVendaInicio: dataVendaInicioEvento,
+                    dataVendaFim: dataVendaFimEvento,
                 };
             });
             setEvents(fetchedAndMappedEvents);
@@ -82,22 +102,22 @@ export const EventProvider = ({ children }) => {
 
             const mappedFavoritedEvents = response.data.map(favEvent => ({
                 id: favEvent.id,
-                name: favEvent.nomeEvento,     
-                description: favEvent.descricao,
-                longDescription: favEvent.descricao, 
-                image: favEvent.urlImagem,       
-                category: favEvent.categoria,
-                status: favEvent.status,         
-                date: favEvent.dataInicio,        
-                dataFim: favEvent.dataFim,
-                horaInicio: favEvent.horaInicio,
-                horaFim: favEvent.horaFim,
-                organizador: favEvent.organizador,
-                contatoOrganizador: favEvent.contatoOrganizador,
-                tipoIngresso: favEvent.tipoIngresso,
-                quantidadeIngressos: favEvent.quantidadeIngressos,
-                dataVendaInicio: favEvent.dataVendaInicio,
-                dataVendaFim: favEvent.dataVendaFim,
+                name: favEvent.nomeEvento || '',
+                description: favEvent.descricao || '', 
+                longDescription: favEvent.descricao || '', 
+                image: favEvent.urlImagem || '', 
+                category: favEvent.categoria || '', 
+                status: favEvent.status || '', 
+                date: createLocalDate(favEvent.dataInicio),        
+                dataFim: createLocalDate(favEvent.dataFim),
+                horaInicio: favEvent.horaInicio || '',
+                horaFim: favEvent.horaFim || '',
+                organizador: favEvent.organizador || '', 
+                contatoOrganizador: favEvent.contatoOrganizador || '',
+                tipoIngresso: favEvent.tipoIngresso || '', 
+                quantidadeIngressos: favEvent.quantidadeIngressos || 0, 
+                dataVendaInicio: createLocalDate(favEvent.dataVendaInicio),
+                dataVendaFim: createLocalDate(favEvent.dataVendaFim),
             }));
             setFavoritedEvents(mappedFavoritedEvents); 
             console.log("EventContext Depuração: Eventos favoritos carregados e mapeados:", mappedFavoritedEvents.length);
@@ -151,17 +171,70 @@ export const EventProvider = ({ children }) => {
         }
     }, [isAuthenticated, userEmail, authToken, favoritedEvents, fetchFavoritedEvents]);
 
-    const addEvent = async (newEvent) => {
-        console.warn("Função addEvent não implementada no EventContext.");
-    };
+    const addEvent = useCallback(async (newEventData) => {
+        setLoadingEvents(true);
+        try {
+            console.log("EventContext Depuração: Adicionando novo evento:", newEventData.name);
+            const response = await axios.post(`${API_BASE_URL}/api/evento`, newEventData, {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            await fetchEvents(); 
+            console.log("EventContext Depuração: Evento adicionado com sucesso:", response.data);
+            return response.data;
+        } catch (error) {
+            console.error("EventContext Depuração: Erro ao adicionar evento:", error.response?.data || error.message);
+            setErrorEvents(`Erro ao adicionar evento: ${error.response?.data || error.message}`);
+            throw error;
+        } finally {
+            setLoadingEvents(false);
+        }
+    }, [authToken, fetchEvents]);
 
-    const updateEvent = async (id, updatedEvent) => {
-        console.warn("Função updateEvent não implementada no EventContext.");
-    };
+    const updateEvent = useCallback(async (id, updatedEventData) => {
+        setLoadingEvents(true);
+        try {
+            console.log("EventContext Depuração: Atualizando evento:", id, updatedEventData.name);
+            const response = await axios.put(`${API_BASE_URL}/api/evento/${id}`, updatedEventData, {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            await fetchEvents();
+            console.log("EventContext Depuração: Evento atualizado com sucesso:", response.data);
+            return response.data;
+        } catch (error) {
+            console.error("EventContext Depuração: Erro ao atualizar evento:", error.response?.data || error.message);
+            setErrorEvents(`Erro ao atualizar evento: ${error.response?.data || error.message}`);
+            throw error;
+        } finally {
+            setLoadingEvents(false);
+        }
+    }, [authToken, fetchEvents]);
 
-    const deleteEvent = async (id) => {
-        console.warn("Função deleteEvent não implementada no EventContext.");
-    };
+    const deleteEvent = useCallback(async (id) => {
+        setLoadingEvents(true);
+        try {
+            console.log("EventContext Depuração: Deletando evento:", id);
+            await axios.delete(`${API_BASE_URL}/api/evento/${id}`, {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`
+                }
+            });
+            await fetchEvents();
+            setFavoritedEvents(prev => prev.filter(event => event.id !== id));
+            console.log("EventContext Depuração: Evento deletado com sucesso:", id);
+        } catch (error) {
+            console.error("EventContext Depuração: Erro ao deletar evento:", error.response?.data || error.message);
+            setErrorEvents(`Erro ao deletar evento: ${error.response?.data || error.message}`);
+            throw error;
+        } finally {
+            setLoadingEvents(false);
+        }
+    }, [authToken, fetchEvents]);
 
     return (
         <EventContext.Provider value={{ 

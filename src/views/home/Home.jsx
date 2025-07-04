@@ -3,7 +3,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { motion } from "framer-motion";
 import { CalendarCheck, MonitorPlay, Star } from 'lucide-react';
 import MenuSistema from "../../MenuSistema";
-import { Link } from "react-router-dom"; 
+import { Link, useNavigate } from "react-router-dom"; 
 
 function cardStyle(color1, color2) {
     return {
@@ -23,6 +23,12 @@ function cardStyle(color1, color2) {
 }
 
 export default function Home() {
+
+    const navigate = useNavigate(); 
+    const handleNavigate = (path) => {
+        navigate(path);
+    };
+
     const iconHover = {
         whileHover: { scale: 1.2, rotate: 3 },
         transition: { type: 'spring', stiffness: 300 },
@@ -30,7 +36,7 @@ export default function Home() {
 
     return (
         <div style={{ backgroundColor: '#0a192f', color: '#ffffff' }}>
-           
+
             <MenuSistema tela={'Home'} />
 
             <section
@@ -57,8 +63,8 @@ export default function Home() {
                     <p style={{ fontSize: '1.5em', color: '#e0e0e0', maxWidth: '700px', margin: '0 auto', marginTop: '1em' }}>
                         Descubra espaços tecnológicos para exposições inesquecíveis. Conecte ideias e oportunidades em ambientes de alto padrão.
                     </p>
-                    
-                    <Link to="/login" style={{ textDecoration: 'none', flex: 1 }}>
+
+                    <Link to="/homeSemLogin" style={{ textDecoration: 'none', flex: 1 }}>
                         <motion.button
                             whileHover={{ scale: 1.05, backgroundColor: '#2563eb' }}
                             whileTap={{ scale: 0.97 }}
@@ -78,7 +84,7 @@ export default function Home() {
                                 display: 'inline-block'
                             }}
                         >
-                            Explorar Stands <span style={{ marginLeft: 12, fontSize: 22 }}>→</span>
+                            Explorar Eventos <span style={{ marginLeft: 12, fontSize: 22 }}>→</span>
                         </motion.button>
                     </Link>
                 </div>
@@ -114,9 +120,9 @@ export default function Home() {
                                             cursor: 'pointer',
                                             boxShadow: '0 0 20px #1e40af77'
                                         }}
-                                        onClick={() => window.location.href = '/eventos'} 
+                                        onClick={() => handleNavigate("/homeSemLogin")}
                                     >
-                                        Explorar Stands
+                                        Explorar Eventos
                                     </motion.button>
                                 </div>
                             </div>
@@ -147,9 +153,9 @@ export default function Home() {
                                             cursor: 'pointer',
                                             boxShadow: '0 0 20px #1e40af77'
                                         }}
-                                        onClick={() => window.location.href = '/eventos'} 
+                                        onClick={() => handleNavigate('/homeSemLogin')}
                                     >
-                                        Explorar Stands
+                                        Explorar Eventos
                                     </motion.button>
                                 </div>
                             </div>
@@ -180,9 +186,9 @@ export default function Home() {
                                             cursor: 'pointer',
                                             boxShadow: '0 0 20px #1e40af77'
                                         }}
-                                        onClick={() => window.location.href = '/eventos'} 
+                                        onClick={() => handleNavigate('/homeSemLogin')}
                                     >
-                                        Explorar Stands
+                                        Explorar Eventos
                                     </motion.button>
                                 </div>
                             </div>

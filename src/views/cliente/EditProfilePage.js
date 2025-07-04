@@ -73,7 +73,7 @@ export default function EditProfilePage() {
             setFormData({
                 nome: backendData.nome || userName,
                 foneCelular: backendData.foneCelular || '',
-                dataNascimento: formatDateForInput(backendData.dataNascimento) // Formatação -> (DD/MM/AAAA)
+                dataNascimento: formatDateForInput(backendData.dataNascimento) 
             });
         } catch (err) {
             setError("Não foi possível carregar os dados do perfil. Verifique o console.");

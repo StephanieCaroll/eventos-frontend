@@ -34,7 +34,7 @@ export default function MenuSistema(props) {
 
                 {isAuthenticated && hasRole('ROLE_ADMINISTRADOR') && (
                     <MenuItem
-                        content="Cadastro Adm"
+                        // content="Cadastro Adm" 
                         active={location.pathname === '/form-adm'}
                         as={Link}
                         to="/form-adm"
@@ -43,7 +43,7 @@ export default function MenuSistema(props) {
 
                 {isAuthenticated && hasRole('ROLE_GERENCIADOR') && !isHomePage && !isFormEventoPage && (
                     <MenuItem
-                        // content="Cadastro Evento"
+                        // content="Cadastro Evento" 
                         active={isFormEventoPage}
                         as={Link}
                         to="/form-evento"
@@ -52,7 +52,7 @@ export default function MenuSistema(props) {
 
                 {isAuthenticated && hasRole('ROLE_EXPOSITOR') && (
                     <MenuItem
-                        content="Meu Perfil Expositor"
+                        // content="Meu Perfil Expositor" 
                         active={location.pathname === '/form-cliente'}
                         as={Link}
                         to="/form-cliente"
@@ -60,6 +60,7 @@ export default function MenuSistema(props) {
                 )}
 
                 <Menu.Menu position="right">
+                   
                     {!isAuthenticated && (
                         <MenuItem 
                             active={isLoginPage}

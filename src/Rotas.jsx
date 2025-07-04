@@ -13,16 +13,7 @@ import React from 'react';
 import HomeGerenciador from './views/home/HomeGerenciador'; 
 import ManagerProfilePage from './componentes/ManagerProfilePage';
 import EditManagerPage from './views/dono/EditManagerPage';
-
-
-// Componente placeholder para o Dashboard do Administrador
-//talvez eu use
-const DashboardAdmin = () => (
-  <div style={{ padding: '2em', textAlign: 'center', background: '#f5f7fa', minHeight: '100vh' }}>
-    <h1 style={{ color: '#3b82f6' }}>Dashboard do Administrador</h1>
-    <p style={{ color: '#444' }}>Bem-vindo(a), Administrador! Esta é a sua área restrita.</p>
-  </div>
-);
+import HomeSemLogin from './views/home/HomeSemLogin';
 
 function Rotas() {
   return (
@@ -40,21 +31,14 @@ function Rotas() {
         <Route path="form-dono" element={<FormDono />} />
         <Route path="form-cliente" element={<FormCliente />} />
         <Route path="form-adm" element={<FormAdm />} />
+        <Route path="homeSemLogin" element={<HomeSemLogin />} />
+
+        {/* Home do Expositor */}
         <Route
           path="homeExpositor"
           element={
             <ProtectedRoute>
               <HomeExpositor />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Dashboard do Administrador */}
-        <Route
-          path="dashboard-admin"
-          element={
-            <ProtectedRoute allowedRoles={['ROLE_ADMINISTRADOR']}>
-              <DashboardAdmin />
             </ProtectedRoute>
           }
         />

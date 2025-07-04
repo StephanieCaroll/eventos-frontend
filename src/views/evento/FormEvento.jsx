@@ -4,7 +4,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import MenuSistema from "../../MenuSistema";
 import { Footer } from "../home/Home";
-import { useEvents } from '../../contexts/EventContext';
+import { useEvents, formatDateForInput } from '../../contexts/EventContext'; 
 import { AuthContext } from '../../AuthContext'; 
 
 export default function FormEvento() {
@@ -14,11 +14,10 @@ export default function FormEvento() {
     const { addEvent, updateEvent } = useEvents();
     const { authToken } = useContext(AuthContext);
 
-    // Estados locais para os campos do formulário
     const [nomeEvento, setNomeEvento] = useState("");
     const [descricao, setDescricao] = useState("");
-    const [dataInicio, setDataInicio] = useState("");
-    const [dataFim, setDataFim] = useState("");
+    const [dataInicio, setDataInicio] = useState(""); 
+    const [dataFim, setDataFim] = useState("");     
     const [horaInicio, setHoraInicio] = useState("");
     const [horaFim, setHoraFim] = useState("");
     const [categoria, setCategoria] = useState("");
@@ -27,34 +26,35 @@ export default function FormEvento() {
     const [urlImagem, setUrlImagem] = useState("");
     const [tipoIngresso, setTipoIngresso] = useState("gratuito");
     const [quantidadeIngressos, setQuantidadeIngressos] = useState("");
-    const [dataVendaInicio, setDataVendaInicio] = useState("");
-    const [dataVendaFim, setDataVendaFim] = useState("");
+    const [dataVendaInicio, setDataVendaInicio] = useState(""); 
+    const [dataVendaFim, setDataVendaFim] = useState("");     
     const [mensagemSucesso, setMensagemSucesso] = useState(false);
     const [mensagemErro, setMensagemErro] = useState(false);
 
-    // Determina se o formulário está no modo de edição
-    const isEditing = id !== undefined && location.state?.event;
+    const isEditing = id !== undefined && location.state && location.state.event;
 
-    // Efeito para preencher o formulário quando em modo de edição
+
     useEffect(() => {
         if (isEditing) {
             const eventToEdit = location.state.event;
+        
+
             setNomeEvento(eventToEdit.name || "");
             setDescricao(eventToEdit.description || "");
-            setDataInicio(eventToEdit.date || "");
-            setDataFim(eventToEdit.dataFim || "");
+            setDataInicio(formatDateForInput(eventToEdit.date)); 
+            setDataFim(formatDateForInput(eventToEdit.dataFim)); 
             setHoraInicio(eventToEdit.horaInicio || "");
             setHoraFim(eventToEdit.horaFim || "");
             setCategoria(eventToEdit.category || "");
             setOrganizador(eventToEdit.organizador || "");
             setContatoOrganizador(eventToEdit.contatoOrganizador || "");
-            setUrlImagem(eventToEdit.image || "");            
+            setUrlImagem(eventToEdit.image || "");              
             setTipoIngresso(eventToEdit.tipoIngresso || "gratuito");
             setQuantidadeIngressos(eventToEdit.quantidadeIngressos || "");
-            setDataVendaInicio(eventToEdit.dataVendaInicio || "");
-            setDataVendaFim(eventToEdit.dataVendaFim || "");
+            setDataVendaInicio(formatDateForInput(eventToEdit.dataVendaInicio));
+            setDataVendaFim(formatDateForInput(eventToEdit.dataVendaFim));
         } else {
-            // Limpa o formulário para nova criação
+        
             setNomeEvento("");
             setDescricao("");
             setDataInicio("");
@@ -70,7 +70,7 @@ export default function FormEvento() {
             setDataVendaInicio("");
             setDataVendaFim("");
         }
-    }, [isEditing, id, location.state]);
+    }, [isEditing, id, location.state]); 
 
     const salvar = async () => {
         setMensagemSucesso(false);
@@ -82,19 +82,12 @@ export default function FormEvento() {
             return;
         }
 
-        const config = {
-            headers: {
-                
-                'Authorization': `Bearer ${authToken}`
-            }
-        };
-
-        // Prepara os dados para o backend
+     
         let eventoBackendRequest = {
             nomeEvento: nomeEvento,
             descricao: descricao,
-            dataInicio: dataInicio,
-            dataFim: dataFim,
+            dataInicio: dataInicio, 
+            dataFim: dataFim,      
             horaInicio: horaInicio,
             horaFim: horaFim,
             categoria: categoria,
@@ -102,60 +95,26 @@ export default function FormEvento() {
             contatoOrganizador: contatoOrganizador,
             urlImagem: urlImagem,
             tipoIngresso: tipoIngresso,
-            quantidadeIngressos: parseInt(quantidadeIngressos) || null,
-            dataVendaInicio: dataVendaInicio,
-            dataVendaFim: dataVendaFim,
+            quantidadeIngressos: quantidadeIngressos ? parseInt(quantidadeIngressos) : null,
+            dataVendaInicio: dataVendaInicio, 
+            dataVendaFim: dataVendaFim,      
         };
 
         try {
-            let response;
             if (isEditing) {
-                // Requisição PUT para atualização, incluindo o token nos headers
-                response = await axios.put(`http://localhost:8080/api/evento/${id}`, eventoBackendRequest, config);
+              
+                await updateEvent(parseInt(id), eventoBackendRequest); 
             } else {
-                // Requisição POST para criação, incluindo o token nos headers
-                response = await axios.post("http://localhost:8080/api/evento", eventoBackendRequest, config);
+                
+                await addEvent(eventoBackendRequest);
             }
 
-            console.log("Operação no backend bem-sucedida:", response.data);
+            console.log("Operação no backend bem-sucedida!");
             setMensagemSucesso(true);
-
-            const eventForContext = {
-                id: isEditing ? parseInt(id) : response.data.id || Math.floor(Math.random() * 100000) + 100,
-                name: nomeEvento,
-                description: descricao,
-                longDescription: descricao,
-                image: urlImagem,
-                category: categoria,
-                status: 'Ativo', 
-                date: dataInicio,
-            };
-
-            if (isEditing) {
-                updateEvent(eventForContext);
-            } else {
-                addEvent(eventForContext);
-            }
-
-            // Limpa o formulário apenas se for uma nova criação
-            if (!isEditing) {
-                setNomeEvento("");
-                setDescricao("");
-                setDataInicio("");
-                setDataFim("");
-                setHoraInicio("");
-                setHoraFim("");
-                setCategoria("");
-                setOrganizador("");
-                setContatoOrganizador("");
-                setUrlImagem("");
-                setTipoIngresso("gratuito");
-                setQuantidadeIngressos("");
-                setDataVendaInicio("");
-                setDataVendaFim("");
-            }
-
-            navigate('/homeGerenciador');
+            
+            setTimeout(() => {
+                navigate('/homeGerenciador');
+            }, 1500); 
 
         } catch (error) {
             console.error("Erro ao processar Evento:", error);
@@ -226,7 +185,6 @@ export default function FormEvento() {
                                     <option value="Educacional">Educacional</option>
                                     <option value="Gastronomico">Gastronômico</option>
                                     <option value="Cultural">Cultural</option>
-
                                 </select>
                             </div>
                         </div>
@@ -339,7 +297,7 @@ export default function FormEvento() {
                                     style={{ width: "100%", padding: '12px 14px', borderRadius: 8, border: "1.5px solid #e0e7ef", fontSize: 15, background: '#fafbfc', outline: 'none', transition: 'border 0.2s' }}
                                 >
                                     <option value="gratuito">Gratuito</option>
-                                  
+                                    {/* Adicione outras opções de tipo de ingresso se houver (ex: "pago") */}
                                 </select>
                             </div>
                             <div style={{ flex: 1, minWidth: 'min(100%, 150px)' }}>
@@ -384,7 +342,7 @@ export default function FormEvento() {
                                 animate={{ opacity: 1 }}
                                 style={{ background: "#e6ffed", color: "#256029", border: "1.5px solid #b7eb8f", borderRadius: 6, padding: 14, marginBottom: 18, fontWeight: 500, fontSize: 15 }}
                             >
-                                <strong>Cadastro Realizado!</strong> Evento cadastrado com sucesso.
+                                <strong>Sucesso!</strong> Evento {isEditing ? 'atualizado' : 'cadastrado'} com sucesso.
                             </motion.div>
                         )}
                         {mensagemErro && (
@@ -393,7 +351,7 @@ export default function FormEvento() {
                                 animate={{ opacity: 1 }}
                                 style={{ background: "#fff1f0", color: "#a8071a", border: "1.5px solid #ffa39e", borderRadius: 6, padding: 14, marginBottom: 18, fontWeight: 500, fontSize: 15 }}
                             >
-                                <strong>Erro no Cadastro:</strong> Ocorreu um erro ao tentar cadastrar o evento. Verifique se você está logado.
+                                <strong>Erro!</strong> Ocorreu um erro ao tentar {isEditing ? 'atualizar' : 'cadastrar'} o evento. Verifique se você está logado e os dados informados.
                             </motion.div>
                         )}
 

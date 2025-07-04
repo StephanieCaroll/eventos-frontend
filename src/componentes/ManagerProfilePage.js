@@ -152,7 +152,7 @@ export default function ManagerProfilePage() {
     if (loading) {
         return (
             <div style={{ backgroundColor: '#0f172a', color: '#ffffff', minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '1.5em' }}>
-                A carregar perfil...
+                carregando perfil...
             </div>
         );
     }
@@ -180,7 +180,7 @@ export default function ManagerProfilePage() {
     if (!profileData) {
         return (
             <div style={{ backgroundColor: '#0f172a', color: '#ffffff', minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '1.2em' }}>
-                Nenhuns dados de perfil disponíveis.
+                Nenhum dado de perfil disponível.
             </div>
         );
     }
@@ -198,9 +198,9 @@ export default function ManagerProfilePage() {
                 flexWrap: 'wrap',
                 gap: '1em'
             }}>
-                <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, cursor: 'pointer' }} onClick={() => navigate('/homeDono')}>
+                <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, cursor: 'pointer' }} >
                     <h1 style={{ fontSize: '2.5em', fontWeight: '800', letterSpacing: '1px', color: '#3b82f6', margin: 0 }}
-                        onClick={() => navigate('/homeDono')}
+
                     >
                         Events Stands
                     </h1>
@@ -388,29 +388,6 @@ export default function ManagerProfilePage() {
                         <CalendarCheck size={20} /> Gerenciar Eventos
                     </motion.button>
 
-                    <motion.button
-                        whileHover={{ scale: 1.05, backgroundColor: '#3b82f6' }}
-                        whileTap={{ scale: 0.97 }}
-                        style={{
-                            backgroundColor: '#2563eb',
-                            color: '#fff',
-                            padding: '0.8em 2em',
-                            fontSize: '1em',
-                            fontWeight: '600',
-                            border: 'none',
-                            borderRadius: 30,
-                            cursor: 'pointer',
-                            boxShadow: '0 4px 15px #2563eb55',
-                            transition: 'background 0.2s',
-                            outline: 'none',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '8px'
-                        }}
-                        onClick={() => navigate('/homeGerenciador')}
-                    >
-                        <Component size={20} /> Gerenciar Stands
-                    </motion.button>
                 </div>
             </main>
             <Footer />

@@ -77,7 +77,7 @@ export default function FormCliente() {
                 setPassword("");
                 setConfirmaPassword("");
             })
-            .catch((error) => {
+            .catch((error) => { //para bugs
                 setMensagemErro(true);
                 console.error("Erro ao incluir Expositor.");
 
@@ -394,7 +394,7 @@ export default function FormCliente() {
                                     fontSize: 15,
                                 }}
                             >
-                                **Cadastro Realizado!** Expositor cadastrado com sucesso.
+                                Cadastro Realizado! Expositor cadastrado com sucesso.
                             </motion.div>
                         )}
                         {mensagemErro && (
@@ -412,7 +412,7 @@ export default function FormCliente() {
                                     fontSize: 15,
                                 }}
                             >
-                                **Erro no Cadastro:** Ocorreu um erro ao tentar cadastrar o
+                                Erro no Cadastro: Ocorreu um erro ao tentar cadastrar o
                                 cliente. Tente novamente.
                             </motion.div>
                         )}
