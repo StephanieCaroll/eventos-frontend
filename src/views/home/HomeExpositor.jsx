@@ -1,19 +1,34 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { motion, AnimatePresence } from "framer-motion";
-import { CalendarCheck, 
-Search, 
-List, 
-ChevronRight, 
-Star, Clapperboard, 
-Monitor, Paintbrush, 
-PlusCircle, Edit, Trash2, 
-Mic, Lightbulb, Music, LayoutList, 
-Trophy, GraduationCap, Utensils, Globe, Heart } from 'lucide-react';
+import {
+  CalendarCheck,
+  Search,
+  List,
+  ChevronRight,
+  Star,
+  Clapperboard,
+  Monitor,
+  Paintbrush,
+  PlusCircle,
+  Edit,
+  Trash2,
+  Mic,
+  Lightbulb,
+  Music,
+  LayoutList,
+  Trophy,
+  GraduationCap,
+  Utensils,
+  Globe,
+  Heart,
+} from "lucide-react";
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../AuthContext";
 import { useEvents } from "../../contexts/EventContext";
+import { Modal, Button, Form, Row, Col } from "react-bootstrap";
+import axios from "axios";
 
 function cardStyle(color1, color2) {
   return {
@@ -60,14 +75,46 @@ function Footer() {
   );
 }
 
+// Serviço para chamadas API de stands
+const StandService = {
+  getAvailableStands: async (eventId) => {
+    try {
+      const response = await axios.get(`http://localhost:8080/api/stands/available?eventId=${eventId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao buscar stands disponíveis:', error);
+      throw error;
+    }
+  },
+  selectStands: async (eventId, standIds, userId) => {
+    try {
+      const response = await axios.post('http://localhost:8080/api/stands/select', {
+        eventId,
+        standIds,
+        userId
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao selecionar stands:', error);
+      throw error;
+    }
+  }
+};
+
 export default function HomeExpositor() {
   const navigate = useNavigate();
-  const { isAuthenticated, userRoles, userName, logout } =
-    useContext(AuthContext);
+  const { isAuthenticated, userRoles, userName, userId, logout } = useContext(AuthContext);
   const { events, favoritedEvents = [], toggleFavorite } = useEvents();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Todos os Eventos");
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [showStandSelectionModal, setShowStandSelectionModal] = useState(false);
+  const [availableStands, setAvailableStands] = useState([]);
+  const [selectedStands, setSelectedStands] = useState([]);
+  const [currentEventId, setCurrentEventId] = useState(null);
+  const [loadingStands, setLoadingStands] = useState(false);
+  const [selectionError, setSelectionError] = useState(null);
 
   useEffect(() => {
     console.log("[HomeExpositor] Componente carregado.");
@@ -90,14 +137,14 @@ export default function HomeExpositor() {
     { name: "Tecnologia", icon: <Monitor size={20} /> },
     { name: "Arte", icon: <Paintbrush size={20} /> },
     { name: "Entretenimento", icon: <Clapperboard size={20} /> },
-    { name: 'Conferencia', icon: <Mic size={20} /> }, 
-    { name: 'Workshop', icon: <Lightbulb size={20} /> }, 
-    { name: 'Show', icon: <Music size={20} /> }, 
-    { name: 'Feira', icon: <LayoutList size={20} /> }, 
-    { name: 'Esportivo', icon: <Trophy size={20} /> }, 
-    { name: 'Educacional', icon: <GraduationCap size={20} /> }, 
-    { name: 'Gastronomico', icon: <Utensils size={20} /> }, 
-    { name: 'Cultural', icon: <Globe size={20} /> } 
+    { name: "Conferencia", icon: <Mic size={20} /> },
+    { name: "Workshop", icon: <Lightbulb size={20} /> },
+    { name: "Show", icon: <Music size={20} /> },
+    { name: "Feira", icon: <LayoutList size={20} /> },
+    { name: "Esportivo", icon: <Trophy size={20} /> },
+    { name: "Educacional", icon: <GraduationCap size={20} /> },
+    { name: "Gastronomico", icon: <Utensils size={20} /> },
+    { name: "Cultural", icon: <Globe size={20} /> },
   ];
 
   const filteredEvents = events.filter((event) => {
@@ -117,11 +164,60 @@ export default function HomeExpositor() {
 
   const handleCardClick = (event) => {
     setSelectedEvent(event);
+    setShowModal(true);
   };
 
-  const handleRegisterStandClick = (eventId) => {
-    navigate(`/cadastro-stand/${eventId}`);
+  const closeModal = () => {
+    setShowModal(false);
     setSelectedEvent(null);
+  };
+
+  const handleRegisterStandClick = async (eventId) => {
+    try {
+      setCurrentEventId(eventId);
+      setLoadingStands(true);
+      setSelectionError(null);
+      
+      const stands = await StandService.getAvailableStands(eventId);
+      setAvailableStands(stands);
+      setSelectedStands([]);
+      setShowStandSelectionModal(true);
+    } catch (error) {
+      console.error('Erro ao buscar stands:', error);
+      setSelectionError('Erro ao carregar stands disponíveis. Tente novamente mais tarde.');
+    } finally {
+      setLoadingStands(false);
+    }
+  };
+
+  const handleStandSelection = (standId, isSelected) => {
+    if (isSelected) {
+      setSelectedStands([...selectedStands, standId]);
+    } else {
+      setSelectedStands(selectedStands.filter(id => id !== standId));
+    }
+  };
+
+  const confirmStandSelection = async () => {
+    try {
+      setLoadingStands(true);
+      setSelectionError(null);
+      
+      await StandService.selectStands(currentEventId, selectedStands, userId);
+      
+      // Fechar modais e resetar estados
+      setShowStandSelectionModal(false);
+      setShowModal(false);
+      setSelectedStands([]);
+      
+      // Mostrar feedback para o usuário
+      alert('Stands selecionados com sucesso!');
+    } catch (error) {
+      console.error('Erro ao selecionar stands:', error);
+      setSelectionError('Erro ao selecionar stands. Tente novamente.');
+    } finally {
+      setLoadingStands(false);
+    }
   };
 
   const handleFavoriteClick = async (e, event) => {
@@ -143,6 +239,7 @@ export default function HomeExpositor() {
         flexDirection: "column",
       }}
     >
+      {/* Cabeçalho */}
       <section
         style={{
           padding: "1.5em 2em",
@@ -248,7 +345,9 @@ export default function HomeExpositor() {
         </div>
       </section>
 
+      {/* Corpo principal */}
       <div style={{ display: "flex", flex: 1, backgroundColor: "#0f172a" }}>
+        {/* Sidebar */}
         <aside
           style={{
             width: "280px",
@@ -304,6 +403,7 @@ export default function HomeExpositor() {
           </ul>
         </aside>
 
+        {/* Conteúdo principal */}
         <main style={{ flex: 1, padding: "4em 2em", overflowY: "auto" }}>
           <h2
             className="text-center text-white mb-5"
@@ -316,6 +416,7 @@ export default function HomeExpositor() {
             Eventos Disponíveis
           </h2>
 
+          {/* Barra de pesquisa */}
           <div
             style={{
               position: "relative",
@@ -353,6 +454,7 @@ export default function HomeExpositor() {
             />
           </div>
 
+          {/* Lista de eventos */}
           <div className="row justify-content-center">
             {filteredEvents.length > 0 ? (
               filteredEvents.map((event) => (
@@ -458,7 +560,7 @@ export default function HomeExpositor() {
             ) : (
               <div className="col-12 text-center p-5">
                 <p style={{ fontSize: "1.5em", color: "#cbd5e1" }}>
-                  Nenhum evento encontrado para a sua busca ou categoria.
+                  Nenhum evento encontrado.
                 </p>
               </div>
             )}
@@ -466,13 +568,14 @@ export default function HomeExpositor() {
         </main>
       </div>
 
+      {/* Modal de Detalhes do Evento */}
       <AnimatePresence>
-        {selectedEvent && (
+        {showModal && selectedEvent && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setSelectedEvent(null)}
+            onClick={closeModal}
             style={{
               position: "fixed",
               top: 0,
@@ -488,29 +591,25 @@ export default function HomeExpositor() {
             }}
           >
             <motion.div
-              initial={{ y: -50, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 50, opacity: 0 }}
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
               style={{
                 background: "linear-gradient(135deg, #1e293b, #0a192f)",
                 borderRadius: 20,
                 padding: "30px",
                 color: "#fff",
-                maxWidth: "700px",
+                maxWidth: "800px",
                 width: "90%",
                 maxHeight: "90vh",
                 overflowY: "auto",
                 boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
                 position: "relative",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                textAlign: "center",
               }}
             >
               <button
-                onClick={() => setSelectedEvent(null)}
+                onClick={closeModal}
                 style={{
                   position: "absolute",
                   top: "15px",
@@ -525,130 +624,429 @@ export default function HomeExpositor() {
               >
                 &times;
               </button>
-              <img
-                src={selectedEvent.image}
-                alt={selectedEvent.name}
-                style={{
-                  width: "100%",
-                  maxHeight: "300px",
-                  objectFit: "cover",
-                  borderRadius: "15px",
-                  marginBottom: "20px",
-                  boxShadow: "0 5px 15px rgba(0,0,0,0.4)",
-                }}
-              />
-              <h3
-                style={{
-                  fontSize: "2.2em",
-                  marginBottom: "15px",
-                  color: "#3b82f6",
-                }}
-              >
-                {selectedEvent.name}
-              </h3>
-              <p
-                style={{
-                  fontSize: "1.1em",
-                  lineHeight: "1.6",
-                  marginBottom: "20px",
-                }}
-              >
-                {selectedEvent.longDescription}
-              </p>
 
               <div
                 style={{
-                  textAlign: "left",
-                  width: "100%",
-                  marginBottom: "20px",
-                  fontSize: "1em",
-                  color: "#e0e0e0",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "20px",
                 }}
               >
-                <p>
-                  <strong>Categoria:</strong> {selectedEvent.category}
-                </p>
-                <p>
-                  <strong>Status:</strong>{" "}
-                  <span
-                    style={{
-                      color:
-                        selectedEvent.status === "Ativo"
-                          ? "#22c55e"
-                          : "#ef4444",
-                    }}
-                  >
-                    {selectedEvent.status}
-                  </span>
-                </p>
-                <p>
-                  <strong>Data de Início:</strong>{" "}
-                  {selectedEvent.date
-                    ? new Date(selectedEvent.date).toLocaleDateString("pt-BR")
-                    : "N/A"}
-                </p>
-                <p>
-                  <strong>Data de Término:</strong>{" "}
-                  {selectedEvent.dataFim
-                    ? new Date(selectedEvent.dataFim).toLocaleDateString(
-                        "pt-BR"
-                      )
-                    : "N/A"}
-                </p>
-                <p>
-                  <strong>Hora de Início:</strong>{" "}
-                  {selectedEvent.horaInicio || "N/A"}
-                </p>
-                <p>
-                  <strong>Hora de Término:</strong>{" "}
-                  {selectedEvent.horaFim || "N/A"}
-                </p>
-                <p>
-                  <strong>Organizador:</strong>{" "}
-                  {selectedEvent.organizador || "N/A"}
-                </p>
-                <p>
-                  <strong>Contato do Organizador:</strong>{" "}
-                  {selectedEvent.contatoOrganizador || "N/A"}
-                </p>
-                <p>
-                  <strong>Tipo de Ingresso:</strong>{" "}
-                  {selectedEvent.tipoIngresso || "N/A"}
-                </p>
-                {selectedEvent.quantidadeIngressos && (
-                  <p>
-                    <strong>Quantidade de Ingressos:</strong>{" "}
-                    {selectedEvent.quantidadeIngressos}
-                  </p>
-                )}
-                <p>
-                  <strong>Início das Vendas:</strong>{" "}
-                  {selectedEvent.dataVendaInicio
-                    ? new Date(
-                        selectedEvent.dataVendaInicio
-                      ).toLocaleDateString("pt-BR")
-                    : "N/A"}
-                </p>
-                <p>
-                  <strong>Fim das Vendas:</strong>{" "}
-                  {selectedEvent.dataVendaFim
-                    ? new Date(selectedEvent.dataVendaFim).toLocaleDateString(
-                        "pt-BR"
-                      )
-                    : "N/A"}
-                </p>
-              </div>
-
-              {selectedEvent.status === "Ativo" && (
                 <div
                   style={{
-                    display: "flex",
-                    gap: "15px",
-                    marginTop: "20px",
-                    flexWrap: "wrap",
-                    justifyContent: "center",
+                    width: "100%",
+                    height: "300px",
+                    borderRadius: "15px",
+                    overflow: "hidden",
+                    boxShadow: "0 5px 15px rgba(0,0,0,0.4)",
                   }}
                 >
+                  <img
+                    src={selectedEvent.image}
+                    alt={selectedEvent.name}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                    onError={(e) =>
+                      (e.target.src =
+                        "https://placehold.co/600x400?text=Imagem+Indisponível")
+                    }
+                  />
+                </div>
+                <div>
+                  <h3
+                    style={{
+                      fontSize: "2.2em",
+                      marginBottom: "10px",
+                      color: "#3b82f6",
+                    }}
+                  >
+                    {selectedEvent.name}
+                  </h3>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "15px",
+                      marginBottom: "15px",
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    <span
+                      style={{
+                        backgroundColor: "#0f172a",
+                        padding: "6px 15px",
+                        borderRadius: "20px",
+                        fontSize: "0.9em",
+                        fontWeight: "bold",
+                        color: "#a78bfa",
+                      }}
+                    >
+                      {selectedEvent.category || "Sem categoria"}
+                    </span>
+
+                    <span
+                      style={{
+                        backgroundColor:
+                          selectedEvent.status === "Ativo"
+                            ? "#22c55e33"
+                            : "#ef444433",
+                        color:
+                          selectedEvent.status === "Ativo"
+                            ? "#22c55e"
+                            : "#ef4444",
+                        padding: "6px 15px",
+                        borderRadius: "20px",
+                        fontSize: "0.9em",
+                        fontWeight: "bold",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                      }}
+                    >
+                      <span
+                        style={{
+                          backgroundColor:
+                            selectedEvent.status === "Ativo"
+                              ? "#22c55e"
+                              : "#ef4444",
+                          width: "10px",
+                          height: "10px",
+                          borderRadius: "50%",
+                        }}
+                      ></span>
+                      {selectedEvent.status || "Status não definido"}
+                    </span>
+                  </div>
+
+                  {/* Descrição */}
+                  {selectedEvent.description && (
+                    <div
+                      style={{
+                        backgroundColor: "#1e293b",
+                        padding: "15px",
+                        borderRadius: "12px",
+                        marginBottom: "20px",
+                        border: "1px solid #334155",
+                      }}
+                    >
+                      <h4
+                        style={{
+                          fontSize: "1.2em",
+                          marginBottom: "10px",
+                          color: "#3b82f6",
+                        }}
+                      >
+                        Descrição
+                      </h4>
+                      <p style={{ fontSize: "1.1em", lineHeight: "1.6" }}>
+                        {selectedEvent.description}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Seção de Datas e Horários */}
+                  <div
+                    style={{
+                      backgroundColor: "#1e293b",
+                      padding: "15px",
+                      borderRadius: "12px",
+                      marginBottom: "20px",
+                      border: "1px solid #334155",
+                    }}
+                  >
+                    <h4
+                      style={{
+                        fontSize: "1.2em",
+                        marginBottom: "10px",
+                        color: "#3b82f6",
+                      }}
+                    >
+                      Datas e Horários
+                    </h4>
+
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "1fr 1fr",
+                        gap: "15px",
+                      }}
+                    >
+                      <div>
+                        <p
+                          style={{
+                            fontSize: "0.9em",
+                            color: "#94a3b8",
+                            marginBottom: "5px",
+                          }}
+                        >
+                          Data Início
+                        </p>
+                        <p style={{ fontSize: "1em", fontWeight: "500" }}>
+                          {selectedEvent.date
+                            ? new Date(selectedEvent.date).toLocaleDateString(
+                                "pt-BR"
+                              )
+                            : "N/A"}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p
+                          style={{
+                            fontSize: "0.9em",
+                            color: "#94a3b8",
+                            marginBottom: "5px",
+                          }}
+                        >
+                          Data Fim
+                        </p>
+                        <p style={{ fontSize: "1em", fontWeight: "500" }}>
+                          {selectedEvent.dataFim
+                            ? new Date(
+                                selectedEvent.dataFim
+                              ).toLocaleDateString("pt-BR")
+                            : "N/A"}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p
+                          style={{
+                            fontSize: "0.9em",
+                            color: "#94a3b8",
+                            marginBottom: "5px",
+                          }}
+                        >
+                          Hora Início
+                        </p>
+                        <p style={{ fontSize: "1em", fontWeight: "500" }}>
+                          {selectedEvent.horaInicio || "N/A"}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p
+                          style={{
+                            fontSize: "0.9em",
+                            color: "#94a3b8",
+                            marginBottom: "5px",
+                          }}
+                        >
+                          Hora Fim
+                        </p>
+                        <p style={{ fontSize: "1em", fontWeight: "500" }}>
+                          {selectedEvent.horaFim || "N/A"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Seção de Organização */}
+                  <div
+                    style={{
+                      backgroundColor: "#1e293b",
+                      padding: "15px",
+                      borderRadius: "12px",
+                      marginBottom: "20px",
+                      border: "1px solid #334155",
+                    }}
+                  >
+                    <h4
+                      style={{
+                        fontSize: "1.2em",
+                        marginBottom: "10px",
+                        color: "#3b82f6",
+                      }}
+                    >
+                      Organização
+                    </h4>
+
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "1fr 1fr",
+                        gap: "15px",
+                      }}
+                    >
+                      <div>
+                        <p
+                          style={{
+                            fontSize: "0.9em",
+                            color: "#94a3b8",
+                            marginBottom: "5px",
+                          }}
+                        >
+                          Organizador
+                        </p>
+                        <p style={{ fontSize: "1em", fontWeight: "500" }}>
+                          {selectedEvent.organizador || "N/A"}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p
+                          style={{
+                            fontSize: "0.9em",
+                            color: "#94a3b8",
+                            marginBottom: "5px",
+                          }}
+                        >
+                          Contato
+                        </p>
+                        <p style={{ fontSize: "1em", fontWeight: "500" }}>
+                          {selectedEvent.contatoOrganizador || "N/A"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Seção de Ingressos */}
+                  <div
+                    style={{
+                      backgroundColor: "#1e293b",
+                      padding: "15px",
+                      borderRadius: "12px",
+                      marginBottom: "20px",
+                      border: "1px solid #334155",
+                    }}
+                  >
+                    <h4
+                      style={{
+                        fontSize: "1.2em",
+                        marginBottom: "10px",
+                        color: "#3b82f6",
+                      }}
+                    >
+                      Informações de Ingressos
+                    </h4>
+
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "1fr 1fr",
+                        gap: "15px",
+                      }}
+                    >
+                      <div>
+                        <p
+                          style={{
+                            fontSize: "0.9em",
+                            color: "#94a3b8",
+                            marginBottom: "5px",
+                          }}
+                        >
+                          Tipo de Ingresso
+                        </p>
+                        <p style={{ fontSize: "1em", fontWeight: "500" }}>
+                          {selectedEvent.tipoIngresso || "N/A"}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p
+                          style={{
+                            fontSize: "0.9em",
+                            color: "#94a3b8",
+                            marginBottom: "5px",
+                          }}
+                        >
+                          Quantidade
+                        </p>
+                        <p style={{ fontSize: "1em", fontWeight: "500" }}>
+                          {selectedEvent.quantidadeIngressos}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p
+                          style={{
+                            fontSize: "0.9em",
+                            color: "#94a3b8",
+                            marginBottom: "5px",
+                          }}
+                        >
+                          Início das Vendas
+                        </p>
+                        <p style={{ fontSize: "1em", fontWeight: "500" }}>
+                          {selectedEvent.dataVendaInicio
+                            ? new Date(
+                                selectedEvent.dataVendaInicio
+                              ).toLocaleDateString("pt-BR")
+                            : "N/A"}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p
+                          style={{
+                            fontSize: "0.9em",
+                            color: "#94a3b8",
+                            marginBottom: "5px",
+                          }}
+                        >
+                          Fim das Vendas
+                        </p>
+                        <p style={{ fontSize: "1em", fontWeight: "500" }}>
+                          {selectedEvent.dataVendaFim
+                            ? new Date(
+                                selectedEvent.dataVendaFim
+                              ).toLocaleDateString("pt-BR")
+                            : "N/A"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Seção de Stands Ativos */}
+                  <div
+                    style={{
+                      backgroundColor: "#1e293b",
+                      padding: "15px",
+                      borderRadius: "12px",
+                      marginBottom: "20px",
+                      border: "1px solid #334155",
+                    }}
+                  >
+                    <h4
+                      style={{
+                        fontSize: "1.2em",
+                        marginBottom: "10px",
+                        color: "#3b82f6",
+                      }}
+                    >
+                      Stands Ativos
+                    </h4>
+                    
+                    {selectedEvent.stands && selectedEvent.stands.length > 0 ? (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                        {selectedEvent.stands.map((stand, index) => (
+                          <span 
+                            key={index}
+                            style={{
+                              backgroundColor: '#3b82f6',
+                              color: 'white',
+                              padding: '6px 12px',
+                              borderRadius: '20px',
+                              fontSize: '0.9em',
+                              fontWeight: '500'
+                            }}
+                          >
+                            {stand}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <p style={{ color: '#94a3b8', fontStyle: 'italic' }}>
+                        Nenhum stand selecionado para este evento
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {selectedEvent.status !== "Encerrado" && (
                   <motion.button
                     whileHover={{ scale: 1.05, backgroundColor: "#10b981" }}
                     whileTap={{ scale: 0.97 }}
@@ -672,49 +1070,126 @@ export default function HomeExpositor() {
                   >
                     Cadastrar Stands para Este Evento
                   </motion.button>
-
-                  {isAuthenticated && (
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.97 }}
-                      style={{
-                        backgroundColor: isEventFavorited(selectedEvent.id)
-                          ? "#ff6347"
-                          : "#6b7280",
-                        color: "#fff",
-                        padding: "0.8em 2em",
-                        fontSize: "1em",
-                        fontWeight: "600",
-                        border: "none",
-                        borderRadius: 30,
-                        cursor: "pointer",
-                        boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
-                        transition: "background 0.2s",
-                        outline: "none",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                      }}
-                      onClick={(e) => handleFavoriteClick(e, selectedEvent)}
-                    >
-                      <Heart
-                        size={20}
-                        fill={
-                          isEventFavorited(selectedEvent.id) ? "#fff" : "none"
-                        }
-                        color={"#fff"}
-                      />
-                      {isEventFavorited(selectedEvent.id)
-                        ? "Desfavoritar Evento"
-                        : "Favoritar Evento"}
-                    </motion.button>
-                  )}
-                </div>
-              )}
+                )}
+                {isAuthenticated && (
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.97 }}
+                    style={{
+                      backgroundColor: isEventFavorited(selectedEvent.id)
+                        ? "#ff6347"
+                        : "#6b7280",
+                      color: "#fff",
+                      padding: "0.8em 2em",
+                      fontSize: "1em",
+                      fontWeight: "600",
+                      border: "none",
+                      borderRadius: 30,
+                      cursor: "pointer",
+                      boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
+                      transition: "background 0.2s",
+                      outline: "none",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                    }}
+                    onClick={(e) => handleFavoriteClick(e, selectedEvent)}
+                  >
+                    <Heart
+                      size={20}
+                      fill={
+                        isEventFavorited(selectedEvent.id) ? "#fff" : "none"
+                      }
+                      color={"#fff"}
+                    />
+                    {isEventFavorited(selectedEvent.id)
+                      ? "Desfavoritar Evento"
+                      : "Favoritar Evento"}
+                  </motion.button>
+                )}
+              </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Modal de Seleção de Stands */}
+      <Modal 
+        show={showStandSelectionModal} 
+        onHide={() => setShowStandSelectionModal(false)}
+        size="lg"
+        centered
+      >
+        <Modal.Header closeButton style={{ backgroundColor: '#1e293b', color: 'white' }}>
+          <Modal.Title>Selecionar Stands para o Evento</Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={{ backgroundColor: '#0f172a', color: 'white' }}>
+          {loadingStands && !selectionError ? (
+            <div className="text-center py-4">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Carregando...</span>
+              </div>
+              <p className="mt-2">Carregando stands disponíveis...</p>
+            </div>
+          ) : selectionError ? (
+            <div className="alert alert-danger">
+              {selectionError}
+              <button 
+                className="btn btn-sm btn-outline-light ms-3"
+                onClick={() => handleRegisterStandClick(currentEventId)}
+              >
+                Tentar novamente
+              </button>
+            </div>
+          ) : (
+            <>
+              <h5 style={{ marginBottom: '20px' }}>Stands Disponíveis:</h5>
+              {availableStands.length === 0 ? (
+                <p>Não há stands disponíveis para este evento.</p>
+              ) : (
+                <Form>
+                  <Row>
+                    {availableStands.map(stand => (
+                      <Col md={4} key={stand.id} style={{ marginBottom: '10px' }}>
+                        <Form.Check 
+                          type="checkbox"
+                          id={`stand-${stand.id}`}
+                          label={`Stand ${stand.codigo}`}
+                          onChange={(e) => handleStandSelection(stand.id, e.target.checked)}
+                          style={{ color: 'white' }}
+                        />
+                      </Col>
+                    ))}
+                  </Row>
+                </Form>
+              )}
+            </>
+          )}
+        </Modal.Body>
+        <Modal.Footer style={{ backgroundColor: '#1e293b' }}>
+          <Button 
+            variant="secondary" 
+            onClick={() => setShowStandSelectionModal(false)}
+            disabled={loadingStands}
+          >
+            Cancelar
+          </Button>
+          <Button 
+            variant="primary" 
+            onClick={confirmStandSelection}
+            disabled={selectedStands.length === 0 || loadingStands}
+          >
+            {loadingStands ? (
+              <>
+                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Processando...
+              </>
+            ) : (
+              `Confirmar Seleção (${selectedStands.length} selecionados)`
+            )}
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
       <Footer />
     </div>
