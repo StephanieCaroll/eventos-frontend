@@ -1031,42 +1031,10 @@ export default function HomeGerenciador() {
                                   fontWeight: "600",
                                 }}
                               >
-                                {stand.nome || `Stand ${index + 1}`}
+                                {stand.codigo || stand.nome || `Stand ${index + 1}`}
                               </h5>
                             </div>
-                            {stand.descricao && (
-                              <p
-                                style={{
-                                  fontSize: "0.9em",
-                                  marginBottom: "5px",
-                                  color: "#e0e7ff",
-                                }}
-                              >
-                                {stand.descricao}
-                              </p>
-                            )}
-                            {stand.dimensoes && (
-                              <p
-                                style={{
-                                  fontSize: "0.8em",
-                                  color: "#e0e7ff",
-                                  marginBottom: "5px",
-                                }}
-                              >
-                                <strong>Dimensões:</strong> {stand.dimensoes}
-                              </p>
-                            )}
-                            {stand.preco && (
-                              <p
-                                style={{
-                                  fontSize: "0.9em",
-                                  fontWeight: "bold",
-                                  color: "#fff",
-                                }}
-                              >
-                                R$ {parseFloat(stand.preco).toFixed(2)}
-                              </p>
-                            )}
+
                           </div>
                         ))}
                       </div>

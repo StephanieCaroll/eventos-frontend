@@ -10,205 +10,197 @@ import Modal from "react-modal";
 
 Modal.setAppElement("#root");
 
+// Lista completa de stands disponíveis
+const STANDS_DISPONIVEIS = [
+  "A1",
+  "A2",
+  "A3",
+  "A4",
+  "B1",
+  "B2",
+  "B3",
+  "B4",
+  "C1",
+  "C2",
+  "C3",
+  "C4",
+  "D1",
+  "D2",
+  "E1",
+  "E2",
+  "F1",
+  "F2",
+  "G1",
+  "G2",
+  "G3",
+  "H1",
+  "H2",
+  "H3",
+  "I1",
+  "I2",
+  "I3",
+];
+
 export default function FormEvento() {
   const navigate = useNavigate();
   const { id } = useParams();
   const location = useLocation();
-  const { addEvent, updateEvent } = useEvents();
   const { authToken } = useContext(AuthContext);
+  const { addEvent, updateEvent } = useEvents();
 
-  const [nomeEvento, setNomeEvento] = useState("");
-  const [descricao, setDescricao] = useState("");
-  const [dataInicio, setDataInicio] = useState("");
-  const [dataFim, setDataFim] = useState("");
-  const [horaInicio, setHoraInicio] = useState("");
-  const [horaFim, setHoraFim] = useState("");
-  const [categoria, setCategoria] = useState("");
-  const [organizador, setOrganizador] = useState("");
-  const [contatoOrganizador, setContatoOrganizador] = useState("");
-  const [urlImagem, setUrlImagem] = useState("");
-  const [tipoIngresso, setTipoIngresso] = useState("gratuito");
-  const [quantidadeIngressos, setQuantidadeIngressos] = useState("");
-  const [dataVendaInicio, setDataVendaInicio] = useState("");
-  const [dataVendaFim, setDataVendaFim] = useState("");
-  const [mensagemSucesso, setMensagemSucesso] = useState(false);
-  const [mensagemErro, setMensagemErro] = useState(false);
+  // Estado principal unificado
+  const [formData, setFormData] = useState({
+    nomeEvento: "",
+    descricao: "",
+    dataInicio: "",
+    dataFim: "",
+    horaInicio: "",
+    horaFim: "",
+    categoria: "",
+    organizador: "",
+    contatoOrganizador: "",
+    urlImagem: "",
+    tipoIngresso: "gratuito",
+    quantidadeIngressos: "",
+    dataVendaInicio: "",
+    dataVendaFim: "",
+    stands: [],
+    standsInput: "",
+  });
 
-  // Estados para o modal de stands
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [standsSelecionados, setStandsSelecionados] = useState([]);
-  const standsDisponiveis = [
-    "A1",
-    "A2",
-    "A3",
-    "A4",
-    "B1",
-    "B2",
-    "B3",
-    "B4",
-    "C1",
-    "C2",
-    "C3",
-    "C4",
-    "D1",
-    "D2",
-    "E1",
-    "E2",
-    "F1",
-    "F2",
-    "G1",
-    "G2",
-    "G3",
-    "H1",
-    "H2",
-    "H3",
-    "I1",
-    "I2",
-    "I3",
-  ];
+  const [mensagem, setMensagem] = useState({ sucesso: false, erro: false });
 
-  const isEditing = id !== undefined && location.state && location.state.event;
+  const isEditing = !!id && location.state?.event;
 
+  // Carrega dados para edição
   useEffect(() => {
-    if (isEditing) {
-      const eventToEdit = location.state.event;
-
-      // Convert stands to the correct format if they are just strings
-      const standsFormatados = eventToEdit.stands
-        ? eventToEdit.stands.map((stand) =>
-            typeof stand === "string"
-              ? {
-                  codigo: stand,
-                  nome: `Stand ${stand}`,
-                  descricao: `Descrição do Stand ${stand}`,
-                  dimensoes: "3x3m",
-                  preco: 1000.0,
-                }
-              : stand
-          )
-        : [];
-
-      setStandsSelecionados(standsFormatados);
-      setNomeEvento(eventToEdit.name || "");
-      setDescricao(eventToEdit.description || "");
-      setDataInicio(formatDateForInput(eventToEdit.date));
-      setDataFim(formatDateForInput(eventToEdit.dataFim));
-      setHoraInicio(eventToEdit.horaInicio || "");
-      setHoraFim(eventToEdit.horaFim || "");
-      setCategoria(eventToEdit.category || "");
-      setOrganizador(eventToEdit.organizador || "");
-      setContatoOrganizador(eventToEdit.contatoOrganizador || "");
-      setUrlImagem(eventToEdit.image || "");
-      setTipoIngresso(eventToEdit.tipoIngresso || "gratuito");
-      setQuantidadeIngressos(eventToEdit.quantidadeIngressos || "");
-      setDataVendaInicio(formatDateForInput(eventToEdit.dataVendaInicio));
-      setDataVendaFim(formatDateForInput(eventToEdit.dataVendaFim));
-    } else {
-      // Reset all fields for new event
-      setNomeEvento("");
-      setDescricao("");
-      setDataInicio("");
-      setDataFim("");
-      setHoraInicio("");
-      setHoraFim("");
-      setCategoria("");
-      setOrganizador("");
-      setContatoOrganizador("");
-      setUrlImagem("");
-      setTipoIngresso("gratuito");
-      setQuantidadeIngressos("");
-      setDataVendaInicio("");
-      setDataVendaFim("");
-      setStandsSelecionados([]);
-    }
-  }, [isEditing, id, location.state]);
-
-  const toggleStand = (standCodigo) => {
-    const standCompleto = {
-      codigo: standCodigo,
-      nome: `Stand ${standCodigo}`,
-      descricao: `Descrição do Stand ${standCodigo}`,
-      dimensoes: "3x3m",
-      preco: 1000.0,
-    };
-
-    if (standsSelecionados.some((s) => s.codigo === standCodigo)) {
-      setStandsSelecionados(
-        standsSelecionados.filter((s) => s.codigo !== standCodigo)
-      );
-    } else {
-      setStandsSelecionados([...standsSelecionados, standCompleto]);
-    }
-  };
-
-  const abrirModalStands = () => {
-    setModalIsOpen(true);
-  };
-
-  const fecharModalStands = () => {
-    setModalIsOpen(false);
-  };
-
-  const salvar = async () => {
-    setMensagemSucesso(false);
-    setMensagemErro(false);
-
-    if (!authToken) {
-      console.error(
-        "Erro: Token de autenticação não encontrado. Por favor, faça login."
-      );
-      setMensagemErro(true);
+    if (!isEditing) {
+      // Reset para novo evento
+      setFormData({
+        nomeEvento: "",
+        descricao: "",
+        dataInicio: "",
+        dataFim: "",
+        horaInicio: "",
+        horaFim: "",
+        categoria: "",
+        organizador: "",
+        contatoOrganizador: "",
+        urlImagem: "",
+        tipoIngresso: "gratuito",
+        quantidadeIngressos: "",
+        dataVendaInicio: "",
+        dataVendaFim: "",
+        stands: [],
+        standsInput: "",
+      });
       return;
     }
 
-    const standsIds = standsSelecionados.map((stand) => stand.id);
+    const eventToEdit = location.state.event;
 
-    let eventoBackendRequest = {
-      nomeEvento: nomeEvento,
-      descricao: descricao,
-      dataInicio: dataInicio,
-      dataFim: dataFim,
-      horaInicio: horaInicio,
-      horaFim: horaFim,
-      categoria: categoria,
-      organizador: organizador,
-      contatoOrganizador: contatoOrganizador,
-      urlImagem: urlImagem,
-      tipoIngresso: tipoIngresso,
-      quantidadeIngressos: quantidadeIngressos
-        ? parseInt(quantidadeIngressos)
-        : null,
-      dataVendaInicio: dataVendaInicio,
-      dataVendaFim: dataVendaFim,
-      standsIds: standsIds
+    const processarStands = (stands) => {
+      // Verificação mais robusta
+      if (typeof stands === 'string' && stands.trim() === '') return [];
+
+      // Se for string (ex: "A1,B2"), converte para array
+      if (typeof stands === "string") {
+       return stands.split(',')
+          .map((stand) => stand.trim().toUpperCase())
+          .filter(
+            (stand) => stand !== "" && STANDS_DISPONIVEIS.includes(stand)
+          );
+      }
+
+     // Se já for array
+    if (Array.isArray(stands)) {
+        return stands
+            .map(stand => {
+                if (typeof stand === 'string') return stand.trim().toUpperCase();
+                if (stand?.codigo) return stand.codigo.toString().trim().toUpperCase();
+                return null;
+            })
+            .filter(stand => stand !== null && STANDS_DISPONIVEIS.includes(stand));
+    }
+    
+    return [];
     };
 
+    setFormData({
+      nomeEvento: eventToEdit.nomeEvento || eventToEdit.name || "",
+      descricao: eventToEdit.descricao || eventToEdit.description || "",
+      dataInicio: formatDateForInput(
+        eventToEdit.dataInicio || eventToEdit.date
+      ),
+      dataFim: formatDateForInput(eventToEdit.dataFim),
+      horaInicio: eventToEdit.horaInicio || "",
+      horaFim: eventToEdit.horaFim || "",
+      categoria: eventToEdit.categoria || eventToEdit.category || "",
+      organizador: eventToEdit.organizador || "",
+      contatoOrganizador: eventToEdit.contatoOrganizador || "",
+      urlImagem: eventToEdit.urlImagem || eventToEdit.image || "",
+      tipoIngresso: eventToEdit.tipoIngresso || "gratuito",
+      quantidadeIngressos: eventToEdit.quantidadeIngressos || "",
+      dataVendaInicio: formatDateForInput(eventToEdit.dataVendaInicio),
+      dataVendaFim: formatDateForInput(eventToEdit.dataVendaFim),
+      stands: processarStands(eventToEdit.stands),
+      standsInput: processarStands(eventToEdit.stands).join(", "),
+    });
+  }, [isEditing, id, location.state]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const toggleStand = (stand) => {
+    setFormData((prev) => ({
+      ...prev,
+      stands: prev.stands.includes(stand)
+        ? prev.stands.filter((s) => s !== stand)
+        : [...prev.stands, stand],
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setMensagem({ sucesso: false, erro: false });
+
     try {
+      const dadosParaEnviar = {
+        ...formData,
+        stands: formData.stands.filter((stand) =>
+          STANDS_DISPONIVEIS.includes(stand)
+        ), // Filtra apenas stands válidos
+        quantidadeIngressos: formData.quantidadeIngressos
+          ? parseInt(formData.quantidadeIngressos)
+          : null,
+      };
+
+      console.log("DEBUG - Dados sendo enviados:", dadosParaEnviar); // Verifique no console
+
       if (isEditing) {
-        await updateEvent(parseInt(id), eventoBackendRequest);
+        await updateEvent(parseInt(id), dadosParaEnviar);
       } else {
-        await addEvent(eventoBackendRequest);
+        await addEvent(dadosParaEnviar);
       }
 
-      console.log("Operação no backend bem-sucedida!");
-      setMensagemSucesso(true);
-
-      setTimeout(() => {
-        navigate("/homeGerenciador");
-      }, 1500);
+      setMensagem({ sucesso: true, erro: false });
+      setTimeout(() => navigate("/homeGerenciador"), 1500);
     } catch (error) {
-      console.error("Erro ao processar Evento:", error);
-      setMensagemErro(true);
-      if (error.response) {
-        console.error("Dados do erro:", error.response.data);
-        console.error("Status do erro:", error.response.status);
-      }
+      console.error(
+        "Erro ao salvar evento:",
+        error.response?.data || error.message
+      );
+      setMensagem({ sucesso: false, erro: true });
     }
   };
 
   return (
     <div style={{ background: "#f5f7fa", minHeight: "80vh" }}>
       <MenuSistema tela={"form-evento"} />
+
       <div style={{ marginTop: "3%" }}>
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -240,6 +232,7 @@ export default function FormEvento() {
             </span>
             &nbsp;{isEditing ? "Edição" : "Cadastro"}
           </h2>
+
           <hr
             style={{
               margin: "20px 0 28px 0",
@@ -247,15 +240,13 @@ export default function FormEvento() {
               borderTop: "1.5px solid #f0f0f0",
             }}
           />
+
           <motion.form
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
             style={{ marginTop: 12 }}
-            onSubmit={(e) => {
-              e.preventDefault();
-              salvar();
-            }}
+            onSubmit={handleSubmit}
           >
             {/* Nome do Evento e Categoria */}
             <div
@@ -282,10 +273,11 @@ export default function FormEvento() {
                 <input
                   required
                   type="text"
+                  name="nomeEvento"
                   placeholder="Ex: Workshop de Tecnologia"
                   maxLength={150}
-                  value={nomeEvento}
-                  onChange={(e) => setNomeEvento(e.target.value)}
+                  value={formData.nomeEvento}
+                  onChange={handleChange}
                   style={{
                     width: "100%",
                     padding: "12px 14px",
@@ -298,6 +290,7 @@ export default function FormEvento() {
                   }}
                 />
               </div>
+
               <div style={{ flex: 1, minWidth: "min(100%, 150px)" }}>
                 <label
                   style={{
@@ -313,8 +306,9 @@ export default function FormEvento() {
                 </label>
                 <select
                   required
-                  value={categoria}
-                  onChange={(e) => setCategoria(e.target.value)}
+                  name="categoria"
+                  value={formData.categoria}
+                  onChange={handleChange}
                   style={{
                     width: "100%",
                     padding: "12px 14px",
@@ -357,10 +351,11 @@ export default function FormEvento() {
                 Descrição
               </label>
               <textarea
+                name="descricao"
                 placeholder="Detalhes completos sobre o evento, programação, etc."
                 rows={5}
-                value={descricao}
-                onChange={(e) => setDescricao(e.target.value)}
+                value={formData.descricao}
+                onChange={handleChange}
                 style={{
                   width: "100%",
                   padding: "12px 14px",
@@ -375,7 +370,7 @@ export default function FormEvento() {
               />
             </div>
 
-            {/* Datas e Horários do Evento */}
+            {/* Datas e Horários */}
             <div
               style={{
                 display: "flex",
@@ -400,8 +395,9 @@ export default function FormEvento() {
                 <input
                   required
                   type="date"
-                  value={dataInicio}
-                  onChange={(e) => setDataInicio(e.target.value)}
+                  name="dataInicio"
+                  value={formData.dataInicio}
+                  onChange={handleChange}
                   style={{
                     width: "100%",
                     padding: "12px 14px",
@@ -414,6 +410,7 @@ export default function FormEvento() {
                   }}
                 />
               </div>
+
               <div style={{ flex: 1, minWidth: "min(100%, 120px)" }}>
                 <label
                   style={{
@@ -429,8 +426,9 @@ export default function FormEvento() {
                 </label>
                 <input
                   type="date"
-                  value={dataFim}
-                  onChange={(e) => setDataFim(e.target.value)}
+                  name="dataFim"
+                  value={formData.dataFim}
+                  onChange={handleChange}
                   style={{
                     width: "100%",
                     padding: "12px 14px",
@@ -443,6 +441,7 @@ export default function FormEvento() {
                   }}
                 />
               </div>
+
               <div style={{ flex: 1, minWidth: "min(100%, 100px)" }}>
                 <label
                   style={{
@@ -459,8 +458,9 @@ export default function FormEvento() {
                 <input
                   required
                   type="time"
-                  value={horaInicio}
-                  onChange={(e) => setHoraInicio(e.target.value)}
+                  name="horaInicio"
+                  value={formData.horaInicio}
+                  onChange={handleChange}
                   style={{
                     width: "100%",
                     padding: "12px 14px",
@@ -473,6 +473,7 @@ export default function FormEvento() {
                   }}
                 />
               </div>
+
               <div style={{ flex: 1, minWidth: "min(100%, 100px)" }}>
                 <label
                   style={{
@@ -488,8 +489,9 @@ export default function FormEvento() {
                 </label>
                 <input
                   type="time"
-                  value={horaFim}
-                  onChange={(e) => setHoraFim(e.target.value)}
+                  name="horaFim"
+                  value={formData.horaFim}
+                  onChange={handleChange}
                   style={{
                     width: "100%",
                     padding: "12px 14px",
@@ -529,9 +531,10 @@ export default function FormEvento() {
                 <input
                   required
                   type="text"
+                  name="organizador"
                   placeholder="Nome ou empresa organizadora"
-                  value={organizador}
-                  onChange={(e) => setOrganizador(e.target.value)}
+                  value={formData.organizador}
+                  onChange={handleChange}
                   style={{
                     width: "100%",
                     padding: "12px 14px",
@@ -544,6 +547,7 @@ export default function FormEvento() {
                   }}
                 />
               </div>
+
               <div style={{ flex: 1, minWidth: "min(100%, 200px)" }}>
                 <label
                   style={{
@@ -555,15 +559,15 @@ export default function FormEvento() {
                     textAlign: "left",
                   }}
                 >
-                  Contato do Organizador (E-mail/Telefone){" "}
-                  <span style={{ color: "red" }}>*</span>
+                  Contato do Organizador <span style={{ color: "red" }}>*</span>
                 </label>
                 <input
                   required
                   type="text"
+                  name="contatoOrganizador"
                   placeholder="email@exemplo.com ou (99) 99999-9999"
-                  value={contatoOrganizador}
-                  onChange={(e) => setContatoOrganizador(e.target.value)}
+                  value={formData.contatoOrganizador}
+                  onChange={handleChange}
                   style={{
                     width: "100%",
                     padding: "12px 14px",
@@ -578,7 +582,7 @@ export default function FormEvento() {
               </div>
             </div>
 
-            {/* URL da Imagem/Banner */}
+            {/* URL da Imagem */}
             <div style={{ marginBottom: 20 }}>
               <label
                 style={{
@@ -590,13 +594,14 @@ export default function FormEvento() {
                   textAlign: "left",
                 }}
               >
-                URL da Imagem/Banner do Evento
+                URL da Imagem/Banner
               </label>
               <input
                 type="url"
+                name="urlImagem"
                 placeholder="Ex: http://exemplo.com/imagem-evento.jpg"
-                value={urlImagem}
-                onChange={(e) => setUrlImagem(e.target.value)}
+                value={formData.urlImagem}
+                onChange={handleChange}
                 style={{
                   width: "100%",
                   padding: "12px 14px",
@@ -626,7 +631,7 @@ export default function FormEvento() {
               </label>
               <button
                 type="button"
-                onClick={abrirModalStands}
+                onClick={() => setModalIsOpen(true)}
                 style={{
                   width: "100%",
                   padding: "12px 14px",
@@ -639,15 +644,11 @@ export default function FormEvento() {
                   textAlign: "left",
                 }}
               >
-                {standsSelecionados.length > 0
-                  ? `Stands selecionados: ${standsSelecionados
-                      .map((s) => s.codigo)
-                      .join(", ")}`
+                {formData.stands.length > 0
+                  ? `Stands selecionados: ${formData.stands.join(", ")}`
                   : "Clique para selecionar os stands"}
               </button>
             </div>
-
-            <br />
 
             {/* Seção de Ingressos */}
             <hr
@@ -692,8 +693,9 @@ export default function FormEvento() {
                 </label>
                 <select
                   required
-                  value={tipoIngresso}
-                  onChange={(e) => setTipoIngresso(e.target.value)}
+                  name="tipoIngresso"
+                  value={formData.tipoIngresso}
+                  onChange={handleChange}
                   style={{
                     width: "100%",
                     padding: "12px 14px",
@@ -706,8 +708,10 @@ export default function FormEvento() {
                   }}
                 >
                   <option value="gratuito">Gratuito</option>
+                  <option value="pago">Pago</option>
                 </select>
               </div>
+
               <div style={{ flex: 1, minWidth: "min(100%, 150px)" }}>
                 <label
                   style={{
@@ -723,9 +727,10 @@ export default function FormEvento() {
                 </label>
                 <input
                   type="number"
+                  name="quantidadeIngressos"
                   placeholder="Ex: 100"
-                  value={quantidadeIngressos}
-                  onChange={(e) => setQuantidadeIngressos(e.target.value)}
+                  value={formData.quantidadeIngressos}
+                  onChange={handleChange}
                   style={{
                     width: "100%",
                     padding: "12px 14px",
@@ -765,8 +770,9 @@ export default function FormEvento() {
                 </label>
                 <input
                   type="date"
-                  value={dataVendaInicio}
-                  onChange={(e) => setDataVendaInicio(e.target.value)}
+                  name="dataVendaInicio"
+                  value={formData.dataVendaInicio}
+                  onChange={handleChange}
                   style={{
                     width: "100%",
                     padding: "12px 14px",
@@ -779,6 +785,7 @@ export default function FormEvento() {
                   }}
                 />
               </div>
+
               <div style={{ flex: 1, minWidth: "min(100%, 150px)" }}>
                 <label
                   style={{
@@ -794,8 +801,9 @@ export default function FormEvento() {
                 </label>
                 <input
                   type="date"
-                  value={dataVendaFim}
-                  onChange={(e) => setDataVendaFim(e.target.value)}
+                  name="dataVendaFim"
+                  value={formData.dataVendaFim}
+                  onChange={handleChange}
                   style={{
                     width: "100%",
                     padding: "12px 14px",
@@ -810,157 +818,294 @@ export default function FormEvento() {
               </div>
             </div>
 
-            {/* Modal de seleção de stands */}
+            {/* Modal de Stands */}
             <Modal
               isOpen={modalIsOpen}
-              onRequestClose={fecharModalStands}
-              contentLabel="Seleção de Stands"
+              onRequestClose={() => setModalIsOpen(false)}
               style={{
                 overlay: {
                   backgroundColor: "rgba(0, 0, 0, 0.5)",
                   zIndex: 1000,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
                 },
                 content: {
-                  maxWidth: "800px",
+                  position: "relative",
+                  width: "700px",
+                  height: "85%",
+                  maxHeight: "700px",
                   margin: "auto",
-                  borderRadius: "16px",
-                  padding: "24px",
-                  boxShadow: "0 4px 24px rgba(0, 0, 0, 0.1)",
+                  borderRadius: "12px",
+                  padding: "30px",
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+                  border: "none",
+                  overflow: "hidden",
+                  inset: "auto",
                 },
               }}
             >
               <div
                 style={{
                   display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: "20px",
+                  flexDirection: "column",
+                  height: "100%",
                 }}
               >
-                <h2
-                  style={{ color: "#222", fontWeight: 700, fontSize: "24px" }}
-                >
-                  Selecione os Stands
-                </h2>
-                <button
-                  onClick={fecharModalStands}
+                <div
                   style={{
-                    background: "none",
-                    border: "none",
-                    fontSize: "24px",
-                    cursor: "pointer",
-                    color: "#666",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: "15px",
+                    flexShrink: 0,
                   }}
                 >
-                  &times;
-                </button>
-              </div>
-
-              <div style={{ display: "flex", gap: "20px" }}>
-                <div style={{ flex: 1 }}>
-                  <img
-                    src="/MapaDoEvento.jpg"
-                    alt="Mapa do Evento"
+                  <h3
                     style={{
-                      width: "100%",
-                      borderRadius: "8px",
-                      border: "1px solid #e0e7ef",
-                    }}
-                  />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <h3 style={{ marginBottom: "16px", color: "#444" }}>
-                    Stands Disponíveis
-                  </h3>
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(3, 1fr)",
-                      gap: "10px",
-                      maxHeight: "400px",
-                      overflowY: "auto",
+                      color: "#222",
+                      fontWeight: 600,
+                      fontSize: "20px",
+                      margin: 0,
                     }}
                   >
-                    {standsDisponiveis.map((stand) => (
-                      <button
-                        key={stand}
-                        type="button"
-                        onClick={() => toggleStand(stand)}
+                    Selecionar Stands
+                  </h3>
+                  <button
+                    onClick={() => setModalIsOpen(false)}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      fontSize: "22px",
+                      cursor: "pointer",
+                      color: "#666",
+                      padding: 0,
+                    }}
+                  >
+                    &times;
+                  </button>
+                </div>
+
+                <div
+                  style={{
+                    flex: 1,
+                    overflowY: "auto",
+                    paddingRight: "8px",
+                    marginRight: "-8px",
+                  }}
+                >
+                  <div
+                    style={{
+                      marginBottom: "15px",
+                      borderRadius: "6px",
+                      overflow: "hidden",
+                      border: "1px solid #e0e7ef",
+                      textAlign: "center",
+                      padding: "10px",
+                    }}
+                  >
+                    <img
+                      src="/MapaDoEvento.jpg"
+                      alt="Mapa do Evento"
+                      style={{
+                        width: "36%",
+                        display: "block",
+                        margin: "0 auto",
+                        objectFit: "contain",
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ marginBottom: "15px" }}>
+                    <label
+                      style={{
+                        display: "block",
+                        marginBottom: "6px",
+                        fontWeight: 450,
+                        color: "#444",
+                        fontSize: "14px",
+                      }}
+                    >
+                      Digite os números dos stands (separados por vírgula):
+                    </label>
+                    <textarea
+                      placeholder="Ex: A1, B2, C3"
+                      value={formData.standsInput}
+                      onChange={(e) => {
+                        const inputValue = e.target.value;
+                        const processedStands = inputValue
+                          .split(",")
+                          .map((stand) => stand.trim().toUpperCase())
+                          .filter((stand) => stand !== "");
+
+                        setFormData((prev) => ({
+                          ...prev,
+                          standsInput: inputValue,
+                          stands:
+                            processedStands.length > 0 ? processedStands : [],
+                        }));
+                      }}
+                      style={{
+                        width: "100%",
+                        padding: "10px 12px",
+                        borderRadius: "6px",
+                        border: "1px solid #e0e7ef",
+                        fontSize: "14px",
+                        minHeight: "50px",
+                        resize: "vertical",
+                        boxSizing: "border-box",
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ marginBottom: "15px" }}>
+                    <h4
+                      style={{
+                        margin: "0 0 8px 0",
+                        color: "#444",
+                        fontSize: "15px",
+                      }}
+                    >
+                      Stands Selecionados ({formData.stands?.length || 0})
+                    </h4>
+                    {(formData.stands?.length || 0) > 0 ? (
+                      <div
                         style={{
-                          padding: "8px 12px",
+                          display: "flex",
+                          flexWrap: "wrap",
+                          gap: "6px",
+                          maxHeight: "120px",
+                          overflowY: "auto",
+                          padding: "8px",
+                          background: "#f8f9fa",
                           borderRadius: "6px",
-                          border: `1.5px solid ${
-                            standsSelecionados.some((s) => s.codigo === stand)
-                              ? "#1677ff"
-                              : "#e0e7ef"
-                          }`,
-                          background: standsSelecionados.some(
-                            (s) => s.codigo === stand
-                          )
-                            ? "#e6f4ff"
-                            : "#fff",
-                          color: standsSelecionados.some(
-                            (s) => s.codigo === stand
-                          )
-                            ? "#1677ff"
-                            : "#444",
-                          cursor: "pointer",
-                          fontWeight: standsSelecionados.some(
-                            (s) => s.codigo === stand
-                          )
-                            ? "600"
-                            : "400",
-                          transition: "all 0.2s",
                         }}
                       >
-                        {stand}
-                      </button>
-                    ))}
+                        {formData.stands.map((stand) => (
+                          <div
+                            key={stand}
+                            style={{
+                              padding: "4px 10px",
+                              borderRadius: "12px",
+                              background: STANDS_DISPONIVEIS.includes(stand)
+                                ? "#e6f4ff"
+                                : "#ffebe9",
+                              color: STANDS_DISPONIVEIS.includes(stand)
+                                ? "#1677ff"
+                                : "#cf1322",
+                              border: `1px solid ${
+                                STANDS_DISPONIVEIS.includes(stand)
+                                  ? "#91caff"
+                                  : "#ffa39e"
+                              }`,
+                              display: "flex",
+                              alignItems: "center",
+                              fontSize: "13px",
+                            }}
+                          >
+                            {stand}
+                            <button
+                              onClick={() => toggleStand(stand)}
+                              style={{
+                                background: "none",
+                                border: "none",
+                                color: "inherit",
+                                cursor: "pointer",
+                                marginLeft: "4px",
+                                padding: "0 4px",
+                                fontSize: "12px",
+                              }}
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div
+                        style={{
+                          padding: "10px",
+                          background: "#f8f9fa",
+                          borderRadius: "6px",
+                          color: "#8c8c8c",
+                          textAlign: "center",
+                          fontSize: "14px",
+                        }}
+                      >
+                        Nenhum stand selecionado
+                      </div>
+                    )}
                   </div>
                 </div>
-              </div>
 
-              <div
-                style={{
-                  marginTop: "24px",
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  gap: "12px",
-                }}
-              >
-                <button
-                  onClick={fecharModalStands}
+                <div
                   style={{
-                    padding: "10px 20px",
-                    borderRadius: "24px",
-                    border: "1.5px solid #e0e7ef",
-                    background: "#fff",
-                    color: "#444",
-                    cursor: "pointer",
-                    fontWeight: "600",
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    gap: "10px",
+                    marginTop: "15px",
+                    paddingTop: "15px",
+                    borderTop: "1px solid #f0f0f0",
+                    flexShrink: 0,
                   }}
                 >
-                  Cancelar
-                </button>
-                <button
-                  onClick={fecharModalStands}
-                  style={{
-                    padding: "10px 20px",
-                    borderRadius: "24px",
-                    border: "1.5px solid #1677ff",
-                    background: "#1677ff",
-                    color: "#fff",
-                    cursor: "pointer",
-                    fontWeight: "600",
-                  }}
-                >
-                  Confirmar
-                </button>
+                  <button
+                    onClick={() => setModalIsOpen(false)}
+                    style={{
+                      padding: "8px 16px",
+                      borderRadius: "20px",
+                      border: "1px solid #e0e7ef",
+                      background: "#fff",
+                      color: "#444",
+                      cursor: "pointer",
+                      fontWeight: "500",
+                      fontSize: "14px",
+                    }}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={() => {
+                      const standsValidos = [
+                        ...new Set( // Remove duplicatas
+                          formData.standsInput
+                            .split(",")
+                            .map((stand) => stand.trim().toUpperCase())
+                            .filter(
+                              (stand) =>
+                                stand !== "" &&
+                                STANDS_DISPONIVEIS.includes(stand)
+                            )
+                        ),
+                      ];
+
+                      setFormData((prev) => ({
+                        ...prev,
+                        stands: standsValidos,
+                        standsInput: standsValidos.join(", "),
+                      }));
+
+                      setModalIsOpen(false);
+                    }}
+                    style={{
+                      padding: "8px 16px",
+                      borderRadius: "20px",
+                      border: "1px solid #1677ff",
+                      background: "#1677ff",
+                      color: "#fff",
+                      cursor: "pointer",
+                      fontWeight: "500",
+                      fontSize: "14px",
+                    }}
+                  >
+                    Confirmar
+                  </button>
+                </div>
               </div>
             </Modal>
 
             {/* Mensagens de feedback */}
-            {mensagemSucesso && (
+            {mensagem.sucesso && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -979,7 +1124,8 @@ export default function FormEvento() {
                 {isEditing ? "atualizado" : "cadastrado"} com sucesso.
               </motion.div>
             )}
-            {mensagemErro && (
+
+            {mensagem.erro && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -995,8 +1141,7 @@ export default function FormEvento() {
                 }}
               >
                 <strong>Erro!</strong> Ocorreu um erro ao tentar{" "}
-                {isEditing ? "atualizar" : "cadastrar"} o evento. Por favor,
-                tente novamente.
+                {isEditing ? "atualizar" : "cadastrar"} o evento.
               </motion.div>
             )}
 
