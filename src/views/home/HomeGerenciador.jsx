@@ -957,7 +957,7 @@ export default function HomeGerenciador() {
                     </div>
                   </div>
 
-                  {/* Nova Seção de Stands Cadastrados */}
+                  {/* Seção de Stands Cadastrados */}
                   <div
                     style={{
                       backgroundColor: "#1e293b",
