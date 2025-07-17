@@ -913,6 +913,7 @@ export default function HomeSemLogin() {
                         display: "flex",
                         alignItems: "center",
                         gap: "8px",
+                        margin: '0 auto', 
                       }}
                       onClick={handleRegisterStandClick}
                     >
