@@ -7,6 +7,7 @@ export const EXPIRATION_SESSION_ATTRIBUTE_NAME = 'expiration';
 export const ROLES_SESSION_ATTRIBUTE_NAME = 'userRoles';
 export const USERNAME_SESSION_ATTRIBUTE_NAME = 'username';
 export const EMAIL_SESSION_ATTRIBUTE_NAME = 'userEmail';
+export const USER_ID_SESSION_ATTRIBUTE_NAME = 'userId'; 
 
 export const registerSuccessfulLoginForJwt = (token, expirationInSeconds) => {
   const expirationMs = parseInt(expirationInSeconds, 10) * 1000;
@@ -18,6 +19,8 @@ export const registerSuccessfulLoginForJwt = (token, expirationInSeconds) => {
   localStorage.setItem(ROLES_SESSION_ATTRIBUTE_NAME, JSON.stringify(decodedData.roles));
   localStorage.setItem(USERNAME_SESSION_ATTRIBUTE_NAME, decodedData.username);
   localStorage.setItem(EMAIL_SESSION_ATTRIBUTE_NAME, decodedData.email);
+ 
+  localStorage.setItem(USER_ID_SESSION_ATTRIBUTE_NAME, decodedData.userId);
 
   setupAxiosInterceptors();
 };
@@ -37,12 +40,13 @@ export const createJWTToken = (token) => {
 };
 
 export const logout = () => {
-  localStorage.clear();
+  localStorage.clear(); 
   delete axios.defaults.headers.common['Authorization'];
 };
 
 export const isTokenExpired = () => {
   let expirationMs = localStorage.getItem(EXPIRATION_SESSION_ATTRIBUTE_NAME);
+ 
   return expirationMs === null || parseInt(expirationMs, 10) < new Date().getTime();
 };
 
@@ -66,23 +70,25 @@ export const decodeTokenData = (token) => {
     const roles = decodedToken.roles || decodedToken.authorities || decodedToken.scope || [];
     const username = decodedToken.sub || 'Utilizador Desconhecido';
     const email = decodedToken.email || decodedToken.sub || null;
+   
+    const userId = decodedToken.userId || decodedToken.sub || decodedToken.id || null;
 
     console.log("AuthenticationService: Decoded Token Payload (raw):", decodedToken);
-    console.log("AuthenticationService: Decoded Token Data (processed):", { roles, username, email });
+    console.log("AuthenticationService: Decoded Token Data (processed):", { roles, username, email, userId }); 
 
     if (typeof roles === 'string') {
-      return { roles: roles.split(' '), username, email };
+      return { roles: roles.split(' '), username, email, userId }; 
     }
 
     if (!Array.isArray(roles)) {
         console.warn("Claim 'roles' no JWT não é um array. Convertendo para array vazio.");
-        return { roles: [], username, email };
+        return { roles: [], username, email, userId };
     }
 
-    return { roles, username, email };
+    return { roles, username, email, userId }; 
   } catch (error) {
     console.error('Erro ao decodificar token:', error);
-    return { roles: [], username: 'Utilizador Desconhecido', email: null };
+    return { roles: [], username: 'Utilizador Desconhecido', email: null, userId: null }; 
   }
 };
 
@@ -102,4 +108,8 @@ export const getUsername = () => {
 
 export const getUserEmail = () => {
   return localStorage.getItem(EMAIL_SESSION_ATTRIBUTE_NAME) || null;
+};
+
+export const getUserId = () => {
+    return localStorage.getItem(USER_ID_SESSION_ATTRIBUTE_NAME) || null;
 };

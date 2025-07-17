@@ -30,6 +30,7 @@ import { useEvents } from "../../contexts/EventContext";
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import axios from "axios";
 
+
 function cardStyle(color1, color2) {
   return {
     background: `linear-gradient(135deg, ${color1}, ${color2})`,
@@ -79,16 +80,17 @@ function Footer() {
 const StandService = {
   getAvailableStands: async (eventId) => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/stands/available?eventId=${eventId}`);
+      const response = await axios.get(`http://localhost:8080/api/stand/available?eventId=${eventId}`);
       return response.data;
     } catch (error) {
       console.error('Erro ao buscar stands disponíveis:', error);
       throw error;
     }
   },
+  
   selectStands: async (eventId, standIds, userId) => {
     try {
-      const response = await axios.post('http://localhost:8080/api/stands/select', {
+      const response = await axios.post('http://localhost:8080/api/stand/select', {
         eventId,
         standIds,
         userId
@@ -98,8 +100,47 @@ const StandService = {
       console.error('Erro ao selecionar stands:', error);
       throw error;
     }
+  },
+  
+   getRegisteredStands: async (userId) => {
+    try {
+      
+     const token = localStorage.getItem('token');
+    if (!token) throw new Error('Token de autenticação não encontrado');
+
+    const response = await axios.get(`http://localhost:8080/api/stand/registered`, {
+      headers: { Authorization: `Bearer ${token}` },
+      params: { userId }
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('Erro detalhado:', error);
+    throw new Error(error.response?.data?.message || 'Erro ao buscar stands registrados');
+    }
+  },
+
+  deleteStand: async (standId) => {
+    try {
+      await axios.delete(`http://localhost:8080/api/stand/${standId}`);
+    } catch (error) {
+      console.error('Erro ao remover stand:', error);
+      throw error;
+    }
+  },
+
+  updateStand: async (standId, description) => {
+    try {
+      await axios.put(`http://localhost:8080/api/stand/${standId}`, {
+        description
+      });
+    } catch (error) {
+      console.error('Erro ao atualizar stand:', error);
+      throw error;
+    }
   }
 };
+
 
 export default function HomeExpositor() {
   const navigate = useNavigate();
@@ -115,13 +156,19 @@ export default function HomeExpositor() {
   const [currentEventId, setCurrentEventId] = useState(null);
   const [loadingStands, setLoadingStands] = useState(false);
   const [selectionError, setSelectionError] = useState(null);
+  const [showStandRegistrationModal, setShowStandRegistrationModal] = useState(false);
+  const [standDescription, setStandDescription] = useState('');
+  const [selectedStandToRegister, setSelectedStandToRegister] = useState(null);
+  const [registeredStands, setRegisteredStands] = useState([]);
 
   useEffect(() => {
     console.log("[HomeExpositor] Componente carregado.");
     console.log("[HomeExpositor] isAuthenticated:", isAuthenticated);
     console.log("[HomeExpositor] userRoles:", userRoles);
     console.log("[HomeExpositor] userName:", userName);
-  }, [isAuthenticated, userRoles, userName]);
+  console.log("[HomeExpositor] userId:", userId); 
+  }, [isAuthenticated, userRoles, userName, userId]); 
+
 
   const handleLogout = () => {
     logout();
@@ -162,14 +209,33 @@ export default function HomeExpositor() {
     return matchesCategory && matchesSearch;
   });
 
-  const handleCardClick = (event) => {
+  const handleCardClick = async (event) => {
     setSelectedEvent(event);
     setShowModal(true);
+    
+     console.log("UserID ao tentar buscar stands registrados:", userId);
+
+    try {
+
+      if (userId) { 
+        const stands = await StandService.getRegisteredStands(userId);
+        const filteredStands = stands.filter(stand => stand.eventId === event.id);
+        setRegisteredStands(filteredStands);
+      } else {
+        console.warn('Não foi possível carregar stands registrados: Usuário não logado ou ID de usuário inválido.');
+        setRegisteredStands([]); 
+
+      }
+    } catch (error) {
+      console.error('Erro ao carregar stands registrados:', error); 
+    
+    }
   };
 
   const closeModal = () => {
     setShowModal(false);
     setSelectedEvent(null);
+    setRegisteredStands([]);
   };
 
   const handleRegisterStandClick = async (eventId) => {
@@ -203,6 +269,13 @@ export default function HomeExpositor() {
       setLoadingStands(true);
       setSelectionError(null);
       
+      // Certifique-se que userId está disponível aqui também, se necessário para esta operação
+      if (!userId) {
+          alert('Você precisa estar logado para selecionar stands.');
+          setSelectionError('Usuário não autenticado.');
+          return;
+      }
+
       await StandService.selectStands(currentEventId, selectedStands, userId);
       
       // Fechar modais e resetar estados
@@ -228,6 +301,62 @@ export default function HomeExpositor() {
   const isEventFavorited = (eventId) => {
     return favoritedEvents.some((fav) => fav.id === eventId);
   };
+
+  const handleDeleteStand = async (standId) => {
+    try {
+      await StandService.deleteStand(standId);
+      setRegisteredStands(registeredStands.filter(stand => stand.id !== standId));
+      alert('Stand removido com sucesso!');
+    } catch (error) {
+      console.error('Erro ao remover stand:', error);
+      alert('Erro ao remover stand. Tente novamente.');
+    }
+  };
+
+  const handleEditStand = (stand) => {
+    setSelectedStandToRegister(stand.id);
+    setStandDescription(stand.descricao);
+    setShowStandRegistrationModal(true);
+  };
+
+  const handleRegisterStand = async () => {
+    try {
+      if (selectedStandToRegister && registeredStands.some(s => s.id === selectedStandToRegister)) {
+        // Atualizar stand existente
+        await StandService.updateStand(selectedStandToRegister, standDescription);
+        
+        setRegisteredStands(registeredStands.map(stand => 
+          stand.id === selectedStandToRegister 
+            ? {...stand, descricao: standDescription} 
+            : stand
+        ));
+      } else {
+        // Cadastrar novo stand
+        const response = await axios.post('http://localhost:8080/api/stands/register', {
+          eventId: currentEventId, 
+          standId: selectedStandToRegister, 
+          description: standDescription,
+          userId: userId 
+        });
+
+        setRegisteredStands([...registeredStands, response.data]);
+      }
+
+      // Fecha o modal e limpa os campos
+      setShowStandRegistrationModal(false);
+      setStandDescription('');
+      setSelectedStandToRegister(null);
+      
+      alert('Operação realizada com sucesso!');
+    } catch (error) {
+      console.error('Erro ao cadastrar/atualizar stand:', error);
+      alert('Erro ao realizar operação. Tente novamente.');
+    }
+  };
+
+  const availableStandsForRegistration = availableStands.filter(stand => 
+    !registeredStands.some(reg => reg.id === stand.id && reg.eventId === currentEventId)
+  );
 
   return (
     <div
@@ -1044,6 +1173,76 @@ export default function HomeExpositor() {
                       </p>
                     )}
                   </div>
+
+                  {/* Seção de Stands Registrados pelo Usuário */}
+                  <div
+                    style={{
+                      backgroundColor: "#1e293b",
+                      padding: "15px",
+                      borderRadius: "12px",
+                      marginBottom: "20px",
+                      border: "1px solid #334155",
+                    }}
+                  >
+                    <h4
+                      style={{
+                        fontSize: "1.2em",
+                        marginBottom: "10px",
+                        color: "#3b82f6",
+                      }}
+                    >
+                      Meus Stands Registrados
+                    </h4>
+                    
+                    {registeredStands.length > 0 ? (
+                      <div style={{ display: 'grid', gap: '10px' }}>
+                        {registeredStands.map((stand, index) => (
+                          <div 
+                            key={index}
+                            style={{
+                              backgroundColor: '#1e40af',
+                              padding: '12px',
+                              borderRadius: '8px',
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center'
+                            }}
+                          >
+                            <div>
+                              <div style={{ fontWeight: 'bold' }}>Stand {stand.codigo}</div>
+                              <div style={{ fontSize: '0.9em', color: '#cbd5e1' }}>
+                                {stand.descricao || 'Sem descrição'}
+                              </div>
+                            </div>
+                            <div>
+                              <button 
+                                className="btn btn-sm btn-outline-danger me-2"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteStand(stand.id);
+                                }}
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                              <button 
+                                className="btn btn-sm btn-outline-warning"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleEditStand(stand);
+                                }}
+                              >
+                                <Edit size={16} />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p style={{ color: '#94a3b8', fontStyle: 'italic' }}>
+                        Você não possui stands registrados para este evento
+                      </p>
+                    )}
+                  </div>
                 </div>
 
                 {selectedEvent.status !== "Encerrado" && (
@@ -1066,7 +1265,7 @@ export default function HomeExpositor() {
                       alignItems: "center",
                       gap: "8px",
                     }}
-                    onClick={() => handleRegisterStandClick(selectedEvent.id)}
+                    onClick={() => navigate(`/stand-registration/${selectedEvent.id}`)}
                   >
                     Cadastrar Stands para Este Evento
                   </motion.button>
@@ -1093,7 +1292,10 @@ export default function HomeExpositor() {
                       alignItems: "center",
                       gap: "8px",
                     }}
-                    onClick={(e) => handleFavoriteClick(e, selectedEvent)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleFavoriteClick(e, selectedEvent);
+                    }}
                   >
                     <Heart
                       size={20}
@@ -1147,21 +1349,52 @@ export default function HomeExpositor() {
               {availableStands.length === 0 ? (
                 <p>Não há stands disponíveis para este evento.</p>
               ) : (
-                <Form>
-                  <Row>
-                    {availableStands.map(stand => (
-                      <Col md={4} key={stand.id} style={{ marginBottom: '10px' }}>
-                        <Form.Check 
-                          type="checkbox"
-                          id={`stand-${stand.id}`}
-                          label={`Stand ${stand.codigo}`}
-                          onChange={(e) => handleStandSelection(stand.id, e.target.checked)}
-                          style={{ color: 'white' }}
-                        />
-                      </Col>
-                    ))}
-                  </Row>
-                </Form>
+                <div className="row">
+                  {availableStands.map(stand => (
+                    <div className="col-md-4 mb-3" key={stand.id}>
+                      <div 
+                        className="p-3 rounded"
+                        style={{
+                          border: selectedStands.includes(stand.id) 
+                            ? '2px solid #3b82f6' 
+                            : '1px solid #334155',
+                          backgroundColor: '#1e293b',
+                          cursor: 'pointer'
+                        }}
+                        onClick={() => handleStandSelection(
+                          stand.id, 
+                          !selectedStands.includes(stand.id)
+                        )}
+                      >
+                        <div className="form-check">
+                          <input
+                            type="checkbox"
+                            className="form-check-input"
+                            checked={selectedStands.includes(stand.id)}
+                            onChange={(e) => handleStandSelection(stand.id, e.target.checked)}
+                            id={`stand-${stand.id}`}
+                          />
+                          <label 
+                            className="form-check-label" 
+                            htmlFor={`stand-${stand.id}`}
+                          >
+                            <strong>Stand {stand.codigo}</strong>
+                            {stand.localizacao && (
+                              <div className="text-muted small">
+                                Local: {stand.localizacao}
+                              </div>
+                            )}
+                            {stand.descricao && (
+                              <div className="text-muted small mt-1">
+                                {stand.descricao}
+                              </div>
+                            )}
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               )}
             </>
           )}
@@ -1187,6 +1420,79 @@ export default function HomeExpositor() {
             ) : (
               `Confirmar Seleção (${selectedStands.length} selecionados)`
             )}
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Modal de Cadastro de Stand */}
+      <Modal 
+        show={showStandRegistrationModal} 
+        onHide={() => {
+          setShowStandRegistrationModal(false);
+          setStandDescription('');
+          setSelectedStandToRegister(null);
+        }}
+        size="lg"
+        centered
+      >
+        <Modal.Header closeButton style={{ backgroundColor: '#1e293b', color: 'white' }}>
+          <Modal.Title>
+            {selectedStandToRegister && registeredStands.some(s => s.id === selectedStandToRegister) 
+              ? 'Editar Stand' 
+              : 'Cadastrar Stand'}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={{ backgroundColor: '#0f172a', color: 'white' }}>
+          <Form>
+            <Form.Group className="mb-3">
+              <Form.Label>Selecione o Stand:</Form.Label>
+              <Form.Select 
+                value={selectedStandToRegister || ''}
+                onChange={(e) => setSelectedStandToRegister(e.target.value)}
+                required
+                disabled={selectedStandToRegister && registeredStands.some(s => s.id === selectedStandToRegister)}
+              >
+                <option value="">Selecione um stand</option>
+                {availableStandsForRegistration.map(stand => (
+                  <option key={stand.id} value={stand.id}>
+                    {stand.codigo} - {stand.localizacao || 'Localização não especificada'}
+                  </option>
+                ))}
+              </Form.Select>
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Descrição do Stand:</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={3}
+                value={standDescription}
+                onChange={(e) => setStandDescription(e.target.value)}
+                placeholder="Descreva o que você fará neste stand..."
+                required
+              />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer style={{ backgroundColor: '#1e293b' }}>
+          <Button 
+            variant="secondary" 
+            onClick={() => {
+              setShowStandRegistrationModal(false);
+              setStandDescription('');
+              setSelectedStandToRegister(null);
+            }}
+          >
+            Cancelar
+          </Button>
+          <Button 
+            variant="primary" 
+            onClick={handleRegisterStand}
+            disabled={!selectedStandToRegister || !standDescription}
+          >
+            {selectedStandToRegister && registeredStands.some(s => s.id === selectedStandToRegister) 
+              ? 'Atualizar Stand' 
+              : 'Cadastrar Stand'}
           </Button>
         </Modal.Footer>
       </Modal>

@@ -14,6 +14,7 @@ import HomeGerenciador from './views/home/HomeGerenciador';
 import ManagerProfilePage from './componentes/ManagerProfilePage';
 import EditManagerPage from './views/dono/EditManagerPage';
 import HomeSemLogin from './views/home/HomeSemLogin';
+import StandRegistrationModal from './stands/StandRegistrationModal';
 
 function Rotas() {
   return (
@@ -22,7 +23,7 @@ function Rotas() {
         <Route path="/" element={<Home />} />
         <Route path="/profile" element={<UserProfilePage />} />
         <Route path="/profileManager" element={<ManagerProfilePage />} />
-
+        <Route path="stand-registration/:eventId" element ={<StandRegistrationModal/>} />
         {/* Rotas para Edição (Retirar Protected PAra testes) */}
         <Route path="/edit-Manager" element={<EditManagerPage />} />
         <Route path="/edit-profile" element={<EditProfilePage />} />
