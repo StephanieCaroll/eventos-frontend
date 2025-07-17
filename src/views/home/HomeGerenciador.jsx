@@ -958,107 +958,105 @@ export default function HomeGerenciador() {
                   </div>
 
                   {/* Seção de Stands Cadastrados */}
-                  <div
-                    style={{
-                      backgroundColor: "#1e293b",
-                      padding: "15px",
-                      borderRadius: "12px",
-                      marginBottom: "20px",
-                      border: "1px solid #334155",
-                    }}
-                  >
-                    <h4
-                      style={{
-                        fontSize: "1.2em",
-                        marginBottom: "15px",
-                        color: "#3b82f6",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "10px",
-                      }}
-                    >
-                      <LayoutList size={20} /> Stands Cadastrados
-                    </h4>
+                 <div
+  style={{
+    backgroundColor: "#1e293b",
+    padding: "15px",
+    borderRadius: "12px",
+    marginBottom: "20px",
+    border: "1px solid #334155",
+  }}
+>
+  <h4
+    style={{
+      fontSize: "1.2em",
+      marginBottom: "15px",
+      color: "#3b82f6",
+      display: "flex",
+      alignItems: "center",
+      gap: "10px",
+    }}
+  >
+    <LayoutList size={20} /> Stands Cadastrados
+  </h4>
 
-                    {selectedEvent.stands && selectedEvent.stands.length > 0 ? (
-                      <div
-                        style={{
-                          display: "grid",
-                          gridTemplateColumns:
-                            "repeat(auto-fill, minmax(200px, 1fr))",
-                          gap: "15px",
-                        }}
-                      >
-                        {selectedEvent.stands.map((stand, index) => (
-                          <div
-                            key={index}
-                            style={{
-                              backgroundColor: "#3b82f6",
-                              padding: "15px",
-                              borderRadius: "10px",
-                              color: "white",
-                              boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-                            }}
-                          >
-                            <div
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                marginBottom: "10px",
-                                gap: "10px",
-                              }}
-                            >
-                              <div
-                                style={{
-                                  width: "40px",
-                                  height: "40px",
-                                  borderRadius: "50%",
-                                  backgroundColor: "#1e40af",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  flexShrink: 0,
-                                }}
-                              >
-                                <span style={{ fontWeight: "bold" }}>
-                                  {index + 1}
-                                </span>
-                              </div>
-                              <h5
-                                style={{
-                                  margin: 0,
-                                  fontSize: "1.1em",
-                                  fontWeight: "600",
-                                }}
-                              >
-                                {stand.codigo || stand.nome || `Stand ${index + 1}`}
-                              </h5>
-                            </div>
-
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div
-                        style={{
-                          textAlign: "center",
-                          padding: "20px",
-                          backgroundColor: "#334155",
-                          borderRadius: "8px",
-                        }}
-                      >
-                        <p
-                          style={{
-                            color: "#94a3b8",
-                            fontStyle: "italic",
-                            margin: 0,
-                          }}
-                        >
-                          Nenhum stand cadastrado para este evento
-                        </p>
-                      </div>
-                    )}
-                  </div>
+  {selectedEvent.stands && selectedEvent.stands.length > 0 ? (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+        gap: "15px",
+      }}
+    >
+      {selectedEvent.stands.map((stand, index) => (
+        <div
+          key={index}
+          style={{
+            backgroundColor: "#3b82f6",
+            padding: "15px",
+            borderRadius: "10px",
+            color: "white",
+            boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              marginBottom: "10px",
+              gap: "10px",
+            }}
+          >
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "50%",
+                backgroundColor: "#1e40af",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+            >
+              <span style={{ fontWeight: "bold" }}>
+                {stand} {/* Mostra diretamente o valor do stand */}
+              </span>
+            </div>
+            <h5
+              style={{
+                margin: 0,
+                fontSize: "1.1em",
+                fontWeight: "600",
+              }}
+            >
+              {stand} {/* Mostra diretamente o valor do stand */}
+            </h5>
+          </div>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <div
+      style={{
+        textAlign: "center",
+        padding: "20px",
+        backgroundColor: "#334155",
+        borderRadius: "8px",
+      }}
+    >
+      <p
+        style={{
+          color: "#94a3b8",
+          fontStyle: "italic",
+          margin: 0,
+        }}
+      >
+        Nenhum stand cadastrado para este evento
+      </p>
+    </div>
+  )}
+</div>
 
                   <div
                     style={{
