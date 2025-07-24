@@ -1,24 +1,24 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   CalendarCheck,
-  Search,
-  Mic,
-  GraduationCap,
-  Utensils,
+  Clapperboard,
   Globe,
-  List,
-  Lightbulb,
-  Music,
+  GraduationCap,
   LayoutList,
+  Lightbulb,
+  List,
+  Mic,
+  Monitor,
+  Music,
+  Paintbrush,
+  Search,
   Star,
   Trophy,
-  Clapperboard,
-  Monitor,
-  Paintbrush,
+  Utensils,
 } from "lucide-react";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useEvents } from "../../contexts/EventContext";
 
@@ -871,21 +871,31 @@ export default function HomeSemLogin() {
                           gap: "10px",
                         }}
                       >
-                        {selectedEvent.stands.map((stand, index) => (
-                          <span
-                            key={index}
-                            style={{
-                              backgroundColor: "#3b82f6",
-                              color: "white",
-                              padding: "6px 12px",
-                              borderRadius: "20px",
-                              fontSize: "0.9em",
-                              fontWeight: "500",
-                            }}
-                          >
-                            {stand}
-                          </span>
-                        ))}
+                        {selectedEvent.stands.map((stand, index) => {
+                          // Se o stand for um objeto, extrair o código ou usar a propriedade adequada
+                          let standDisplay = '';
+                          if (typeof stand === 'object' && stand !== null) {
+                            standDisplay = stand.codigo || stand.id || String(stand) || `Stand ${index + 1}`;
+                          } else {
+                            standDisplay = String(stand) || `Stand ${index + 1}`;
+                          }
+                          
+                          return (
+                            <span
+                              key={index}
+                              style={{
+                                backgroundColor: "#3b82f6",
+                                color: "white",
+                                padding: "6px 12px",
+                                borderRadius: "20px",
+                                fontSize: "0.9em",
+                                fontWeight: "500",
+                              }}
+                            >
+                              {standDisplay}
+                            </span>
+                          );
+                        })}
                       </div>
                     ) : (
                       <p style={{ color: "#94a3b8", fontStyle: "italic" }}>

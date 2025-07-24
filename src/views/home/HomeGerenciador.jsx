@@ -24,7 +24,6 @@ import {
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../AuthContext";
-import StandManagementButton from '../../components/StandManagementButton';
 import { useEvents } from "../../contexts/EventContext";
 
 function cardStyle(color1, color2) {
@@ -523,10 +522,6 @@ export default function HomeGerenciador() {
                         marginTop: "20px",
                       }}
                     >
-                      <StandManagementButton 
-                        eventId={event.id}
-                        eventName={event.name}
-                      />
                       <motion.button
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
@@ -992,53 +987,68 @@ export default function HomeGerenciador() {
         gap: "15px",
       }}
     >
-      {selectedEvent.stands.map((stand, index) => (
-        <div
-          key={index}
-          style={{
-            backgroundColor: "#3b82f6",
-            padding: "15px",
-            borderRadius: "10px",
-            color: "white",
-            boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-          }}
-        >
+      {selectedEvent.stands.map((stand, index) => {
+        // Verificar se stand é um objeto e extrair o valor apropriado para renderização
+        const standDisplay = typeof stand === 'object' ? (stand.codigo || stand.id || `Stand ${index + 1}`) : stand;
+        
+        return (
           <div
+            key={index}
             style={{
-              display: "flex",
-              alignItems: "center",
-              marginBottom: "10px",
-              gap: "10px",
+              backgroundColor: "#3b82f6",
+              padding: "15px",
+              borderRadius: "10px",
+              color: "white",
+              boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
             }}
           >
             <div
               style={{
-                width: "40px",
-                height: "40px",
-                borderRadius: "50%",
-                backgroundColor: "#1e40af",
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0,
+                marginBottom: "10px",
+                gap: "10px",
               }}
             >
-              <span style={{ fontWeight: "bold" }}>
-                {stand} {/* Mostra diretamente o valor do stand */}
-              </span>
+              <div
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "50%",
+                  backgroundColor: "#1e40af",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                <span style={{ fontWeight: "bold", fontSize: "0.9em" }}>
+                  {standDisplay}
+                </span>
+              </div>
+              <h5
+                style={{
+                  margin: 0,
+                  fontSize: "1.1em",
+                  fontWeight: "600",
+                }}
+              >
+                {standDisplay}
+              </h5>
             </div>
-            <h5
-              style={{
-                margin: 0,
-                fontSize: "1.1em",
-                fontWeight: "600",
-              }}
-            >
-              {stand} {/* Mostra diretamente o valor do stand */}
-            </h5>
+            {typeof stand === 'object' && stand.descricao && (
+              <p style={{ 
+                margin: 0, 
+                fontSize: "0.9em", 
+                opacity: 0.8,
+                lineHeight: "1.4"
+              }}>
+                {stand.descricao}
+              </p>
+            )}
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   ) : (
     <div

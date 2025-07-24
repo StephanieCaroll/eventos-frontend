@@ -315,10 +315,18 @@ const StandVisualSelection = ({ onClose, eventId, eventName, managementMode = fa
 
   return (
     <div style={{ 
-      backgroundColor: '#0a192f', 
+      backgroundColor: managementMode && !hideEventSelector ? '#0a192f' : 'transparent', 
       color: '#ffffff', 
-      minHeight: '80vh',
-      padding: '30px'
+      minHeight: managementMode && !hideEventSelector ? '100vh' : 'auto',
+      width: '100%',
+      position: managementMode && !hideEventSelector ? 'fixed' : 'relative',
+      top: managementMode && !hideEventSelector ? 0 : 'auto',
+      left: managementMode && !hideEventSelector ? 0 : 'auto',
+      right: managementMode && !hideEventSelector ? 0 : 'auto',
+      bottom: managementMode && !hideEventSelector ? 0 : 'auto',
+      zIndex: managementMode && !hideEventSelector ? 9999 : 'auto',
+      overflow: managementMode && !hideEventSelector ? 'auto' : 'visible',
+      padding: managementMode && !hideEventSelector ? '30px' : '0'
     }}>
       {/* Header com título */}
       <motion.div 

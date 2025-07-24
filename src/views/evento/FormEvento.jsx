@@ -6,6 +6,7 @@ import { AuthContext } from "../../AuthContext";
 import StandSelectorForEventCreation from "../../components/StandSelectorForEventCreation";
 import { formatDateForInput, useEvents } from "../../contexts/EventContext";
 import MenuSistema from "../../MenuSistema";
+import '../../styles/StandGrid.css';
 import { Footer } from "../home/Home";
 
 Modal.setAppElement("#root");
@@ -75,16 +76,21 @@ export default function FormEvento() {
 
   // Handler para seleção visual de stands
   const handleStandSelection = (stands) => {
+    const standsArray = stands.map(stand => 
+      typeof stand === 'object' ? (stand.codigo || stand.id || String(stand)) : String(stand)
+    );
     setFormData(prev => ({
       ...prev,
-      stands: stands,
-      standsInput: stands.map(stand => stand.codigo || stand).join(', ')
+      stands: standsArray,
+      standsInput: standsArray.join(', ')
     }));
   };
 
   // Handler para seleção visual adicional
   const handleVisualStandSelection = (selectedStands) => {
-    const standsArray = selectedStands.map(stand => stand.codigo || stand);
+    const standsArray = selectedStands.map(stand => 
+      typeof stand === 'object' ? (stand.codigo || stand.id || String(stand)) : String(stand)
+    );
     setFormData(prev => ({
       ...prev,
       stands: standsArray,

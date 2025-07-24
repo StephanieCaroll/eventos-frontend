@@ -45,7 +45,9 @@ const FormEventoStandSelector = ({ onStandSelect, selectedEventId, userEmail, pr
         background: 'rgba(255,255,255,0.1)',
         borderRadius: '10px',
         padding: '20px',
-        backdropFilter: 'blur(10px)'
+        backdropFilter: 'blur(10px)',
+        position: 'relative',
+        overflow: 'hidden'
       }}>
         <StandVisualSelection
           eventId={selectedEventId}
@@ -71,7 +73,11 @@ const FormEventoStandSelector = ({ onStandSelect, selectedEventId, userEmail, pr
         >
           <p><strong>Stands Selecionados:</strong> {selectedStands.length}</p>
           <div style={{ fontSize: '14px', marginTop: '5px' }}>
-            {selectedStands.map(stand => `Stand ${stand.codigo || stand.id}`).join(', ')}
+            {selectedStands.map(stand => {
+              const standCode = typeof stand === 'object' && stand !== null ? 
+                (stand.codigo || stand.id || String(stand)) : String(stand);
+              return `Stand ${standCode}`;
+            }).join(', ')}
           </div>
         </motion.div>
       )}

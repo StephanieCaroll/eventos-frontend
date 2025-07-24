@@ -28,7 +28,14 @@ const calculateEventStatus = (dataVendaInicio) => {
 
 const processStandsData = (stands) => {
   if (!stands) return [];
-  if (Array.isArray(stands)) return stands.filter(stand => stand);
+  if (Array.isArray(stands)) {
+    return stands.filter(stand => stand).map(stand => {
+      if (typeof stand === 'object' && stand !== null) {
+        return stand.codigo || stand.id || String(stand);
+      }
+      return String(stand);
+    });
+  }
   if (typeof stands === 'string') {
     return stands.split(',')
       .map(stand => stand.trim())

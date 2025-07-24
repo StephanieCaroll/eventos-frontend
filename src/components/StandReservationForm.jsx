@@ -1,4 +1,4 @@
-import { Check, Grid } from 'lucide-react';
+import { Check, Grid, X } from 'lucide-react';
 import { useContext, useEffect, useState } from 'react';
 import { Alert, Badge, Button, Modal } from 'react-bootstrap';
 import { AuthContext } from '../AuthContext';
@@ -169,7 +169,7 @@ const StandReservationForm = ({ eventId, eventName, onStandsUpdate }) => {
                 style={{ cursor: 'pointer' }}
                 onClick={() => toggleStand(stand)}
               >
-                {stand}
+                {typeof stand === 'object' ? (stand.codigo || stand.id || stand) : stand}
                 <X size={12} />
               </Badge>
             ))}

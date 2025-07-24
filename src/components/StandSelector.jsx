@@ -110,7 +110,9 @@ const StandSelector = ({
         >
           <Grid size={20} />
           {selectedStands.length > 0 
-            ? `Stands Selecionados: ${selectedStands.join(', ')}`
+            ? `Stands Selecionados: ${selectedStands.map(stand => 
+                typeof stand === 'object' ? (stand.codigo || stand.id || stand) : stand
+              ).join(', ')}`
             : 'Abrir Seleção Visual de Stands'
           }
         </Button>
