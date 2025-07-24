@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Button, Form, Alert, Spinner, Card, Row, Col } from 'react-bootstrap';
-import axios from 'axios';
-import { jwtDecode } from 'jwt-decode'; 
+import { jwtDecode } from 'jwt-decode';
+import { useEffect, useState } from 'react';
+import { Alert, Button, Card, Col, Form, Row, Spinner } from 'react-bootstrap';
+import { useNavigate, useParams } from 'react-router-dom';
+import StandSelectionService from '../services/StandSelectionService';
 
 const StandRegistrationModal = () => {
   const { eventId } = useParams();
@@ -26,32 +26,21 @@ const StandRegistrationModal = () => {
         if (!eventId || isNaN(eventId)) throw new Error('ID do evento inválido');
 
         const decodedToken = jwtDecode(token);
-      
-        const userId = decodedToken.id; 
+        const userId = decodedToken.sub || decodedToken.id;
 
         if (!userId) {
             throw new Error('ID do usuário não encontrado no token JWT. Por favor, verifique o payload do seu token em jwt.io e ajuste a propriedade.');
         }
 
-        const config = {
-          headers: { 
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          params: { 
-            eventId: parseInt(eventId),
-            userId: userId 
-          }
-        };
-
-        const [availableResponse, myStandsResponse] = await Promise.all([
-          axios.get('http://localhost:8080/api/stand/disponiveis', config),
-          axios.get('http://localhost:8080/api/stand/usuario', config)
+        // Usar o novo serviço
+        const [availableStands, myStands] = await Promise.all([
+          StandSelectionService.getAvailableStandsForEvent(eventId),
+          StandSelectionService.getUserStandsByEvent(userId, eventId)
         ]);
 
-        setStands(availableResponse.data.map(stand => ({
+        setStands(availableStands.map(stand => ({
           ...stand,
-          isRegisteredByMe: myStandsResponse.data.some(s => s.id === stand.id)
+          isRegisteredByMe: myStands.some(s => s.id === stand.id)
         })));
 
       } catch (err) {
@@ -69,9 +58,18 @@ const StandRegistrationModal = () => {
   }, [eventId]);
 
   const handleStandSelection = (stand) => {
-    if (!stand.isRegisteredByMe) {
+    // Verifica se o stand está disponível para seleção
+    if (stand.isRegisteredByMe || stand.ocupado) {
+      return; // Não permite selecionar stands já ocupados
+    }
+    
+    if (!selectedStand || selectedStand.id !== stand.id) {
       setSelectedStand(stand);
       setDescription(stand.descricao || '');
+    } else {
+      // Se clicou no stand já selecionado, deseleciona
+      setSelectedStand(null);
+      setDescription('');
     }
   };
 
@@ -89,23 +87,33 @@ const StandRegistrationModal = () => {
       }
 
       const decodedToken = jwtDecode(token);
-     
-      const userId = decodedToken.id; 
+      const userId = decodedToken.sub || decodedToken.id; 
 
       if (!userId) {
           throw new Error('ID do usuário não encontrado no token JWT para registrar o stand.');
       }
 
-      await axios.post('http://localhost:8080/api/stand/registrar', {
-        eventId: parseInt(eventId),
-        standId: selectedStand.id,
-        descricao: description,
-        userId: userId
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
+      // Usar o serviço para criar o stand
+      await StandSelectionService.createStand({
+        codigo: selectedStand.codigo,
+        userId: userId,
+        eventoId: parseInt(eventId),
+        descricao: description
       });
 
+      // Atualiza o estado dos stands, marcando o stand selecionado como ocupado
+      setStands(prevStands => 
+        prevStands.map(stand => 
+          stand.id === selectedStand.id 
+            ? { ...stand, ocupado: true, isRegisteredByMe: true }
+            : stand
+        )
+      );
+
       setShowSuccess(true);
+      setSelectedStand(null);
+      setDescription('');
+      
       setTimeout(() => navigate('/homeExpositor'), 1500);
     } catch (err) {
       console.error('Erro ao cadastrar stand:', err);
@@ -162,36 +170,93 @@ const StandRegistrationModal = () => {
                     onLoad={() => setImageLoaded(true)}
                   />
                   
+                  {/* Legenda de cores */}
+                  <div style={{
+                    position: 'absolute',
+                    top: '10px',
+                    right: '10px',
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: '10px',
+                    borderRadius: '8px',
+                    color: 'white',
+                    fontSize: '12px'
+                  }}>
+                    <div className="mb-2"><strong>Legenda:</strong></div>
+                    <div className="d-flex align-items-center mb-1">
+                      <div style={{ width: '12px', height: '12px', backgroundColor: '#198754', borderRadius: '50%', marginRight: '8px' }}></div>
+                      Disponível
+                    </div>
+                    <div className="d-flex align-items-center mb-1">
+                      <div style={{ width: '12px', height: '12px', backgroundColor: '#0d6efd', borderRadius: '50%', marginRight: '8px' }}></div>
+                      Selecionado
+                    </div>
+                    <div className="d-flex align-items-center mb-1">
+                      <div style={{ width: '12px', height: '12px', backgroundColor: '#dc3545', borderRadius: '50%', marginRight: '8px' }}></div>
+                      Meu Stand
+                    </div>
+                    <div className="d-flex align-items-center">
+                      <div style={{ width: '12px', height: '12px', backgroundColor: '#8b0000', borderRadius: '50%', marginRight: '8px' }}></div>
+                      Ocupado
+                    </div>
+                  </div>
+                  
                   {imageLoaded && (
                     <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
-                      {stands.map((stand) => (
-                        <div
-                          key={stand.id}
-                          style={{
-                            position: 'absolute',
-                            left: `${stand.posicaoX || 0}%`,
-                            top: `${stand.posicaoY || 0}%`,
-                            width: '40px',
-                            height: '40px',
-                            borderRadius: '50%',
-                            backgroundColor: stand.isRegisteredByMe
-                              ? '#dc3545'
-                              : selectedStand?.id === stand.id
-                                ? '#0d6efd'
-                                : '#198754',
-                            border: '2px solid white',
-                            cursor: stand.isRegisteredByMe ? 'not-allowed' : 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontWeight: 'bold'
-                          }}
-                          onClick={() => handleStandSelection(stand)}
-                          title={`Stand ${stand.codigo}${stand.isRegisteredByMe ? ' (Indisponível)' : ''}`}
-                        >
-                          {stand.codigo}
-                        </div>
-                      ))}
+                      {stands.map((stand) => {
+                        // Define a cor baseada no status do stand
+                        let backgroundColor;
+                        let cursor;
+                        let title;
+                        
+                        if (stand.isRegisteredByMe) {
+                          // Stand já registrado por mim - vermelho
+                          backgroundColor = '#dc3545';
+                          cursor = 'not-allowed';
+                          title = `Stand ${stand.codigo} (Já registrado por você)`;
+                        } else if (stand.ocupado) {
+                          // Stand ocupado por outro expositor - vermelho escuro
+                          backgroundColor = '#8b0000';
+                          cursor = 'not-allowed';
+                          title = `Stand ${stand.codigo} (Ocupado por outro expositor)`;
+                        } else if (selectedStand?.id === stand.id) {
+                          // Stand selecionado atualmente - azul
+                          backgroundColor = '#0d6efd';
+                          cursor = 'pointer';
+                          title = `Stand ${stand.codigo} (Selecionado)`;
+                        } else {
+                          // Stand disponível - verde
+                          backgroundColor = '#198754';
+                          cursor = 'pointer';
+                          title = `Stand ${stand.codigo} (Disponível)`;
+                        }
+                        
+                        return (
+                          <div
+                            key={stand.id}
+                            style={{
+                              position: 'absolute',
+                              left: `${stand.posicaoX || 0}%`,
+                              top: `${stand.posicaoY || 0}%`,
+                              width: '40px',
+                              height: '40px',
+                              borderRadius: '50%',
+                              backgroundColor: backgroundColor,
+                              border: '2px solid white',
+                              cursor: cursor,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontWeight: 'bold',
+                              boxShadow: selectedStand?.id === stand.id ? '0 0 10px rgba(13, 110, 253, 0.8)' : 'none',
+                              transition: 'all 0.3s ease'
+                            }}
+                            onClick={() => handleStandSelection(stand)}
+                            title={title}
+                          >
+                            {stand.codigo}
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>

@@ -2,8 +2,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { motion } from "framer-motion";
 import { CalendarCheck, MonitorPlay, Star } from 'lucide-react';
+import { Link, useNavigate } from "react-router-dom";
 import MenuSistema from "../../MenuSistema";
-import { Link, useNavigate } from "react-router-dom"; 
 
 function cardStyle(color1, color2) {
     return {
@@ -210,23 +210,6 @@ export default function Home() {
             {/* Sobre Nós */}
             <section style={{ background: 'linear-gradient(to right, #0f172a, #0a192f)', padding: '6em 0', color: '#fff', position: 'relative', overflow: 'hidden' }}>
                 <div className="container text-center">
-                    <motion.h2
-                        initial={{ opacity: 0, y: 40 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6 }}
-                        style={{ fontSize: '3em', fontWeight: '800', color: '#3b82f6', marginBottom: '1em' }}
-                    >
-                        Sobre Nós
-                    </motion.h2>
-                    <motion.p
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2, duration: 0.6 }}
-                        style={{ fontSize: '1.3em', maxWidth: 800, margin: '0 auto', color: '#cbd5e1' }}
-                    >
-                        Somos movidos pela inovação. Transformamos espaços em experiências, conectando marcas e pessoas através da tecnologia.
-                    </motion.p>
-
                     <div className="row mt-5">
                         {/* Card 1 */}
                         <motion.div className="col-md-4 p-3"
@@ -306,13 +289,20 @@ export function Footer() {
         <footer style={{ padding: '3em 0', backgroundColor: '#000000', borderTop: '1px solid #1e293b', textAlign: 'center' }}>
             <div style={{ maxWidth: 900, margin: '0 auto', padding: '0 2em' }}>
                 <h4 style={{ color: '#3b82f6', fontWeight: 700, fontSize: 22, marginBottom: 8 }}>Events Stands</h4>
-                <p style={{ color: '#94a3b8', fontSize: 16 }}>
+                <p style={{ color: '#94a3b8', fontSize: 17 }}>
                     Conectando espaços e expositores com tecnologia e eficiência.
                 </p>
-                <p style={{ color: '#94a3b8', fontSize: 16 }}>
+                
+                <p style={{ color: '#94a3b8', fontSize: 17 }}>
+                    Sobre Nós
+                    <br />
+                    Somos movidos pela inovação. Transformamos espaços em experiências, conectando marcas e pessoas através da tecnologia.
+                </p>
+                
+                <p style={{ color: '#94a3b8', fontSize: 17 }}>
                     contato@eventsstands.com.br | +55 (81) 99999-0000
                 </p>
-                <p style={{ color: '#94a3b8', fontSize: 16 }}>
+                <p style={{ color: '#94a3b8', fontSize: 17 }}>
                     &copy; 2025 - Projeto e Prática II - IFPE Jaboatão dos Guararapes
                 </p>
             </div>

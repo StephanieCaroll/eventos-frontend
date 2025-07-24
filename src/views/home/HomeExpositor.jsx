@@ -1,34 +1,32 @@
+import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   CalendarCheck,
-  Search,
-  List,
-  ChevronRight,
-  Star,
   Clapperboard,
-  Monitor,
-  Paintbrush,
-  PlusCircle,
   Edit,
-  Trash2,
-  Mic,
-  Lightbulb,
-  Music,
-  LayoutList,
-  Trophy,
-  GraduationCap,
-  Utensils,
   Globe,
+  GraduationCap,
   Heart,
+  LayoutList,
+  Lightbulb,
+  List,
+  Mic,
+  Monitor,
+  Music,
+  Paintbrush,
+  Search,
+  Star,
+  Trash2,
+  Trophy,
+  Utensils
 } from "lucide-react";
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { Button, Form, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../AuthContext";
 import { useEvents } from "../../contexts/EventContext";
-import { Modal, Button, Form, Row, Col } from "react-bootstrap";
-import axios from "axios";
 
 
 function cardStyle(color1, color2) {
@@ -80,7 +78,10 @@ function Footer() {
 const StandService = {
   getAvailableStands: async (eventId) => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/stand/available?eventId=${eventId}`);
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`http://localhost:8080/api/stand/disponiveis-evento/${eventId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       return response.data;
     } catch (error) {
       console.error('Erro ao buscar stands disponíveis:', error);
@@ -90,39 +91,73 @@ const StandService = {
   
   selectStands: async (eventId, standIds, userId) => {
     try {
-      const response = await axios.post('http://localhost:8080/api/stand/select', {
-        eventId,
-        standIds,
-        userId
+      const token = localStorage.getItem('token');
+      
+      // Validação dos parâmetros
+      if (!Array.isArray(standIds) || standIds.length === 0) {
+        throw new Error('Lista de stands não pode estar vazia');
+      }
+      if (!eventId || isNaN(parseInt(eventId))) {
+        throw new Error('ID do evento é obrigatório');
+      }
+      if (!userId) {
+        throw new Error('ID do usuário é obrigatório');
+      }
+
+      const requestData = {
+        standIds: standIds.map(id => parseInt(id)),
+        eventoId: parseInt(eventId),
+        usuarioId: userId.toString(),
+        operacao: 'RESERVAR',
+        observacoes: 'Seleção via interface do expositor'
+      };
+
+      console.log('Enviando dados para batch operation (HomeExpositor):', requestData);
+
+      const response = await axios.post('http://localhost:8080/api/stand-selection/batch', requestData, {
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
+      
       return response.data;
     } catch (error) {
       console.error('Erro ao selecionar stands:', error);
+      if (error.response) {
+        console.error('Response data:', error.response.data);
+        console.error('Response status:', error.response.status);
+      }
       throw error;
     }
   },
   
-   getRegisteredStands: async (userId) => {
+  getRegisteredStands: async (userId) => {
     try {
-      
-     const token = localStorage.getItem('token');
-    if (!token) throw new Error('Token de autenticação não encontrado');
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('Token de autenticação não encontrado');
 
-    const response = await axios.get(`http://localhost:8080/api/stand/registered`, {
-      headers: { Authorization: `Bearer ${token}` },
-      params: { userId }
-    });
+      const response = await axios.get(`http://localhost:8080/api/stand/registered`, {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { userId }
+      });
 
-    return response.data;
-  } catch (error) {
-    console.error('Erro detalhado:', error);
-    throw new Error(error.response?.data?.message || 'Erro ao buscar stands registrados');
+      return response.data;
+    } catch (error) {
+      console.error('Erro detalhado:', error);
+      throw new Error(error.response?.data?.message || 'Erro ao buscar stands registrados');
     }
   },
 
   deleteStand: async (standId) => {
     try {
-      await axios.delete(`http://localhost:8080/api/stand/${standId}`);
+      const token = localStorage.getItem('token');
+      await axios.post('http://localhost:8080/api/stand/processar-reserva', {
+        standId,
+        operacao: 'LIBERAR'
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
     } catch (error) {
       console.error('Erro ao remover stand:', error);
       throw error;
@@ -131,11 +166,27 @@ const StandService = {
 
   updateStand: async (standId, description) => {
     try {
+      const token = localStorage.getItem('token');
       await axios.put(`http://localhost:8080/api/stand/${standId}`, {
-        description
+        descricao: description
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
       });
     } catch (error) {
       console.error('Erro ao atualizar stand:', error);
+      throw error;
+    }
+  },
+
+  getStandInfo: async (standId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`http://localhost:8080/api/stand/${standId}/info`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao buscar informações do stand:', error);
       throw error;
     }
   }
@@ -245,7 +296,15 @@ export default function HomeExpositor() {
       setSelectionError(null);
       
       const stands = await StandService.getAvailableStands(eventId);
-      setAvailableStands(stands);
+      
+      // Marca os stands que já estão ocupados/registrados
+      const standsWithStatus = stands.map(stand => ({
+        ...stand,
+        ocupado: stand.ocupado || false,
+        isRegisteredByMe: registeredStands.some(reg => reg.standId === stand.id && reg.eventId === eventId)
+      }));
+      
+      setAvailableStands(standsWithStatus);
       setSelectedStands([]);
       setShowStandSelectionModal(true);
     } catch (error) {
@@ -257,6 +316,12 @@ export default function HomeExpositor() {
   };
 
   const handleStandSelection = (standId, isSelected) => {
+    // Verifica se o stand está disponível para seleção
+    const stand = availableStands.find(s => s.id === standId);
+    if (!stand || stand.ocupado || stand.isRegisteredByMe) {
+      return; // Não permite selecionar stands já ocupados
+    }
+    
     if (isSelected) {
       setSelectedStands([...selectedStands, standId]);
     } else {
@@ -277,6 +342,15 @@ export default function HomeExpositor() {
       }
 
       await StandService.selectStands(currentEventId, selectedStands, userId);
+      
+      // Atualiza o estado dos stands marcando como ocupados
+      setAvailableStands(prevStands => 
+        prevStands.map(stand => 
+          selectedStands.includes(stand.id)
+            ? { ...stand, ocupado: true, isRegisteredByMe: true }
+            : stand
+        )
+      );
       
       // Fechar modais e resetar estados
       setShowStandSelectionModal(false);
@@ -1350,50 +1424,89 @@ export default function HomeExpositor() {
                 <p>Não há stands disponíveis para este evento.</p>
               ) : (
                 <div className="row">
-                  {availableStands.map(stand => (
-                    <div className="col-md-4 mb-3" key={stand.id}>
-                      <div 
-                        className="p-3 rounded"
-                        style={{
-                          border: selectedStands.includes(stand.id) 
-                            ? '2px solid #3b82f6' 
-                            : '1px solid #334155',
-                          backgroundColor: '#1e293b',
-                          cursor: 'pointer'
-                        }}
-                        onClick={() => handleStandSelection(
-                          stand.id, 
-                          !selectedStands.includes(stand.id)
-                        )}
-                      >
-                        <div className="form-check">
-                          <input
-                            type="checkbox"
-                            className="form-check-input"
-                            checked={selectedStands.includes(stand.id)}
-                            onChange={(e) => handleStandSelection(stand.id, e.target.checked)}
-                            id={`stand-${stand.id}`}
-                          />
-                          <label 
-                            className="form-check-label" 
-                            htmlFor={`stand-${stand.id}`}
-                          >
-                            <strong>Stand {stand.codigo}</strong>
-                            {stand.localizacao && (
-                              <div className="text-muted small">
-                                Local: {stand.localizacao}
-                              </div>
-                            )}
-                            {stand.descricao && (
-                              <div className="text-muted small mt-1">
-                                {stand.descricao}
-                              </div>
-                            )}
-                          </label>
+                  {availableStands.map(stand => {
+                    let borderColor = '#334155';
+                    let backgroundColor = '#1e293b';
+                    let textColor = 'white';
+                    let isClickable = true;
+                    
+                    if (stand.isRegisteredByMe) {
+                      borderColor = '#dc3545';
+                      backgroundColor = '#dc354533';
+                      textColor = '#dc3545';
+                      isClickable = false;
+                    } else if (stand.ocupado) {
+                      borderColor = '#8b0000';
+                      backgroundColor = '#8b000033';
+                      textColor = '#ff6b6b';
+                      isClickable = false;
+                    } else if (selectedStands.includes(stand.id)) {
+                      borderColor = '#3b82f6';
+                      backgroundColor = '#3b82f633';
+                      textColor = '#3b82f6';
+                    } else {
+                      borderColor = '#198754';
+                      backgroundColor = '#19875433';
+                      textColor = '#22c55e';
+                    }
+                    
+                    return (
+                      <div className="col-md-4 mb-3" key={stand.id}>
+                        <div 
+                          className="p-3 rounded"
+                          style={{
+                            border: `2px solid ${borderColor}`,
+                            backgroundColor: backgroundColor,
+                            cursor: isClickable ? 'pointer' : 'not-allowed',
+                            opacity: isClickable ? 1 : 0.6,
+                            transition: 'all 0.3s ease'
+                          }}
+                          onClick={() => isClickable && handleStandSelection(
+                            stand.id, 
+                            !selectedStands.includes(stand.id)
+                          )}
+                        >
+                          <div className="form-check">
+                            <input
+                              type="checkbox"
+                              className="form-check-input"
+                              checked={selectedStands.includes(stand.id)}
+                              onChange={(e) => isClickable && handleStandSelection(stand.id, e.target.checked)}
+                              id={`stand-${stand.id}`}
+                              disabled={!isClickable}
+                            />
+                            <label 
+                              className="form-check-label" 
+                              htmlFor={`stand-${stand.id}`}
+                              style={{ color: textColor }}
+                            >
+                              <strong>Stand {stand.codigo}</strong>
+                              {stand.localizacao && (
+                                <div className="small" style={{ opacity: 0.8 }}>
+                                  Local: {stand.localizacao}
+                                </div>
+                              )}
+                              {stand.descricao && (
+                                <div className="small mt-1" style={{ opacity: 0.8 }}>
+                                  {stand.descricao}
+                                </div>
+                              )}
+                              {stand.isRegisteredByMe && (
+                                <div className="small mt-1" style={{ color: '#dc3545', fontWeight: 'bold' }}>
+                                  Já registrado por você
+                                </div>
+                              )}
+                              {stand.ocupado && !stand.isRegisteredByMe && (
+                                <div className="small mt-1" style={{ color: '#ff6b6b', fontWeight: 'bold' }}>
+                                  Ocupado por outro expositor
+                                </div>
+                              )}
+                            </label>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </>

@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../AuthContext';
 
 const EventContext = createContext();
@@ -43,7 +43,7 @@ export const EventProvider = ({ children }) => {
   const [favoritedEvents, setFavoritedEvents] = useState([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
   const [errorEvents, setErrorEvents] = useState(null);
-  
+
   // Carrega os stands do localStorage ao iniciar
   const [lastStandsData, setLastStandsData] = useState(() => {
     try {
@@ -211,7 +211,7 @@ export const EventProvider = ({ children }) => {
 
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/api/clientes/by-email/${encodeURIComponent(userEmail)}/favorited-events`,
+        `${API_BASE_URL}/api/clientes/favorited-events?email=${encodeURIComponent(userEmail)}`,
         { headers: { Authorization: `Bearer ${authToken}` } }
       );
 
@@ -248,7 +248,7 @@ export const EventProvider = ({ children }) => {
     try {
       const isFavorited = favoritedEvents.some(fav => fav.id === event.id);
       const endpoint = isFavorited ? 'desfavoritar' : 'favoritar';
-      
+
       await axios[isFavorited ? 'delete' : 'post'](
         `${API_BASE_URL}/api/clientes/${userEmail}/${endpoint}/${event.id}`,
         {},

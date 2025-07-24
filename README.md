@@ -9,12 +9,32 @@ Para Acessar o site -> https://eventos-frontend-rho.vercel.app/
 O objetivo principal desta plataforma é simplificar o processo de cadastro e organização de stands para eventos presenciais. Ela oferece uma interface intuitiva para que organizadores ou administradores possam adicionar novos stands, preencher suas informações essenciais e gerenciar o espaço de forma eficiente.
 
 ### Funcionalidades Principais:
+- **Sistema de Seleção Visual de Stands**: 
+  - Grid interativo com stands disponíveis: A1-A4, B1-B4, C1-C4, D1-D2, E1-E2, F1-F2, G1-G3, H1-H3, I1-I3
+  - Cores diferenciadas por status: verde (disponível), vermelho (ocupado), azul (selecionado)
+  - Seleção múltipla com clique individual
+  - Filtros por evento, disponibilidade e busca por código
+  - Operações em lote (reservar/liberar múltiplos stands)
+  - Design consistente com o restante da aplicação
+- **Gerenciamento Avançado de Stands**: 
+  - Interface de administração para gerenciar stands de todos os eventos
+  - Modo gerenciamento com salvamento automático e retorno à página anterior
+  - Integração completa com backend através de APIs RESTful
 - **Cadastro de Stands**: Interface para inserir todos os detalhes de um novo stand, incluindo nome, descrição, dimensões, informações do responsável e requisitos especiais.
-- **Visualização de Stands**:(A ser implementado) Exibição de uma lista dos stands cadastrados, com opções para visualização detalhada.
-- **Cadastro de Eventos** : Interface para inserir detalhes sobre um novo evento, incluindo data, nomes e quantidade de ingresso.
+- **Visualização de Stands**: Exibição de uma lista dos stands cadastrados, com sistema de cores para indicar disponibilidade.
+- **Sistema de Coloração de Stands**: 
+  - 🟢 Verde: Stands disponíveis para seleção
+  - 🔵 Azul: Stand atualmente selecionado
+  - 🔴 Vermelho: Stands já registrados pelo usuário atual
+  - 🔴 Vermelho escuro: Stands ocupados por outros expositores
+- **Seleção Inteligente de Stands**: Previne a seleção de stands já ocupados ou indisponíveis
+- **Cadastro de Eventos**: Interface para inserir detalhes sobre um novo evento, incluindo data, nomes e quantidade de ingresso.
+- **Mapa Visual de Stands**: Visualização interativa do layout do evento com indicadores de status
 
 ## 📚 Componentes
 
+- **StandVisualSelection**: Componente principal para seleção visual de stands com grid interativo 8x4
+- **StandManagementButton**: Botão para acesso rápido ao gerenciamento de stands nos eventos
 - **FormCliente**: Componente principal para o formulário de cadastro de um Cliente, onde os usuários interagem para inserir os dados.
 - **LoginCliente**: Componente principal para o Login de um cliente, onde os usuários interagem para inserir os dados.
 - **FormDono**: Componente principal para o formulário de cadastro do Dono de um evento, onde os usuários interagem para inserir os dados.

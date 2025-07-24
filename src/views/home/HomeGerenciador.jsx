@@ -1,30 +1,30 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   CalendarCheck,
-  Search,
-  List,
-  ChevronRight,
-  Star,
   Clapperboard,
+  Edit,
+  Globe,
+  GraduationCap,
+  LayoutList,
+  Lightbulb,
+  List,
+  Mic,
   Monitor,
+  Music,
   Paintbrush,
   PlusCircle,
-  Edit,
+  Search,
+  Star,
   Trash2,
-  Mic,
-  Lightbulb,
-  Music,
-  LayoutList,
   Trophy,
-  GraduationCap,
-  Utensils,
-  Globe,
+  Utensils
 } from "lucide-react";
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../AuthContext";
+import StandManagementButton from '../../components/StandManagementButton';
 import { useEvents } from "../../contexts/EventContext";
 
 function cardStyle(color1, color2) {
@@ -523,6 +523,10 @@ export default function HomeGerenciador() {
                         marginTop: "20px",
                       }}
                     >
+                      <StandManagementButton 
+                        eventId={event.id}
+                        eventName={event.name}
+                      />
                       <motion.button
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}

@@ -1,0 +1,178 @@
+/* Estilos para o Grid de Stands - Design atualizado */
+.stand-grid {
+  padding: 20px;
+  background: transparent;
+  border-radius: 12px;
+  margin: 10px 0;
+}
+
+.stand-cell {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+
+.stand-cell:hover {
+  transform: scale(1.1) translateY(-3px);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+  z-index: 10;
+  position: relative;
+}
+
+.stand-cell.selected {
+  animation: glow 2s infinite alternate;
+}
+
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 5px rgba(59, 130, 246, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.9), 0 0 30px rgba(59, 130, 246, 0.6);
+  }
+}
+
+/* Modal customizado */
+.modal-90w {
+  max-width: 95% !important;
+  width: 95% !important;
+}
+
+.modal-content {
+  background-color: #0a192f !important;
+  border: none !important;
+  border-radius: 12px !important;
+}
+
+/* Responsividade para o grid */
+@media (max-width: 992px) {
+  .stand-cell {
+    width: 40px !important;
+    height: 40px !important;
+    font-size: 10px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .stand-cell {
+    width: 35px !important;
+    height: 35px !important;
+    font-size: 9px !important;
+  }
+  
+  .stand-grid {
+    overflow-x: auto;
+    padding: 10px;
+  }
+
+  .modal-90w {
+    max-width: 98% !important;
+    width: 98% !important;
+    margin: 10px auto !important;
+  }
+}
+
+/* Estilo para tooltips personalizados */
+.tooltip-inner {
+  max-width: 250px;
+  text-align: left;
+  background-color: #1e293b;
+  border: 1px solid #334155;
+}
+
+.tooltip.bs-tooltip-top .tooltip-arrow::before {
+  border-top-color: #1e293b;
+}
+
+/* Animação para cards selecionados */
+.selected-stand-card {
+  animation: slideInFromRight 0.4s ease-out;
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Loading spinner personalizado */
+.stand-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+}
+
+/* Estilo para badges de status */
+.badge {
+  font-size: 0.8rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+}
+
+/* Efeito hover para botões de ação */
+.btn {
+  transition: all 0.3s ease;
+  border-radius: 25px !important;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+/* Scrollbar customizada */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e293b;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Form controls dark theme */
+.form-control, .form-select {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+}
+
+.form-control:focus, .form-select:focus {
+  background-color: #1e293b !important;
+  border-color: #3b82f6 !important;
+  color: #e2e8f0 !important;
+  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25) !important;
+}
+
+.form-control::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Alert customizado */
+.alert {
+  border-radius: 12px !important;
+  border: none !important;
+}
+
+.alert-danger {
+  background-color: rgba(239, 68, 68, 0.1) !important;
+  color: #fca5a5 !important;
+}
+
+.alert-success {
+  background-color: rgba(34, 197, 94, 0.1) !important;
+  color: #86efac !important;
+}

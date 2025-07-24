@@ -1,13 +1,13 @@
 
 import axios from 'axios';
-import React, { useState, useContext } from 'react'; 
-import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import MenuSistema from '../../MenuSistema'; 
-import { Footer } from '../home/Home'; 
-import PopupCadastro from '../../componentes/PopupCadastro'; 
-import { AuthContext } from '../../AuthContext'; 
-import { decodeTokenData } from '../../views/util/AuthenticationService'; 
+import { useContext, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../AuthContext';
+import PopupCadastro from '../../componentes/PopupCadastro';
+import MenuSistema from '../../MenuSistema';
+import { decodeTokenData } from '../../views/util/AuthenticationService';
+import { Footer } from '../home/Home';
 
 export default function FormLogin() {
   const navigate = useNavigate(); 

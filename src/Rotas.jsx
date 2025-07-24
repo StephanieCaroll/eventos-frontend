@@ -1,20 +1,19 @@
-import { Route, Routes, useNavigate } from 'react-router-dom';
-import { ProtectedRoute } from './views/util/ProtectedRoute';
-import FormCliente from './views/cliente/FormCliente';
-import FormLogin from './views/login/FormLogin';
-import FormDono from './views/dono/FormDono';
-import Home from './views/home/Home';
-import FormEvento from './views/evento/FormEvento';
-import FormAdm from './views/administrador/FormAdm';
-import HomeExpositor from './views/home/HomeExpositor';
-import UserProfilePage from './componentes/UserProfilePage';
-import EditProfilePage from './views/cliente/EditProfilePage';
-import React from 'react';
-import HomeGerenciador from './views/home/HomeGerenciador'; 
+import { Route, Routes } from 'react-router-dom';
 import ManagerProfilePage from './componentes/ManagerProfilePage';
-import EditManagerPage from './views/dono/EditManagerPage';
-import HomeSemLogin from './views/home/HomeSemLogin';
+import UserProfilePage from './componentes/UserProfilePage';
 import StandRegistrationModal from './stands/StandRegistrationModal';
+import FormAdm from './views/administrador/FormAdm';
+import EditProfilePage from './views/cliente/EditProfilePage';
+import FormCliente from './views/cliente/FormCliente';
+import EditManagerPage from './views/dono/EditManagerPage';
+import FormDono from './views/dono/FormDono';
+import FormEvento from './views/evento/FormEvento';
+import Home from './views/home/Home';
+import HomeExpositor from './views/home/HomeExpositor';
+import HomeGerenciador from './views/home/HomeGerenciador';
+import HomeSemLogin from './views/home/HomeSemLogin';
+import FormLogin from './views/login/FormLogin';
+import { ProtectedRoute } from './views/util/ProtectedRoute';
 
 function Rotas() {
   return (

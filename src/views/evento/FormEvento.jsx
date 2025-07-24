@@ -1,12 +1,12 @@
-import axios from "axios";
 import { motion } from "framer-motion";
-import React, { useState, useEffect, useContext } from "react";
-import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
+import Modal from "react-modal";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { AuthContext } from "../../AuthContext";
+import StandSelectorForEventCreation from "../../components/StandSelectorForEventCreation";
+import { formatDateForInput, useEvents } from "../../contexts/EventContext";
 import MenuSistema from "../../MenuSistema";
 import { Footer } from "../home/Home";
-import { useEvents, formatDateForInput } from "../../contexts/EventContext";
-import { AuthContext } from "../../AuthContext";
-import Modal from "react-modal";
 
 Modal.setAppElement("#root");
 
@@ -68,10 +68,29 @@ export default function FormEvento() {
     standsInput: "",
   });
 
-  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [showVisualSelection, setShowVisualSelection] = useState(false);
   const [mensagem, setMensagem] = useState({ sucesso: false, erro: false });
 
   const isEditing = !!id && location.state?.event;
+
+  // Handler para seleção visual de stands
+  const handleStandSelection = (stands) => {
+    setFormData(prev => ({
+      ...prev,
+      stands: stands,
+      standsInput: stands.map(stand => stand.codigo || stand).join(', ')
+    }));
+  };
+
+  // Handler para seleção visual adicional
+  const handleVisualStandSelection = (selectedStands) => {
+    const standsArray = selectedStands.map(stand => stand.codigo || stand);
+    setFormData(prev => ({
+      ...prev,
+      stands: standsArray,
+      standsInput: standsArray.join(', ')
+    }));
+  };
 
   // Carrega dados para edição
   useEffect(() => {
@@ -152,15 +171,6 @@ export default function FormEvento() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const toggleStand = (stand) => {
-    setFormData((prev) => ({
-      ...prev,
-      stands: prev.stands.includes(stand)
-        ? prev.stands.filter((s) => s !== stand)
-        : [...prev.stands, stand],
-    }));
   };
 
   const handleSubmit = async (e) => {
@@ -615,7 +625,7 @@ export default function FormEvento() {
               />
             </div>
 
-            {/* Seção de Stands */}
+            {/* Seleção Visual de Stands */}
             <div style={{ marginBottom: 20 }}>
               <label
                 style={{
@@ -629,25 +639,41 @@ export default function FormEvento() {
               >
                 Stands do Evento
               </label>
-              <button
-                type="button"
-                onClick={() => setModalIsOpen(true)}
-                style={{
-                  width: "100%",
-                  padding: "12px 14px",
-                  borderRadius: 8,
-                  border: "1.5px solid #e0e7ef",
-                  fontSize: 15,
-                  background: "#fafbfc",
-                  outline: "none",
-                  cursor: "pointer",
-                  textAlign: "left",
-                }}
-              >
-                {formData.stands.length > 0
-                  ? `Stands selecionados: ${formData.stands.join(", ")}`
-                  : "Clique para selecionar os stands"}
-              </button>
+              <div style={{ display: "flex", gap: "10px" }}>
+                <button
+                  type="button"
+                  onClick={() => setShowVisualSelection(true)}
+                  style={{
+                    flex: 1,
+                    padding: "12px 20px",
+                    borderRadius: 8,
+                    border: "1.5px solid #3b82f6",
+                    fontSize: 15,
+                    background: "#3b82f6",
+                    color: "#fff",
+                    outline: "none",
+                    cursor: "pointer",
+                    fontWeight: "600",
+                    textAlign: "center",
+                  }}
+                >
+                  {formData.stands.length > 0
+                    ? `${formData.stands.length} Stands Selecionados - Clique para Editar`
+                    : "Selecionar Stands Visualmente"}
+                </button>
+              </div>
+              {formData.stands.length > 0 && (
+                <div style={{
+                  marginTop: "10px",
+                  padding: "10px",
+                  background: "#f8f9fa",
+                  borderRadius: "6px",
+                  fontSize: "14px",
+                  color: "#666"
+                }}>
+                  <strong>Stands selecionados:</strong> {formData.stands.join(", ")}
+                </div>
+              )}
             </div>
 
             {/* Seção de Ingressos */}
@@ -818,290 +844,40 @@ export default function FormEvento() {
               </div>
             </div>
 
-            {/* Modal de Stands */}
+            {/* Modal de Seleção Visual */}
             <Modal
-              isOpen={modalIsOpen}
-              onRequestClose={() => setModalIsOpen(false)}
+              isOpen={showVisualSelection}
+              onRequestClose={() => setShowVisualSelection(false)}
               style={{
                 overlay: {
-                  backgroundColor: "rgba(0, 0, 0, 0.5)",
+                  backgroundColor: "rgba(0, 0, 0, 0.8)",
                   zIndex: 1000,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
                 },
                 content: {
                   position: "relative",
-                  width: "700px",
-                  height: "85%",
-                  maxHeight: "700px",
+                  width: "95vw",
+                  height: "95vh",
                   margin: "auto",
                   borderRadius: "12px",
-                  padding: "30px",
-                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+                  padding: "0",
                   border: "none",
                   overflow: "hidden",
                   inset: "auto",
                 },
               }}
             >
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  height: "100%",
+              <StandSelectorForEventCreation
+                onClose={() => setShowVisualSelection(false)}
+                onStandsSelected={(selectedStands) => {
+                  setFormData(prev => ({
+                    ...prev,
+                    stands: selectedStands,
+                    standsInput: selectedStands.join(", ")
+                  }));
+                  setShowVisualSelection(false);
                 }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: "15px",
-                    flexShrink: 0,
-                  }}
-                >
-                  <h3
-                    style={{
-                      color: "#222",
-                      fontWeight: 600,
-                      fontSize: "20px",
-                      margin: 0,
-                    }}
-                  >
-                    Selecionar Stands
-                  </h3>
-                  <button
-                    onClick={() => setModalIsOpen(false)}
-                    style={{
-                      background: "none",
-                      border: "none",
-                      fontSize: "22px",
-                      cursor: "pointer",
-                      color: "#666",
-                      padding: 0,
-                    }}
-                  >
-                    &times;
-                  </button>
-                </div>
-
-                <div
-                  style={{
-                    flex: 1,
-                    overflowY: "auto",
-                    paddingRight: "8px",
-                    marginRight: "-8px",
-                  }}
-                >
-                  <div
-                    style={{
-                      marginBottom: "15px",
-                      borderRadius: "6px",
-                      overflow: "hidden",
-                      border: "1px solid #e0e7ef",
-                      textAlign: "center",
-                      padding: "10px",
-                    }}
-                  >
-                    <img
-                      src="/MapaDoEvento.jpg"
-                      alt="Mapa do Evento"
-                      style={{
-                        width: "36%",
-                        display: "block",
-                        margin: "0 auto",
-                        objectFit: "contain",
-                      }}
-                    />
-                  </div>
-
-                  <div style={{ marginBottom: "15px" }}>
-                    <label
-                      style={{
-                        display: "block",
-                        marginBottom: "6px",
-                        fontWeight: 450,
-                        color: "#444",
-                        fontSize: "14px",
-                      }}
-                    >
-                      Digite os números dos stands (separados por vírgula):
-                    </label>
-                    <textarea
-                      placeholder="Ex: A1, B2, C3"
-                      value={formData.standsInput}
-                      onChange={(e) => {
-                        const inputValue = e.target.value;
-                        const processedStands = inputValue
-                          .split(",")
-                          .map((stand) => stand.trim().toUpperCase())
-                          .filter((stand) => stand !== "");
-
-                        setFormData((prev) => ({
-                          ...prev,
-                          standsInput: inputValue,
-                          stands:
-                            processedStands.length > 0 ? processedStands : [],
-                        }));
-                      }}
-                      style={{
-                        width: "100%",
-                        padding: "10px 12px",
-                        borderRadius: "6px",
-                        border: "1px solid #e0e7ef",
-                        fontSize: "14px",
-                        minHeight: "50px",
-                        resize: "vertical",
-                        boxSizing: "border-box",
-                      }}
-                    />
-                  </div>
-
-                  <div style={{ marginBottom: "15px" }}>
-                    <h4
-                      style={{
-                        margin: "0 0 8px 0",
-                        color: "#444",
-                        fontSize: "15px",
-                      }}
-                    >
-                      Stands Selecionados ({formData.stands?.length || 0})
-                    </h4>
-                    {(formData.stands?.length || 0) > 0 ? (
-                      <div
-                        style={{
-                          display: "flex",
-                          flexWrap: "wrap",
-                          gap: "6px",
-                          maxHeight: "120px",
-                          overflowY: "auto",
-                          padding: "8px",
-                          background: "#f8f9fa",
-                          borderRadius: "6px",
-                        }}
-                      >
-                        {formData.stands.map((stand) => (
-                          <div
-                            key={stand}
-                            style={{
-                              padding: "4px 10px",
-                              borderRadius: "12px",
-                              background: STANDS_DISPONIVEIS.includes(stand)
-                                ? "#e6f4ff"
-                                : "#ffebe9",
-                              color: STANDS_DISPONIVEIS.includes(stand)
-                                ? "#1677ff"
-                                : "#cf1322",
-                              border: `1px solid ${
-                                STANDS_DISPONIVEIS.includes(stand)
-                                  ? "#91caff"
-                                  : "#ffa39e"
-                              }`,
-                              display: "flex",
-                              alignItems: "center",
-                              fontSize: "13px",
-                            }}
-                          >
-                            {stand}
-                            <button
-                              onClick={() => toggleStand(stand)}
-                              style={{
-                                background: "none",
-                                border: "none",
-                                color: "inherit",
-                                cursor: "pointer",
-                                marginLeft: "4px",
-                                padding: "0 4px",
-                                fontSize: "12px",
-                              }}
-                            >
-                              ×
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div
-                        style={{
-                          padding: "10px",
-                          background: "#f8f9fa",
-                          borderRadius: "6px",
-                          color: "#8c8c8c",
-                          textAlign: "center",
-                          fontSize: "14px",
-                        }}
-                      >
-                        Nenhum stand selecionado
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "flex-end",
-                    gap: "10px",
-                    marginTop: "15px",
-                    paddingTop: "15px",
-                    borderTop: "1px solid #f0f0f0",
-                    flexShrink: 0,
-                  }}
-                >
-                  <button
-                    onClick={() => setModalIsOpen(false)}
-                    style={{
-                      padding: "8px 16px",
-                      borderRadius: "20px",
-                      border: "1px solid #e0e7ef",
-                      background: "#fff",
-                      color: "#444",
-                      cursor: "pointer",
-                      fontWeight: "500",
-                      fontSize: "14px",
-                    }}
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    onClick={() => {
-                      const standsValidos = [
-                        ...new Set( // Remove duplicatas
-                          formData.standsInput
-                            .split(",")
-                            .map((stand) => stand.trim().toUpperCase())
-                            .filter(
-                              (stand) =>
-                                stand !== "" &&
-                                STANDS_DISPONIVEIS.includes(stand)
-                            )
-                        ),
-                      ];
-
-                      setFormData((prev) => ({
-                        ...prev,
-                        stands: standsValidos,
-                        standsInput: standsValidos.join(", "),
-                      }));
-
-                      setModalIsOpen(false);
-                    }}
-                    style={{
-                      padding: "8px 16px",
-                      borderRadius: "20px",
-                      border: "1px solid #1677ff",
-                      background: "#1677ff",
-                      color: "#fff",
-                      cursor: "pointer",
-                      fontWeight: "500",
-                      fontSize: "14px",
-                    }}
-                  >
-                    Confirmar
-                  </button>
-                </div>
-              </div>
+                initialSelection={formData.stands}
+              />
             </Modal>
 
             {/* Mensagens de feedback */}

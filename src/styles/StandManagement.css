@@ -1,0 +1,146 @@
+/* Estilos específicos para o modal de gerenciamento de stands */
+.stand-management-modal {
+  height: 100vh !important;
+  max-height: 100vh !important;
+}
+
+.stand-management-modal .ReactModal__Content {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  border: none !important;
+  background: #0a192f !important;
+  overflow: auto !important;
+  border-radius: 0 !important;
+  outline: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+}
+
+.stand-management-modal .ReactModal__Overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background-color: rgba(0, 0, 0, 0.9) !important;
+  z-index: 9999 !important;
+}
+
+/* Container principal do componente de seleção visual */
+.stand-visual-selection-container {
+  min-height: 100vh;
+  height: auto;
+  overflow-y: auto;
+  background-color: #0a192f;
+  padding: 20px;
+}
+
+/* Grid de stands responsivo */
+.stand-grid-container {
+  max-height: calc(100vh - 400px);
+  overflow-y: auto;
+  padding: 20px;
+  background: transparent;
+  border-radius: 12px;
+}
+
+/* Sidebar com altura fixa */
+.stand-sidebar {
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+/* Lista de stands selecionados com scroll */
+.selected-stands-list {
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 10px;
+  background: #334155;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+/* Responsividade para dispositivos móveis */
+@media (max-width: 768px) {
+  .stand-visual-selection-container {
+    padding: 10px;
+  }
+  
+  .stand-grid-container {
+    max-height: calc(100vh - 300px);
+    padding: 10px;
+  }
+  
+  .stand-sidebar {
+    max-height: 400px;
+    margin-top: 20px;
+  }
+}
+
+/* Scrollbar personalizada para o modal */
+.stand-management-modal ::-webkit-scrollbar {
+  width: 8px;
+}
+
+.stand-management-modal ::-webkit-scrollbar-track {
+  background: #1e293b;
+  border-radius: 4px;
+}
+
+.stand-management-modal ::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+
+.stand-management-modal ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Overlay escuro para modais */
+.modal-overlay-dark {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Conteúdo do modal que ocupa tela inteira */
+.modal-fullscreen-content {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+}
+
+/* Botão de voltar fixo */
+.back-button-fixed {
+  position: sticky;
+  bottom: 20px;
+  z-index: 100;
+  margin-top: 20px;
+}
+
+/* Container principal com altura dinâmica */
+.main-content-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #0a192f;
+}
+
+/* Seção de conteúdo flexível */
+.content-section {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+/* Footer fixo na parte inferior */
+.footer-section {
+  margin-top: auto;
+  padding: 20px;
+}
