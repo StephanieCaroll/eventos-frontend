@@ -4,7 +4,7 @@ import { Alert, Button } from 'react-bootstrap';
 import Modal from 'react-modal';
 import { AuthContext } from '../AuthContext';
 import StandSelectionService from '../services/StandSelectionServiceCleanFinal';
-import StandVisualSelection from './StandVisualSelectionNew';
+import StandVisualSelection from './StandVisualSelectionRedirect';
 
 const StandSelectorNew = ({ 
   selectedStands = [], 

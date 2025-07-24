@@ -112,7 +112,11 @@ export default function HomeSemLogin() {
   });
 
   const handleRegisterStandClick = () => {
-    navigate("/login");
+    if (selectedEvent) {
+      navigate(`/cadastrar-stand/${selectedEvent.id}`);
+    } else {
+      navigate("/login");
+    }
     setSelectedEvent(null);
   };
 

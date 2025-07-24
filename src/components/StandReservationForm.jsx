@@ -3,7 +3,7 @@ import { useContext, useEffect, useState } from 'react';
 import { Alert, Badge, Button, Modal } from 'react-bootstrap';
 import { AuthContext } from '../AuthContext';
 import StandSelectionService from '../services/StandSelectionServiceCleanFinal';
-import StandVisualSelection from './StandVisualSelectionNew';
+import StandVisualSelection from './StandVisualSelectionRedirect';
 
 // Lista de stands disponíveis
 const STANDS_DISPONIVEIS = [

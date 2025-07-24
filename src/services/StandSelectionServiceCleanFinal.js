@@ -156,6 +156,29 @@ const StandSelectionService = {
       console.error('Erro ao buscar eventos:', error);
       throw error;
     }
+  },
+
+  // Buscar stands por evento
+  getStandsByEvent: async (eventId) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/stand/selecao?eventoId=${eventId}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${this.getToken()}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erro ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return Array.isArray(data) ? data : [];
+    } catch (error) {
+      console.error('Erro ao buscar stands por evento:', error);
+      throw error;
+    }
   }
 };
 

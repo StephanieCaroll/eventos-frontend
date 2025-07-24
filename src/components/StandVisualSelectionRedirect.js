@@ -1,2 +1,4 @@
-// Remover o arquivo antigo e usar a nova versão
-export { default } from './StandVisualSelectionNew';
+// Componente de redirecionamento para compatibilidade
+import StandVisualSelectionNew from './StandVisualSelectionNew';
+
+export default StandVisualSelectionNew;
