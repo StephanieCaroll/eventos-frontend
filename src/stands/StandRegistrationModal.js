@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { AuthContext } from '../AuthContext';
 import StandVisualSelection from '../components/StandVisualSelectionNew';
@@ -71,22 +71,27 @@ const StandRegistrationModal = () => {
     }
   };
 
-  // Fechar seleção visual
-  const handleVisualSelectionClose = (changesWereMade) => {
+  // Atualizar stands selecionados
+  const handleStandSelectionUpdate = useCallback((standCodes) => {
+    setSelectedStands(standCodes);
+  }, []);
+
+  // Fechar seleção visual e processar seleções
+  const handleVisualSelectionClose = useCallback((changesWereMade) => {
     if (changesWereMade) {
-      // Se houve mudanças, processar as seleções
-      if (selectedStands.length > 0) {
-        handleReserveStands();
-      }
+      // Se houve mudanças, processar reserva se necessário
+      setTimeout(() => {
+        if (selectedStands.length > 0) {
+          handleReserveStands();
+        } else {
+          navigate('/homeExpositor');
+        }
+      }, 100);
     } else {
-      // Se não houve mudanças, voltar para home
+      // Se não houve mudanças ou não há seleções, voltar para home
       navigate('/homeExpositor');
     }
-  };
-
-  const handleStandSelectionUpdate = (stands) => {
-    setSelectedStands(stands);
-  };
+  }, [navigate]);
 
   return (
     <div 

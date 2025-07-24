@@ -43,6 +43,16 @@ function Rotas() {
           }
         />
 
+        {/* Seleção de Stands do Expositor */}
+        <Route
+          path="/stand-selection/:eventId"
+          element={
+            <ProtectedRoute allowedRoles={['ROLE_CLIENTE']}>
+              <StandRegistrationModal />
+            </ProtectedRoute>
+          }
+        />
+
         {/* Cadastro de Evento (Criação), acessível apenas para GERENCIADORES e ADMINISTRADORES */}
         <Route
           path="form-evento"
@@ -79,3 +89,5 @@ function Rotas() {
 }
 
 export default Rotas;
+
+// O componente correto é StandRegistrationModal para seleção de stands do expositor

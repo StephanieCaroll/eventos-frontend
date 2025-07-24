@@ -1,6 +1,6 @@
-import { Modal, Button } from "semantic-ui-react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect, useRef } from "react";
+import { Button, Modal } from "semantic-ui-react";
 
 export default function PopupCadastro({ aberto, fechar }) {
   const navigate = useNavigate();
@@ -66,15 +66,47 @@ export default function PopupCadastro({ aberto, fechar }) {
             Escolha como deseja continuar:
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: '0.8rem', width: '100%', maxWidth: '250px' }}> 
-            <Button primary fluid onClick={() => handleNavigate("/form-dono")}>
-              Gerenciador
+            <Button 
+              primary 
+              fluid 
+              onClick={() => handleNavigate("/form-dono")}
+              style={{
+                backgroundColor: '#3b82f6',
+                borderColor: '#3b82f6',
+                padding: '12px 16px',
+                fontWeight: '600'
+              }}
+            >
+              Gerenciador de Eventos
             </Button>
-            <Button secondary fluid onClick={() => handleNavigate("/form-cliente")}>
+            <Button 
+              secondary 
+              fluid 
+              onClick={() => handleNavigate("/form-cliente")}
+              style={{
+                backgroundColor: '#22c55e',
+                borderColor: '#22c55e',
+                color: '#ffffff',
+                padding: '12px 16px',
+                fontWeight: '600'
+              }}
+            >
               Expositor
             </Button>
-            {/* <Button tertiary fluid onClick={() => handleNavigate("/form-adm")}>
-              Administrador
-            </Button> */}
+            <Button 
+              color="red"
+              fluid 
+              onClick={() => handleNavigate("/form-adm")}
+              style={{
+                backgroundColor: '#ef4444',
+                borderColor: '#ef4444',
+                color: '#ffffff',
+                padding: '12px 16px',
+                fontWeight: '600'
+              }}
+            >
+              Administrador do Sistema
+            </Button>
           </div>
         </Modal.Content>
         <Modal.Actions style={{ textAlign: "center", marginTop: '1rem' }}>

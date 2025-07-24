@@ -3,7 +3,6 @@ import { ArrowLeft, Check, Filter, Grid, Search, Users, X } from 'lucide-react';
 import { useContext, useEffect, useState } from 'react';
 import { Alert, Badge, Button, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { AuthContext } from '../AuthContext';
-import useStandSelection from '../hooks/useStandSelection';
 import StandSelectionService from '../services/StandSelectionServiceCleanFinal';
 import '../styles/StandGrid.css';
 
@@ -29,46 +28,45 @@ const StandVisualSelectionNew = ({
 }) => {
   const { userName } = useContext(AuthContext);
   
-  // Hook personalizado para gerenciar seleção de stands
-  const {
-    standsData,
-    selectedStands,
-    isLoading,
-    error: standError,
-    toggleStandSelection,
-    clearSelection,
-    selectAllAvailable,
-    setError: setStandError,
-    fetchStands
-  } = useStandSelection();
-
-  // Estados locais para filtros e UI
+  // Estados locais
+  const [standsData, setStandsData] = useState([]);
+  const [selectedStands, setSelectedStands] = useState(new Set());
   const [filterAvailability, setFilterAvailability] = useState('todos');
   const [searchTerm, setSearchTerm] = useState('');
   const [observacoes, setObservacoes] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-  const [localError, setLocalError] = useState('');
-  const [localIsLoading, setLocalIsLoading] = useState(false);
-
-  const error = standError || localError;
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   // Carregar stands do evento específico
   useEffect(() => {
     if (eventId) {
-      const loadStands = async () => {
-        try {
-          setLocalIsLoading(true);
-          await fetchStands(eventId, null);
-        } catch (error) {
-          console.error('Erro ao carregar stands:', error);
-          setLocalError('Erro ao carregar stands');
-        } finally {
-          setLocalIsLoading(false);
-        }
-      };
       loadStands();
     }
   }, [eventId]);
+
+  // Notificar mudanças para componente pai
+  useEffect(() => {
+    if (onStandsUpdate) {
+      const selectedStandsCodes = standsData
+        .filter(stand => selectedStands.has(stand.id))
+        .map(stand => stand.codigo);
+      onStandsUpdate(selectedStandsCodes);
+    }
+  }, [selectedStands, standsData, onStandsUpdate]);
+
+  const loadStands = async () => {
+    try {
+      setIsLoading(true);
+      const stands = await StandSelectionService.getStandsByEvent(eventId);
+      setStandsData(stands);
+    } catch (error) {
+      console.error('Erro ao carregar stands:', error);
+      setError('Erro ao carregar stands');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Função para filtrar stands
   const filterStands = () => {
@@ -94,6 +92,32 @@ const StandVisualSelectionNew = ({
 
       return true;
     });
+  };
+
+  // Alternar seleção de stand
+  const toggleStandSelection = (standId) => {
+    setSelectedStands(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(standId)) {
+        newSet.delete(standId);
+      } else {
+        newSet.add(standId);
+      }
+      return newSet;
+    });
+  };
+
+  // Limpar seleção
+  const clearSelection = () => {
+    setSelectedStands(new Set());
+  };
+
+  // Selecionar todos disponíveis
+  const selectAllAvailable = () => {
+    const availableStands = standsData
+      .filter(stand => stand.disponivel)
+      .map(stand => stand.id);
+    setSelectedStands(new Set(availableStands));
   };
 
   // Gerar grid visual de stands
@@ -133,10 +157,7 @@ const StandVisualSelectionNew = ({
             const isAvailable = stand?.disponivel ?? false;
             
             // Determinar o status do stand
-            let standStatus;
-            let standColor;
-            let standBorderColor;
-            let standBackgroundColor;
+            let standStatus, standColor, standBorderColor, standBackgroundColor;
             
             if (isSelected) {
               standStatus = 'selecionado';
@@ -207,12 +228,12 @@ const StandVisualSelectionNew = ({
   // Processar reserva de stands
   const handleReserveStands = async () => {
     if (selectedStands.size === 0) {
-      setLocalError('Selecione ao menos um stand');
+      setError('Selecione ao menos um stand');
       return;
     }
 
     try {
-      setLocalIsLoading(true);
+      setIsLoading(true);
       
       // Converter Set para Array e processar reservas
       const standIds = Array.from(selectedStands);
@@ -225,14 +246,6 @@ const StandVisualSelectionNew = ({
       
       setSuccessMessage(`${selectedStands.size} stand(s) reservado(s) com sucesso!`);
       
-      // Notificar componente pai sobre as seleções
-      if (onStandsUpdate) {
-        const selectedStandsCodes = standsData
-          .filter(stand => selectedStands.has(stand.id))
-          .map(stand => stand.codigo);
-        onStandsUpdate(selectedStandsCodes);
-      }
-      
       // Fechar modal após 2 segundos
       setTimeout(() => {
         setSuccessMessage('');
@@ -242,9 +255,9 @@ const StandVisualSelectionNew = ({
       }, 2000);
     } catch (error) {
       console.error('Erro ao reservar stands:', error);
-      setLocalError('Erro ao reservar stands. Tente novamente.');
+      setError('Erro ao reservar stands. Tente novamente.');
     } finally {
-      setLocalIsLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -353,8 +366,7 @@ const StandVisualSelectionNew = ({
             <Button 
               variant="outline-light" 
               onClick={() => {
-                setLocalError('');
-                setStandError('');
+                setError('');
               }}
               disabled={isLoading}
               style={{ borderColor: '#334155' }}
@@ -367,10 +379,7 @@ const StandVisualSelectionNew = ({
 
       {/* Mensagens */}
       {error && (
-        <Alert variant="danger" onClose={() => {
-          setLocalError('');
-          setStandError('');
-        }} dismissible>
+        <Alert variant="danger" onClose={() => setError('')} dismissible>
           {error}
         </Alert>
       )}
@@ -406,7 +415,7 @@ const StandVisualSelectionNew = ({
               </div>
             </div>
             <div className="p-4">
-              {isLoading || localIsLoading ? (
+              {isLoading ? (
                 <div className="text-center py-5">
                   <div className="spinner-border text-primary" role="status">
                     <span className="visually-hidden">Carregando...</span>
@@ -515,7 +524,7 @@ const StandVisualSelectionNew = ({
                   whileTap={{ scale: 0.98 }}
                   className="btn d-flex align-items-center justify-content-center"
                   onClick={handleReserveStands}
-                  disabled={selectedStands.size === 0 || isLoading || localIsLoading}
+                  disabled={selectedStands.size === 0 || isLoading}
                   style={{
                     backgroundColor: '#22c55e',
                     border: 'none',
@@ -527,7 +536,7 @@ const StandVisualSelectionNew = ({
                   }}
                 >
                   <Check size={16} className="me-2" />
-                  {localIsLoading ? 'Processando...' : `Reservar Stands (${selectedStands.size})`}
+                  {isLoading ? 'Processando...' : `Reservar Stands (${selectedStands.size})`}
                 </motion.button>
               </div>
             </div>
