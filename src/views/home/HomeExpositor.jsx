@@ -466,7 +466,7 @@ export default function HomeExpositor() {
               margin: 0,
             }}
           >
-            Events Stands - Expositor
+          Expositor
           </h1>
         </div>
 

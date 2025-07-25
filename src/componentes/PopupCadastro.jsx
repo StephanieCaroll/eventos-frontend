@@ -93,7 +93,7 @@ export default function PopupCadastro({ aberto, fechar }) {
             >
               Expositor
             </Button>
-            <Button 
+            {/* <Button 
               color="red"
               fluid 
               onClick={() => handleNavigate("/form-adm")}
@@ -106,7 +106,7 @@ export default function PopupCadastro({ aberto, fechar }) {
               }}
             >
               Administrador do Sistema
-            </Button>
+            </Button> */}
           </div>
         </Modal.Content>
         <Modal.Actions style={{ textAlign: "center", marginTop: '1rem' }}>

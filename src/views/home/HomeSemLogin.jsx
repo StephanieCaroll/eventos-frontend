@@ -18,9 +18,13 @@ import {
   Trophy,
   Utensils,
 } from "lucide-react";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useContext } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useEvents } from "../../contexts/EventContext";
+import { Link } from 'react-router-dom';
+import { Menu } from 'semantic-ui-react';
+import { AuthContext } from '../../AuthContext';
+
 
 function cardStyle(color1, color2) {
   return {
@@ -68,6 +72,11 @@ function Footer() {
 }
 
 export default function HomeSemLogin() {
+  const location = useLocation();
+  const { isAuthenticated } = useContext(AuthContext);
+
+  const isHomePage = location.pathname === '/homeSemLogin';
+
   const navigate = useNavigate();
   const { events } = useEvents();
   const [searchTerm, setSearchTerm] = useState("");
@@ -164,7 +173,24 @@ export default function HomeSemLogin() {
             }}
             onClick={() => navigate("/")}
           >
-            Events Stands
+            <Menu.Item
+              content={
+                <img
+                  src="/LogoPrincipal.png"
+                  alt="LogoPrincipal"
+                  style={{
+                    height: '40px',
+                    width: '100px',
+                    objectFit: 'contain',
+                    verticalAlign: 'middle'
+                  }}
+                />
+              }
+              active={isHomePage}
+              as={Link}
+              to={isAuthenticated ? '/' : '/'}
+            />
+
           </h1>
         </div>
 
@@ -501,8 +527,8 @@ export default function HomeSemLogin() {
                       objectFit: "cover",
                     }}
                     onError={(e) =>
-                      (e.target.src =
-                        "https://placehold.co/600x400?text=Imagem+Indisponível")
+                    (e.target.src =
+                      "https://placehold.co/600x400?text=Imagem+Indisponível")
                     }
                   />
                 </div>
@@ -637,8 +663,8 @@ export default function HomeSemLogin() {
                         <p style={{ fontSize: "1em", fontWeight: "500" }}>
                           {selectedEvent.date
                             ? new Date(selectedEvent.date).toLocaleDateString(
-                                "pt-BR"
-                              )
+                              "pt-BR"
+                            )
                             : "N/A"}
                         </p>
                       </div>
@@ -656,8 +682,8 @@ export default function HomeSemLogin() {
                         <p style={{ fontSize: "1em", fontWeight: "500" }}>
                           {selectedEvent.dataFim
                             ? new Date(
-                                selectedEvent.dataFim
-                              ).toLocaleDateString("pt-BR")
+                              selectedEvent.dataFim
+                            ).toLocaleDateString("pt-BR")
                             : "N/A"}
                         </p>
                       </div>
@@ -821,8 +847,8 @@ export default function HomeSemLogin() {
                         <p style={{ fontSize: "1em", fontWeight: "500" }}>
                           {selectedEvent.dataVendaInicio
                             ? new Date(
-                                selectedEvent.dataVendaInicio
-                              ).toLocaleDateString("pt-BR")
+                              selectedEvent.dataVendaInicio
+                            ).toLocaleDateString("pt-BR")
                             : "N/A"}
                         </p>
                       </div>
@@ -840,8 +866,8 @@ export default function HomeSemLogin() {
                         <p style={{ fontSize: "1em", fontWeight: "500" }}>
                           {selectedEvent.dataVendaFim
                             ? new Date(
-                                selectedEvent.dataVendaFim
-                              ).toLocaleDateString("pt-BR")
+                              selectedEvent.dataVendaFim
+                            ).toLocaleDateString("pt-BR")
                             : "N/A"}
                         </p>
                       </div>
@@ -883,7 +909,7 @@ export default function HomeSemLogin() {
                           } else {
                             standDisplay = String(stand) || `Stand ${index + 1}`;
                           }
-                          
+
                           return (
                             <span
                               key={index}
@@ -927,9 +953,9 @@ export default function HomeSemLogin() {
                         display: "flex",
                         alignItems: "center",
                         gap: "8px",
-                        margin: '0 auto', 
+                        margin: '0 auto',
                       }}
-                      onClick={handleRegisterStandClick}
+                      onClick={() => navigate("/login")}
                     >
                       Cadastrar Stands para Este Evento
                     </motion.button>

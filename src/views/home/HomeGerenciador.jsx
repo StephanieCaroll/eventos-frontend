@@ -159,15 +159,15 @@ export default function HomeGerenciador() {
     >
       <section
         style={{
+          background: 'linear-gradient(135deg, #000000 0%, #0a192f 100%)',
+          color: '#fff',
+          margin: 0,
           padding: "1.5em 2em",
-          background: "linear-gradient(135deg, #000000 0%, #0a192f 100%)",
-          color: "#fff",
-          borderBottom: "1px solid #1e293b",
           display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
           flexWrap: "wrap",
           gap: "1em",
+          textAlign: 'center',
+          borderBottom: '1px solid #1e293b'
         }}
       >
         <div style={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
@@ -180,7 +180,7 @@ export default function HomeGerenciador() {
               margin: 0,
             }}
           >
-            Events Stands - Gerenciador
+            Gerenciador
           </h1>
         </div>
 
@@ -224,9 +224,9 @@ export default function HomeGerenciador() {
                   alt="Avatar do Usuário"
                   style={{ width: "100%", height: "100%", objectFit: "cover" }}
                   onError={(e) =>
-                    (e.target.src = `https://placehold.co/40x40/3b82f6/ffffff?text=${firstName
-                      .charAt(0)
-                      .toUpperCase()}`)
+                  (e.target.src = `https://placehold.co/40x40/3b82f6/ffffff?text=${firstName
+                    .charAt(0)
+                    .toUpperCase()}`)
                   }
                 />
               </div>
@@ -803,8 +803,8 @@ export default function HomeGerenciador() {
                         <p style={{ fontSize: "1em", fontWeight: "500" }}>
                           {selectedEvent.date
                             ? new Date(selectedEvent.date).toLocaleDateString(
-                                "pt-BR"
-                              )
+                              "pt-BR"
+                            )
                             : "N/A"}
                         </p>
                       </div>
@@ -822,8 +822,8 @@ export default function HomeGerenciador() {
                         <p style={{ fontSize: "1em", fontWeight: "500" }}>
                           {selectedEvent.dataFim
                             ? new Date(
-                                selectedEvent.dataFim
-                              ).toLocaleDateString("pt-BR")
+                              selectedEvent.dataFim
+                            ).toLocaleDateString("pt-BR")
                             : "N/A"}
                         </p>
                       </div>
@@ -929,8 +929,8 @@ export default function HomeGerenciador() {
                         <p style={{ fontSize: "1em", fontWeight: "500" }}>
                           {selectedEvent.dataVendaInicio
                             ? new Date(
-                                selectedEvent.dataVendaInicio
-                              ).toLocaleDateString("pt-BR")
+                              selectedEvent.dataVendaInicio
+                            ).toLocaleDateString("pt-BR")
                             : "N/A"}
                         </p>
                       </div>
@@ -948,8 +948,8 @@ export default function HomeGerenciador() {
                         <p style={{ fontSize: "1em", fontWeight: "500" }}>
                           {selectedEvent.dataVendaFim
                             ? new Date(
-                                selectedEvent.dataVendaFim
-                              ).toLocaleDateString("pt-BR")
+                              selectedEvent.dataVendaFim
+                            ).toLocaleDateString("pt-BR")
                             : "N/A"}
                         </p>
                       </div>
@@ -957,120 +957,120 @@ export default function HomeGerenciador() {
                   </div>
 
                   {/* Seção de Stands Cadastrados */}
-                 <div
-  style={{
-    backgroundColor: "#1e293b",
-    padding: "15px",
-    borderRadius: "12px",
-    marginBottom: "20px",
-    border: "1px solid #334155",
-  }}
->
-  <h4
-    style={{
-      fontSize: "1.2em",
-      marginBottom: "15px",
-      color: "#3b82f6",
-      display: "flex",
-      alignItems: "center",
-      gap: "10px",
-    }}
-  >
-    <LayoutList size={20} /> Stands Cadastrados
-  </h4>
+                  <div
+                    style={{
+                      backgroundColor: "#1e293b",
+                      padding: "15px",
+                      borderRadius: "12px",
+                      marginBottom: "20px",
+                      border: "1px solid #334155",
+                    }}
+                  >
+                    <h4
+                      style={{
+                        fontSize: "1.2em",
+                        marginBottom: "15px",
+                        color: "#3b82f6",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "10px",
+                      }}
+                    >
+                      <LayoutList size={20} /> Stands Cadastrados
+                    </h4>
 
-  {selectedEvent.stands && selectedEvent.stands.length > 0 ? (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-        gap: "15px",
-      }}
-    >
-      {selectedEvent.stands.map((stand, index) => {
-        // Verificar se stand é um objeto e extrair o valor apropriado para renderização
-        const standDisplay = typeof stand === 'object' ? (stand.codigo || stand.id || `Stand ${index + 1}`) : stand;
-        
-        return (
-          <div
-            key={index}
-            style={{
-              backgroundColor: "#3b82f6",
-              padding: "15px",
-              borderRadius: "10px",
-              color: "white",
-              boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                marginBottom: "10px",
-                gap: "10px",
-              }}
-            >
-              <div
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  borderRadius: "50%",
-                  backgroundColor: "#1e40af",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                }}
-              >
-                <span style={{ fontWeight: "bold", fontSize: "0.9em" }}>
-                  {standDisplay}
-                </span>
-              </div>
-              <h5
-                style={{
-                  margin: 0,
-                  fontSize: "1.1em",
-                  fontWeight: "600",
-                }}
-              >
-                {standDisplay}
-              </h5>
-            </div>
-            {typeof stand === 'object' && stand.descricao && (
-              <p style={{ 
-                margin: 0, 
-                fontSize: "0.9em", 
-                opacity: 0.8,
-                lineHeight: "1.4"
-              }}>
-                {stand.descricao}
-              </p>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  ) : (
-    <div
-      style={{
-        textAlign: "center",
-        padding: "20px",
-        backgroundColor: "#334155",
-        borderRadius: "8px",
-      }}
-    >
-      <p
-        style={{
-          color: "#94a3b8",
-          fontStyle: "italic",
-          margin: 0,
-        }}
-      >
-        Nenhum stand cadastrado para este evento
-      </p>
-    </div>
-  )}
-</div>
+                    {selectedEvent.stands && selectedEvent.stands.length > 0 ? (
+                      <div
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+                          gap: "15px",
+                        }}
+                      >
+                        {selectedEvent.stands.map((stand, index) => {
+                          // Verificar se stand é um objeto e extrair o valor apropriado para renderização
+                          const standDisplay = typeof stand === 'object' ? (stand.codigo || stand.id || `Stand ${index + 1}`) : stand;
+
+                          return (
+                            <div
+                              key={index}
+                              style={{
+                                backgroundColor: "#3b82f6",
+                                padding: "15px",
+                                borderRadius: "10px",
+                                color: "white",
+                                boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  marginBottom: "10px",
+                                  gap: "10px",
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    width: "40px",
+                                    height: "40px",
+                                    borderRadius: "50%",
+                                    backgroundColor: "#1e40af",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    flexShrink: 0,
+                                  }}
+                                >
+                                  <span style={{ fontWeight: "bold", fontSize: "0.9em" }}>
+                                    {standDisplay}
+                                  </span>
+                                </div>
+                                <h5
+                                  style={{
+                                    margin: 0,
+                                    fontSize: "1.1em",
+                                    fontWeight: "600",
+                                  }}
+                                >
+                                  {standDisplay}
+                                </h5>
+                              </div>
+                              {typeof stand === 'object' && stand.descricao && (
+                                <p style={{
+                                  margin: 0,
+                                  fontSize: "0.9em",
+                                  opacity: 0.8,
+                                  lineHeight: "1.4"
+                                }}>
+                                  {stand.descricao}
+                                </p>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div
+                        style={{
+                          textAlign: "center",
+                          padding: "20px",
+                          backgroundColor: "#334155",
+                          borderRadius: "8px",
+                        }}
+                      >
+                        <p
+                          style={{
+                            color: "#94a3b8",
+                            fontStyle: "italic",
+                            margin: 0,
+                          }}
+                        >
+                          Nenhum stand cadastrado para este evento
+                        </p>
+                      </div>
+                    )}
+                  </div>
 
                   <div
                     style={{

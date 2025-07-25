@@ -23,10 +23,31 @@ export default function MenuSistema(props) {
 
     return (
         <>
-            <Menu style={{ backgroundColor: '#0a192f', color: '#fff', border: 0, borderRadius: 0, margin: 0, padding: '20px 1em 20px' }}>
+            <Menu style={{
+                background: 'linear-gradient(135deg, #000000 0%, #0a192f 100%)',
+                color: '#fff',
+                margin: 0,
+                padding: "1.5em 2em",
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "1em",
+                textAlign: 'center',
+                borderBottom: '1px solid #1e293b'
+            }}>
 
                 <Menu.Item
-                    content={<span style={{ fontFamily: 'Roboto, sans-serif', fontSize: '30px', fontWeight: 'bold', color: '#3b82f6' }}>EVENTS</span>}
+                    content={
+                        <img
+                            src="/LogoPrincipal.png"
+                            alt="LogoPrincipal"
+                            style={{
+                                height: '40px',
+                                width: '100px',
+                                objectFit: 'contain',
+                                verticalAlign: 'middle'
+                            }}
+                        />
+                    }
                     active={isHomePage}
                     as={Link}
                     to={isAuthenticated ? '/' : '/'}
@@ -60,9 +81,9 @@ export default function MenuSistema(props) {
                 )}
 
                 <Menu.Menu position="right">
-                   
+
                     {!isAuthenticated && (
-                        <MenuItem 
+                        <MenuItem
                             active={isLoginPage}
                             as={Link}
                             to="/login"

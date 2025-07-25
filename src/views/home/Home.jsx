@@ -58,7 +58,7 @@ export default function Home() {
                             margin: 0
                         }}
                     >
-                        Events Stands
+                        EVEXIS
                     </h1>
                     <p style={{ fontSize: '1.5em', color: '#e0e0e0', maxWidth: '700px', margin: '0 auto', marginTop: '1em' }}>
                         Descubra espaços tecnológicos para exposições inesquecíveis. Conecte ideias e oportunidades em ambientes de alto padrão.
